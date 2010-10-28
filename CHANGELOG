@@ -1,0 +1,38 @@
+Version 1.39
+ - Fixed bugs with sustainability index
+
+Version 1.38
+ - solver.cpp: Fixed major bug on Benders decomposition
+
+Version 1.37
+ - IMPORTANT: Updated code to run with CPlex 12.2, see the following for available servers: http://it.eng.iastate.edu/remote
+ - Storage doesn't interfere with Benders decomposition
+ - global.cpp: Timer added to find execution times
+ - write.cpp: Fixed function that writes output
+ - Fixed more bugs
+
+Version 1.36
+ - read.cpp: Allow monthly data input without repeating per year (needs testing).
+ - arc.cpp: New property "InvertEff" allows changing efficiency in energy balance constraints, useful for generators (needs testing).
+ - Fixed various bugs related to reading files, steps, comments, solver...
+
+Version 1.35
+ - Fixed some bugs in the solver module
+ - Added solution of different events
+ - Use sustainability metrics as NSGA-II objectives
+ - Started: Calculation of resiliency metrics based on events
+
+Version 1.34
+ - read.cpp: Added capability of adding sustainability metrics and objectives
+ - preprocess.cpp, arc.cpp, solve.cpp: Compatible with multiple sustainability metrics
+ - Implement national constraints for sustanaibility metrics
+ - Introduced reading capacity events for resiliency calculations
+ - postnsga.cpp: First attempt at reporting NSGA-II solution (objectives + investments by type and location). Still experimental.
+
+Version 1.33
+ - global.cpp: CleanLine() updated to allow comments in input files, using "%" character (not tested thoroughly)
+ - solver.cpp, solver.h: Implementation completed for solving and solution reporting with and without Benders
+ - preprocess.cpp, postprocess.cpp, index.cpp: Updated to fully integrate Benders decomposition (including reporting)
+ - Created metrics.cpp, metrics.h
+ - Full integration of Benders decomposition in NSGA-II
+ - NSGA-II parameters can be changed with parameters.csv
