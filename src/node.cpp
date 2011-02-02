@@ -1,7 +1,7 @@
 // --------------------------------------------------------------
-//    NETSCORE Version 1
+//    NETSCORE Version 2
 //    node.cpp -- Implementation of node functions
-//    2009-2010 (c) Eduardo Ibáñez
+//    2009-2011 (c) Eduardo Ibanez
 // --------------------------------------------------------------
 
 using namespace std;

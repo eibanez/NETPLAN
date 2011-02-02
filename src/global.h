@@ -1,7 +1,7 @@
 // --------------------------------------------------------------
-//    NETSCORE Version 1
+//    NETSCORE Version 2
 //    global.h -- Definition of global variables and functions
-//    2009-2010 (c) Eduardo Ibáñez
+//    2009-2011 (c) Eduardo Ibanez
 // --------------------------------------------------------------
 
 #ifndef _GLOBAL_H_

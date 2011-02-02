@@ -1,7 +1,7 @@
 // --------------------------------------------------------------
-//    NETSCORE Version 1
+//    NETSCORE Version 2
 //    arc.h -- Definition of node functions
-//    2009-2010 (c) Eduardo Ibáñez
+//    2009-2011 (c) Eduardo Ibanez
 // --------------------------------------------------------------
 
 #ifndef _ARC_H_

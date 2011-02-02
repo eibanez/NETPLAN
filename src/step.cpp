@@ -1,8 +1,7 @@
 // --------------------------------------------------------------
-// --------------------------------------------------------------
-//    NETSCORE Version 1
+//    NETSCORE Version 2
 //    step.cpp -- Implementation of step functions
-//    2009-2010 (c) Eduardo Ibáñez
+//    2009-2011 (c) Eduardo Ibanez
 // --------------------------------------------------------------
 
 using namespace std;

@@ -1,7 +1,7 @@
 // --------------------------------------------------------------
-//    NETSCORE Version 1
+//    NETSCORE Version 2
 //    Implementation NSGA-II
-//    2009-2010 (c) Eduardo Ibáñez and others
+//    2009-2011 (c) Eduardo Ibanez and others
 //    For more info:
 //        http://natek85.blogspot.com/2009/07/c-nsga2-code.html
 //        http://www.iitk.ac.in/kangal/codes.shtml
