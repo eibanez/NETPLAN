@@ -1,0 +1,11 @@
+from,to,const
+% Coal generators (short ton per GWh),,
+EC,EL,0.09383
+ED,EL,0.073358
+% Natural gas generators,,
+EG,EL,0.003412
+ET,EL,0.005118
+% Petroleum generation,,
+EO,EL,0.18766
+% Nuclear,,
+EN,EL,0.006999677

@@ -1,0 +1,6 @@
+from,to,const
+% Coal generators (% ash in coal),,
+1T,E,0.0772
+2T,E,0.1111
+3T,E,0.0644
+4T,E,0.0974
