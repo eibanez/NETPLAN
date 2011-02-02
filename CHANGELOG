@@ -1,0 +1,90 @@
+Version 1.50
+ - Model elements are wrapped in a structure called "CPLEX"
+ - All CPlex functions are coded within the solver.cpp library, mainly in the new structure
+ - Improved postnsga solution reports, which are written in the "bestdata" folder
+ - ngsa2/main-parallel2.cpp and nsga2-individual prepared for parallelization
+ - Possibility of resuming NSGA-II optimization implemented
+ - Fixed bugs in NSGA-II code
+
+Version 1.49
+ - Simplified parallel functions and introduced nsga2-individual.cpp
+
+Version 1.48
+ - Updated parallel NSGA-II solver:
+      * It can be executed with ./nsga2b
+      * Code is now in src/nsga2/main-parallel.cpp
+      * Deleted nsga2b folder
+ - Added new structure (called CPLEX) in solver.cpp to store optimization models and updated all functions
+ - Fixed bugs in nsga2 and postnsga
+ - Deleted metrics.cpp (solver.cpp includes these functions)
+
+Version 1.47
+ - Resiliency bugs fixed
+
+Version 1.46
+ - Finalized implementation of resiliency. The minimum number of calculations is performed.
+
+Version 1.45
+ - Added parameter "pstart", which is the probability to obtain 1 in the random generator of the initial string in NSGA-II
+
+Version 1.44
+ - postnsga.cpp: The post-processor of NSGA-II results is completed. Execute with ./postnsga
+
+Version 1.43
+ - Feasibility cut bug solved
+
+Versions 1.41, 1.42
+ - Reworked solver module to reduce memory usage
+ - Postprocessor and NSGA-II modified according to those changes
+ - Fixed Benders' decomposition bug
+
+Version 1.40
+ - Fixed bug related to peak load constraints and variables
+ - Increased preprocessor speed
+ - Reduced number of investment and capacity variables
+ - Introduced resiliency in NSGA-II
+ - NSGA-II bugs
+ - Investmente candidate is now a binary string. New global variables introduced:
+      * "pcross_bin": Crossing probability for binary variables
+	  * "pmut_bin": Mutation probability for a binary element
+	  * "stages": Number of bits used to represent an investment
+
+Version 1.39
+ - Fixed bugs with sustainability index
+ - Further improvements in the resiliency methods
+
+Version 1.38
+ - solver.cpp: Fixed major bug on Benders decomposition
+
+Version 1.37
+ - IMPORTANT: Updated code to run with CPlex 12.2, see the following for available servers: http://it.eng.iastate.edu/remote
+ - Storage doesn't interfere with Benders decomposition
+ - global.cpp: Timer added to find execution times
+ - write.cpp: Fixed function that writes output
+ - Fixed more bugs
+
+Version 1.36
+ - read.cpp: Allow monthly data input without repeating per year (needs testing).
+ - arc.cpp: New property "InvertEff" allows changing efficiency in energy balance constraints, useful for generators (needs testing).
+ - Fixed various bugs related to reading files, steps, comments, solver...
+
+Version 1.35
+ - Fixed some bugs in the solver module
+ - Added solution of different events
+ - Use sustainability metrics as NSGA-II objectives
+ - Started: Calculation of resiliency metrics based on events
+
+Version 1.34
+ - read.cpp: Added capability of adding sustainability metrics and objectives
+ - preprocess.cpp, arc.cpp, solve.cpp: Compatible with multiple sustainability metrics
+ - Implement national constraints for sustanaibility metrics
+ - Introduced reading capacity events for resiliency calculations
+ - postnsga.cpp: First attempt at reporting NSGA-II solution (objectives + investments by type and location). Still experimental.
+
+Version 1.33
+ - global.cpp: CleanLine() updated to allow comments in input files, using "%" character (not tested thoroughly)
+ - solver.cpp, solver.h: Implementation completed for solving and solution reporting with and without Benders
+ - preprocess.cpp, postprocess.cpp, index.cpp: Updated to fully integrate Benders decomposition (including reporting)
+ - Created metrics.cpp, metrics.h
+ - Full integration of Benders decomposition in NSGA-II
+ - NSGA-II parameters can be changed with parameters.csv

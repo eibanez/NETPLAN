@@ -1,0 +1,30 @@
+
+// Write solution vector into a single file
+void WriteSolution( const char* filename, vector<string> varsol ) {
+	// Open file
+	ofstream myfile;
+	myfile.open(filename);
+	// Write solution in file
+	for (int i = 0; i < varsol.size(); ++i)
+		myfile << varsol[i] << endl;
+	// Close file
+	myfile.close();
+}
+
+// Load solution vector (to be used as initial solution)
+void LoadSolution( const char* filename ) {
+	// Open file
+	FILE *file; char line [ 200 ];
+	file = fopen(filename, "r");
+	if ( file != NULL ) {
+		for (;;) {
+			// Read a line from the file and finish if empty is read
+			if ( fgets(line, sizeof line, file) == NULL )
+				break;
+			double d1;
+			d1 = strtod(line, NULL);
+			IloNum d2 = d1;
+			InitialSolution.add( d2 );
+		}
+	}
+}
