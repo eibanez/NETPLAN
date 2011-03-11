@@ -11,14 +11,13 @@ typedef struct lists {
 	int index;
 	struct lists *parent;
 	struct lists *child;
-}
-list;
+} list;
 
 class CLinkedList {
 	public:
 		CLinkedList(void);
 		~CLinkedList(void);
-
+		
 		void  insert (list *node, int x);
 		list* del (list *node);
 };

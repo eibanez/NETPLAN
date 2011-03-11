@@ -25,7 +25,7 @@ struct CPLEX {
 	IloArray<IloRangeArray> rng;
 	IloNumArray solution;
 	IloArray<IloNumArray> dualsolution;
-
+	
 	CPLEX() : env(), model(env, 0), cplex(env, 0), obj(env, 0), var(env, 0), rng(env, 0), solution(env, 0), dualsolution(env, 0) {};
 	~CPLEX() {
 		// Remove optimization elements from memory
@@ -64,18 +64,14 @@ void CapacityConstraints(IloArray<IloRangeArray>& Cuts, const double events[], c
 double EmissionIndex(const IloNumArray& v, const int start);
 vector<double> SumByRow(const IloNumArray& v, Index Idx, const int start);
 
-// Resets models to improve memory management
-// void ResetProblem(IloArray<IloModel>& model, IloArray<IloCplex>& cplex);
-
 /*
+
+// Resets models to improve memory management
+void ResetProblem(IloArray<IloModel>& model, IloArray<IloCplex>& cplex);
+
 // Import Minimum investment into the model from file (not tested)
 void ImportMin( const char* filename, const int MstartInv );
 
-// Apply values in the arry as LB for investment variables
-void ApplyLB( vector<string> StoredLine, int startInv );
-
-// Resets models to improve memory management
-void ResetProblem();
 */
 
 #endif  // _SOLVER_H_

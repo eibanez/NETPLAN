@@ -78,24 +78,24 @@ Step StepSum(const Step& a, const Step& b) {
 // Given a 'Step', it determines the column position (for reading properties).
 // It goes like this: 'const' 'y1' 'y1m1' 'y1m1h1' 'y1m1h2' ... 'y1m2' etc.
 int Step2Pos(const Step& mystep) {
-    int output = 0, temp_size;
-    unsigned int j = 0;
-    while ((j < mystep.size()) && (mystep[j] !=0)) {
-        temp_size = 1;
-        for (unsigned int k = mystep.size()-1; k > j; k--) {
-            temp_size = temp_size * SLength[k] + 1;
-        }
-        output += (mystep[j]-1) * temp_size + 1;
-        j++;
-    }
-    return output;
+	int output = 0, temp_size;
+	unsigned int j = 0;
+	while ((j < mystep.size()) && (mystep[j] !=0)) {
+		temp_size = 1;
+		for (unsigned int k = mystep.size()-1; k > j; k--) {
+			temp_size = temp_size * SLength[k] + 1;
+		}
+		output += (mystep[j]-1) * temp_size + 1;
+		j++;
+	}
+	return output;
 }
 
 // Given a 'Step', it determines the column position (for writing output).
 // It goes like this: 'y1' 'y2' ... 'y1m1' 'y1m2' ... 'y1m1h1' 'y1m1h2' etc.
 int Step2Col(const Step& mystep) {
-    int output = 1, temp, num = 0;
-    for (int i = mystep.size()-2; i >= 0 ; --i) {
+	int output = 1, temp, num = 0;
+	for (int i = mystep.size()-2; i >= 0 ; --i) {
 		if (mystep[i+1] != 0) {
 			output = 1 + output * SLength[i];
 			num++;
@@ -107,7 +107,7 @@ int Step2Col(const Step& mystep) {
 		for (unsigned int k = i+1; k <= num; ++k) temp = temp * SLength[k];
 		output += (mystep[i] - 1) * temp;
 	}
-    return output;
+	return output;
 }
 
 // Given a 'Step', find its length in hours, which is stored in the global variable StepHours

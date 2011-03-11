@@ -34,90 +34,91 @@ int FindCode(const Arc& myarc, const MatrixStr mymatrix);
 
 // Write DC Power flow columns in the MPS file
 vector<string> DCFlowColumns(const vector<Node>& v, const vector<Arc>& w) {
-    vector<string> temp_output(SLength[0]+1, "");
-    for (unsigned int i = 0; i < v.size(); ++i) {
-        for (unsigned int j = 0; j < w.size(); ++j) {
-            if ( w[j].Get("From") < w[j].Get("To") ) {
-                if ( v[i].Get("Code") == (w[j].Get("From") + w[j].Get("FromStep")) ) {
-                    temp_output[ v[i].Time() ] += "    th" + v[i].Get("Code") + " dcpf" + w[j].Get("Code") + " " + w[j].Get("Suscep") + "\n";
-                } else if ( v[i].Get("Code") == (w[j].Get("To") + w[j].Get("ToStep")) ) {
-                    temp_output[ v[i].Time() ] += "    th" + v[i].Get("Code") + " dcpf" + w[j].Get("Code") + " -" + w[j].Get("Suscep") + "\n";
-                }
-            }
-        }
-    }
-    return temp_output;
+	vector<string> temp_output(SLength[0]+1, "");
+	for (unsigned int i = 0; i < v.size(); ++i) {
+		for (unsigned int j = 0; j < w.size(); ++j) {
+			if ( w[j].Get("From") < w[j].Get("To") ) {
+				if ( v[i].Get("Code") == (w[j].Get("From") + w[j].Get("FromStep")) ) {
+					temp_output[ v[i].Time() ] += "    th" + v[i].Get("Code") + " dcpf" + w[j].Get("Code") + " " + w[j].Get("Suscep") + "\n";
+				} else if ( v[i].Get("Code") == (w[j].Get("To") + w[j].Get("ToStep")) ) {
+					temp_output[ v[i].Time() ] += "    th" + v[i].Get("Code") + " dcpf" + w[j].Get("Code") + " -" + w[j].Get("Suscep") + "\n";
+				}
+			}
+		}
+	}
+	return temp_output;
 }
 
 
 // Given a matrix of values, finds the row that fits best to a code. It tries to match the whole code, two or one letters.
 int FindCode(const string& mystr, const MatrixStr mymatrix) {
-    int output = -1, one_char = -1, two_char = -1, k = 0;
-
-    if (mymatrix.size() > 0) {
-        while ((k < mymatrix.size()) && (output == -1)) {
-            if (mystr == mymatrix[k][0]) output = k;
-            else if (mystr.substr(0,1) == mymatrix[k][0]) one_char = k;
-            else if (mystr.substr(0,2) == mymatrix[k][0]) two_char = k;
-            k++;
-        }
-    }
-    if (output == -1) {
-        if (one_char != -1) output = one_char;
-        if (two_char != -1) output = two_char;
-    }
-
-    return output;
+	int output = -1, one_char = -1, two_char = -1, k = 0;
+	
+	if (mymatrix.size() > 0) {
+		while ((k < mymatrix.size()) && (output == -1)) {
+			if (mystr == mymatrix[k][0]) output = k;
+			else if (mystr.substr(0,1) == mymatrix[k][0]) one_char = k;
+			else if (mystr.substr(0,2) == mymatrix[k][0]) two_char = k;
+			k++;
+		}
+	}
+	if (output == -1) {
+		if (one_char != -1) output = one_char;
+		if (two_char != -1) output = two_char;
+	}
+	
+	return output;
 }
 
 // This function has the same porpuse, but prepared for arcs
 int FindCode(const string& strfrom, const string& strto, const MatrixStr mymatrix) {
-    int output = -1, one_one = -1, one_two = -1, one_all = -1, two_two = -1, two_all = -1, k = 0;
-    int zero_one = -1, zero_two = -1, zero_all = -1;
-
-    if (mymatrix.size() > 0) {
-        while ((k < mymatrix.size()) && (output == -1)) {
-            if (strfrom == mymatrix[k][0]) {
-                if (strto == mymatrix[k][1]) output = k;
-                else if (strto.substr(0,1) == mymatrix[k][1]) one_all = k;
-                else if (strto.substr(0,2) == mymatrix[k][1]) two_all = k;
-                else if (mymatrix[k][1] == "") zero_all = k;
-            } else if (strfrom.substr(0,2) == mymatrix[k][0]) {
-                if (strto == mymatrix[k][1]) two_all = k;
-                else if (strto.substr(0,1) == mymatrix[k][1]) one_two = k;
-                else if (strto.substr(0,2) == mymatrix[k][1]) two_two = k;
-                else if (mymatrix[k][1] == "") zero_two = k;
-            } else if (strfrom.substr(0,1) == mymatrix[k][0]) {
-                if (strto == mymatrix[k][1]) one_all = k;
-                else if (strto.substr(0,1) == mymatrix[k][1]) one_one = k;
-                else if (strto.substr(0,2) == mymatrix[k][1]) one_two = k;
-                else if (mymatrix[k][1] == "") zero_one = k;
-            } else if (mymatrix[k][0] == "") {
-                if (strto == mymatrix[k][1]) zero_all = k;
-                else if (strto.substr(0,1) == mymatrix[k][1]) zero_one = k;
-                else if (strto.substr(0,2) == mymatrix[k][1]) zero_two = k;
-            }
-            k++;
-        }
-    }
-    if (output == -1) {
-        if (zero_one != -1) output = zero_one;
-        if (zero_two != -1) output = zero_two;
-        if (zero_all != -1) output = zero_all;
-        if (one_one != -1) output = one_one;
-        if (one_two != -1) output = one_two;
-        if (one_all != -1) output = one_all;
-        if (two_two != -1) output = two_two;
-        if (two_all != -1) output = two_all;
-    }
-
-    return output;
+	int output = -1, one_one = -1, one_two = -1, one_all = -1, two_two = -1, two_all = -1, k = 0;
+	int zero_one = -1, zero_two = -1, zero_all = -1;
+	
+	if (mymatrix.size() > 0) {
+		while ((k < mymatrix.size()) && (output == -1)) {
+			if (strfrom == mymatrix[k][0]) {
+				if (strto == mymatrix[k][1]) output = k;
+				else if (strto.substr(0,1) == mymatrix[k][1]) one_all = k;
+				else if (strto.substr(0,2) == mymatrix[k][1]) two_all = k;
+				else if (mymatrix[k][1] == "") zero_all = k;
+			} else if (strfrom.substr(0,2) == mymatrix[k][0]) {
+				if (strto == mymatrix[k][1]) two_all = k;
+				else if (strto.substr(0,1) == mymatrix[k][1]) one_two = k;
+				else if (strto.substr(0,2) == mymatrix[k][1]) two_two = k;
+				else if (mymatrix[k][1] == "") zero_two = k;
+			} else if (strfrom.substr(0,1) == mymatrix[k][0]) {
+				if (strto == mymatrix[k][1]) one_all = k;
+				else if (strto.substr(0,1) == mymatrix[k][1]) one_one = k;
+				else if (strto.substr(0,2) == mymatrix[k][1]) one_two = k;
+				else if (mymatrix[k][1] == "") zero_one = k;
+			} else if (mymatrix[k][0] == "") {
+				if (strto == mymatrix[k][1]) zero_all = k;
+				else if (strto.substr(0,1) == mymatrix[k][1]) zero_one = k;
+				else if (strto.substr(0,2) == mymatrix[k][1]) zero_two = k;
+			}
+			k++;
+		}
+	}
+	if (output == -1) {
+		if (zero_one != -1) output = zero_one;
+		if (zero_two != -1) output = zero_two;
+		if (zero_all != -1) output = zero_all;
+		if (one_one != -1) output = one_one;
+		if (one_two != -1) output = one_two;
+		if (one_all != -1) output = one_all;
+		if (two_two != -1) output = two_two;
+		if (two_all != -1) output = two_all;
+	}
+	
+	return output;
 }
 
 // Shortcuts for nodes and arcs
 int FindCode(const Node& mynode, const MatrixStr mymatrix) {
 	return FindCode(mynode.Get("ShortCode"), mymatrix);
 }
+
 int FindCode(const Arc& myarc, const MatrixStr mymatrix) {
 	int output = -1;
 	// Look for properties for the arc in the opposite direction

@@ -17,7 +17,7 @@ CFileIO::CFileIO(CNSGA2* nsga2) {
 
 CFileIO::~CFileIO(void) {    
 	flushIO();
-
+	
 	fclose(fpt1);
 	fclose(fpt2);
 	fclose(fpt3);
@@ -25,7 +25,7 @@ CFileIO::~CFileIO(void) {
 	fclose(fpt5);
 }
 
-void CFileIO::flushIO() {			
+void CFileIO::flushIO() {
 	fflush(stdout);
 	fflush(fpt1);
 	fflush(fpt2);
@@ -61,7 +61,7 @@ void CFileIO::recordConfiguration() {
 		fprintf(fpt5,"\n Probability of mutation of binary variable = %e",p_nsga2->pmut_bin);
 	}
 	fprintf(fpt5,"\n Seed for random number generator = %e",p_nsga2->randgen->seed);
-
+	
 	fprintf(fpt1,"# of objectives = %d, # of constraints = %d, # of real_var = %d, # of bits of bin_var = %d, constr_violation, rank, crowding_distance\n",p_nsga2->nobj,p_nsga2->ncon,p_nsga2->nreal,p_nsga2->bitlength);
 	fprintf(fpt2,"# of objectives = %d, # of constraints = %d, # of real_var = %d, # of bits of bin_var = %d, constr_violation, rank, crowding_distance\n",p_nsga2->nobj,p_nsga2->ncon,p_nsga2->nreal,p_nsga2->bitlength);
 	fprintf(fpt3,"# of objectives = %d, # of constraints = %d, # of real_var = %d, # of bits of bin_var = %d, constr_violation, rank, crowding_distance\n",p_nsga2->nobj,p_nsga2->ncon,p_nsga2->nreal,p_nsga2->bitlength);
@@ -74,7 +74,7 @@ void CFileIO::report_pop (population *pop, FILE *fpt) {
 		// Objectives
 		for (int j=0; j<p_nsga2->nobj; j++)
 			fprintf(fpt,"%e\t",pop->ind[i].obj[j]);
-
+		
 		// Constraints?
 		if ( p_nsga2->ncon != 0 ) {
 			for (int j=0; j<p_nsga2->ncon; j++)
@@ -86,7 +86,7 @@ void CFileIO::report_pop (population *pop, FILE *fpt) {
 			for (int j=0; j<p_nsga2->nreal; j++)
 				fprintf(fpt,"%e\t",pop->ind[i].xreal[j]);
 		}
-
+		
 		// Binary?
 		if (p_nsga2->nbin!=0) {
 			for ( int j=0; j < p_nsga2->nbin; j++ )
@@ -95,7 +95,7 @@ void CFileIO::report_pop (population *pop, FILE *fpt) {
 					fprintf(fpt,"%d\t",pop->ind[i].gene[j][k]);
 			}
 		}
-
+		
 		// Other info
 		fprintf(fpt,"%e\t",pop->ind[i].constr_violation);
 		fprintf(fpt,"%d\t",pop->ind[i].rank);
@@ -109,19 +109,19 @@ void CFileIO::report_feasible (population *pop, FILE *fpt) {
 		if (pop->ind[i].constr_violation == 0.0 && pop->ind[i].rank==1) {
 			for ( int j = 0; j < p_nsga2->nobj; j++)
 				fprintf(fpt,"%e\t",pop->ind[i].obj[j]);
-
+			
 			// Constraints?
 			if (p_nsga2->ncon!=0) {
 				for ( int j = 0; j < p_nsga2->ncon; j++)
 					fprintf(fpt,"%e\t",pop->ind[i].constr[j]);
 			}
-
+			
 			// Real?
 			if (p_nsga2->nreal!=0) {
 				for ( int j = 0 ; j < p_nsga2->nreal; j++)
 					fprintf(fpt,"%e\t",pop->ind[i].xreal[j]);
 			}
-
+			
 			// Binary?
 			if (p_nsga2->nbin!=0) {
 				for (int j=0; j<p_nsga2->nbin; j++)
@@ -130,7 +130,7 @@ void CFileIO::report_feasible (population *pop, FILE *fpt) {
 						fprintf(fpt,"%d\t",pop->ind[i].gene[j][k]);
 				}
 			}
-
+			
 			// Other
 			fprintf(fpt,"%e\t",pop->ind[i].constr_violation);
 			fprintf(fpt,"%d\t",pop->ind[i].rank);

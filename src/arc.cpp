@@ -14,20 +14,20 @@ using namespace std;
 
 // Contructors and destructor for the Arc class
 Arc::Arc() :
-    Properties(ArcDefault),
-    Energy2Trans(false),
-    Trans2Energy(0) {}
+	Properties(ArcDefault),
+	Energy2Trans(false),
+	Trans2Energy(0) {}
 
 Arc::Arc(const Arc& rhs) :
-    Properties(rhs.GetVecStr("Properties")),
-    Energy2Trans(rhs.GetBool("Energy2Trans")),
-    Trans2Energy(rhs.GetVecStr("Trans2Energy")) {}
+	Properties(rhs.GetVecStr("Properties")),
+	Energy2Trans(rhs.GetBool("Energy2Trans")),
+	Trans2Energy(rhs.GetVecStr("Trans2Energy")) {}
 
 // This constructor creates an arc going in the opposite direction
 Arc::Arc(const Arc& rhs, const bool reverse) :
-    Properties(rhs.GetVecStr("Properties")),
-    Energy2Trans(rhs.GetBool("Energy2Trans")),
-    Trans2Energy(rhs.GetVecStr("Trans2Energy")) {
+	Properties(rhs.GetVecStr("Properties")),
+	Energy2Trans(rhs.GetBool("Energy2Trans")),
+	Trans2Energy(rhs.GetVecStr("Trans2Energy")) {
 		if (reverse) {
 			if ( !isTransport() ) {
 				string temp = Get("To");
@@ -41,7 +41,7 @@ Arc::Arc(const Arc& rhs, const bool reverse) :
 			}
 		}
 	}
-	
+
 Arc::~Arc() {}
 
 Arc& Arc::operator=(const Arc& rhs) {
@@ -53,14 +53,14 @@ Arc& Arc::operator=(const Arc& rhs) {
 
 // Read a property in string format
 string Arc::Get(const string& selector) const {
-    string temp_output;
+	string temp_output;
 	int index = FindArcSelector(selector);
-    if (index >= 0) temp_output = Properties[index];
+	if (index >= 0) temp_output = Properties[index];
 	else {
-        temp_output = "ERROR";
-        printError("arcread", selector);
-    }
-    return temp_output;
+		temp_output = "ERROR";
+		printError("arcread", selector);
+	}
+	return temp_output;
 }
 
 // Read the year from the step
@@ -78,40 +78,40 @@ double Arc::GetDouble(const string& selector) const {
 
 // Read a boolean property
 bool Arc::GetBool(const string& selector) const {
-    bool temp_output;
-    if (selector == "Energy2Trans") temp_output = Energy2Trans;
-    else printError("arcread", selector);
+	bool temp_output;
+	if (selector == "Energy2Trans") temp_output = Energy2Trans;
+	else printError("arcread", selector);
 	
-    return temp_output;
+	return temp_output;
 };
 
 // Read an entire vector of string properties
 vector<string> Arc::GetVecStr(const string& selector) const {
-    vector<string> temp_output;
-    if (selector == "Properties") temp_output = Properties;
-    else if (selector == "Trans2Energy") temp_output = Trans2Energy;
-    else printError("arcread", selector);
-    return temp_output;
+	vector<string> temp_output;
+	if (selector == "Properties") temp_output = Properties;
+	else if (selector == "Trans2Energy") temp_output = Trans2Energy;
+	else printError("arcread", selector);
+	return temp_output;
 };
 
 // Modify a propery
 void Arc::Set(const string& selector, const string& input){
 	int index = FindArcSelector(selector);	
-    if (index >= 0) Properties[index] = input;
-    else printError("arcwrite", selector);
+	if (index >= 0) Properties[index] = input;
+	else printError("arcwrite", selector);
 };
 
 // Modify a boolean property
 void Arc::Set(const string& selector, const bool input){
-    if (selector == "Energy2Trans") Energy2Trans = input;
-    else printError("arcwrite", selector);
+	if (selector == "Energy2Trans") Energy2Trans = input;
+	else printError("arcwrite", selector);
 };
 
 // Add a new line to the Trans2Energy vector, where the consumption of energy
 // for a transportation link is stored
 void Arc::Add(const string& selector, const string& input) {
-    if (selector == "Trans2Energy") Trans2Energy.push_back(input);
-    else printError("arcwrite", selector);
+	if (selector == "Trans2Energy") Trans2Energy.push_back(input);
+	else printError("arcwrite", selector);
 };
 
 // Multiply a value or a vector by a given value
@@ -133,8 +133,8 @@ void Arc::Multiply(const string& selector, const double value) {
 
 // ****** MPS output functions ******
 string Arc::ArcUbNames() const {
-    string temp_output = "";
-    // Create upper bound constraint
+	string temp_output = "";
+	// Create upper bound constraint
 	if ( isTransport()  && Get("TransInfr") == "" ) {
 		// Transportation arc
 		if ( Get("OpMax") != "Inf" ) {
@@ -148,11 +148,11 @@ string Arc::ArcUbNames() const {
 			temp_output += " L ub" + Get("Code") + "\n";
 		}
 	}
-    return temp_output;
+	return temp_output;
 }
 
 string Arc::ArcCapNames() const {
-    string temp_output = "";
+	string temp_output = "";
 	// Create capacity-investment constraint for arcs with valid investment
 	if ( isFirstinYear() && isTransport()  && Get("TransInfr") == "" ) {
 		// Transportation arc
@@ -165,21 +165,21 @@ string Arc::ArcCapNames() const {
 			temp_output += " E inv2cap" + Get("Code") + "\n";
 		}
 	}
-    return temp_output;
+	return temp_output;
 }
 
 string Arc::ArcDcNames() const {
-    string temp_output = "";
-    // Create a constraint for DC power flow branches
-    if ( isDCflow() && (Get("From") < Get("To")) ) {
-        temp_output += " E dcpf" + Get("Code") + "\n";
-    }
-    return temp_output;
+	string temp_output = "";
+	// Create a constraint for DC power flow branches
+	if ( isDCflow() && (Get("From") < Get("To")) ) {
+		temp_output += " E dcpf" + Get("Code") + "\n";
+	}
+	return temp_output;
 }
 
 string Arc::ArcColumns() const {
-    string temp_output = "";
-    string temp_code;
+	string temp_output = "";
+	string temp_code;
 	if ( !isTransport() || Get("TransInfr") != "" ) {
 		// Cost objective function
 		if ( Get("OpCost") != "0" ) {
@@ -231,16 +231,16 @@ string Arc::ArcColumns() const {
 		temp_output += WriteEnergy2Trans();
 		temp_output += WriteTrans2Energy();
 	}
-    // Put arc in DC power flow constraint if appropriate
-    if ( isDCflow() ) {
-        if ( Get("From") < Get("To") ) {
-            temp_output += "    " + Get("Code") + " dcpf" + Get("Code") + " -1\n";
-        } else {
-            temp_code = Get("To") + Get("ToStep") + "_" + Get("From") + Get("FromStep");
-            temp_output += "    " + Get("Code") + " dcpf" + temp_code + " 1\n";
-        }
-    }
-    return temp_output;
+	// Put arc in DC power flow constraint if appropriate
+	if ( isDCflow() ) {
+		if ( Get("From") < Get("To") ) {
+			temp_output += "    " + Get("Code") + " dcpf" + Get("Code") + " -1\n";
+		} else {
+			temp_code = Get("To") + Get("ToStep") + "_" + Get("From") + Get("FromStep");
+			temp_output += "    " + Get("Code") + " dcpf" + temp_code + " 1\n";
+		}
+	}
+	return temp_output;
 }
 
 string Arc::InvArcColumns() const {
@@ -288,7 +288,7 @@ string Arc::InvArcColumns() const {
 }
 
 string Arc::CapArcColumns(int selector) const {
-    string temp_output = "";
+	string temp_output = "";
 	
 	// If investment is allowed,
     if ( isFirstinYear() && Get("OpMax") != "Inf" && Get("TransInfr") == "" ) {
@@ -335,15 +335,15 @@ string Arc::CapArcColumns(int selector) const {
 				temp_output += " pk" + Get("To") + Get("ToStep") + " " + Get("CapacityFactor") + "\n";
 			}
 		}
-    }
-    return temp_output;
+	}
+	return temp_output;
 }
 
 vector<string> Arc::Events() const {
-    vector<string> temp_output(0);
+	vector<string> temp_output(0);
 	
 	// If investment is allowed,
-    if ( isFirstinYear() && Get("OpMax") != "Inf" && Get("TransInfr") == "" ) {
+	if ( isFirstinYear() && Get("OpMax") != "Inf" && Get("TransInfr") == "" ) {
 		// Base case
 		temp_output.push_back( "1" );
 		for (int event = 1; event <= Nevents; ++event) {
@@ -352,16 +352,16 @@ vector<string> Arc::Events() const {
 			temp_output.push_back( Get(property)  );
 		}
 	}
-    return temp_output;
+	return temp_output;
 }
 
 string Arc::ArcRhs() const {
-    string temp_output = "";
-    // RHS in the upper bound constraints, for the capacity existing at t=0
-    if ( isFirstinYear() && Get("OpMax") != "Inf"  && Get("TransInfr") == "" ) {
+	string temp_output = "";
+	// RHS in the upper bound constraints, for the capacity existing at t=0
+	if ( isFirstinYear() && Get("OpMax") != "Inf"  && Get("TransInfr") == "" ) {
 		temp_output += " rhs inv2cap" + Get("Code") + " " + Get("OpMax") + "\n";
-    }
-    return temp_output;
+	}
+	return temp_output;
 }
 
 string Arc::ArcBounds() const {

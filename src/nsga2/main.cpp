@@ -64,7 +64,7 @@ int main (int argc, char **argv) {
 		nsga2->evaluatePop(nsga2->child_pop, events);
 		nsga2->merge (nsga2->parent_pop, nsga2->child_pop, nsga2->mixed_pop);
 		nsga2->fillNondominatedSort(nsga2->mixed_pop, nsga2->parent_pop);
-
+		
 		// Comment following three lines if information for all
 		// generations is not desired, it will speed up the execution 
 		fprintf(nsga2->fileio->fpt4,"# gen = %d\n",i);
@@ -73,7 +73,7 @@ int main (int argc, char **argv) {
 		
 		cout << "- Finished generation #" << i << endl;
 	}
-
+	
 	cout << endl << "- Generations finished, now reporting solutions" << endl;
 	nsga2->fileio->report_pop(nsga2->parent_pop,nsga2->fileio->fpt2);
 	nsga2->fileio->report_feasible(nsga2->parent_pop,nsga2->fileio->fpt3);

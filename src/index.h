@@ -9,11 +9,11 @@
 
 // Declare class type to hold index information
 class Index {
-    public:
-        Index();
-        Index(const Index& rhs);
-        ~Index();
-        Index& operator=(const Index& rhs);
+	public:
+		Index();
+		Index(const Index& rhs);
+		~Index();
+		Index& operator=(const Index& rhs);
 		
 		vector<int> GetPosition() const;
 		vector<int> GetColumn() const;
@@ -30,7 +30,7 @@ class Index {
 		void Add(const int idx, const Step& col, const string& name);
 		void WriteFile(const char* fileinput) const;
 		
-    private:
+	private:
 		vector<int> Position;
 		vector<int> Column;
 		vector<int> Year;

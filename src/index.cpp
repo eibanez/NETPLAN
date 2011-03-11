@@ -28,7 +28,7 @@ Index::Index(const Index& rhs) :
 Index::~Index() {}
 
 Index& Index::operator=(const Index& rhs) {
-    Position = rhs.GetPosition();
+	Position = rhs.GetPosition();
 	Column = rhs.GetColumn(),
 	Year = rhs.GetYear(),
 	Name = rhs.GetName();
@@ -86,7 +86,7 @@ Index ReadFile(const char* fileinput) {
 	Index TempIndex;
 	char line [ 200 ];
 	FILE *file = fopen(fileinput, "r");
-    
+	
 	if ( file != NULL ) {
 		int idx, col, year;
 		string name;

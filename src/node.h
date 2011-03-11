@@ -9,33 +9,33 @@
 
 // Declare class type to hold node information
 class Node {
-    public:
-        Node();
-        Node(const Node& rhs);
-        ~Node();
-        Node& operator=(const Node& rhs);
+	public:
+		Node();
+		Node(const Node& rhs);
+		~Node();
+		Node& operator=(const Node& rhs);
 		
-        string Get(const string& selector) const;
-        double GetDouble(const string& selector) const;
-        vector<string> GetVecStr() const;
-        void Set(const string& selector, const string& input);
+		string Get(const string& selector) const;
+		double GetDouble(const string& selector) const;
+		vector<string> GetVecStr() const;
+		void Set(const string& selector, const string& input);
 		void Multiply(const string& selector, const double value);
 		int Time() const;
 
-        string NodeNames() const;
-        string NodeUDColumns() const;
+		string NodeNames() const;
+		string NodeUDColumns() const;
 		string NodePeakRows() const;
-        string NodeRMColumns() const;
-        string NodeRMBounds() const;
-        string NodeRhs() const;
-        string DCNodesBounds() const;
+		string NodeRMColumns() const;
+		string NodeRMBounds() const;
+		string NodeRhs() const;
+		string DCNodesBounds() const;
 		
 		bool isDCelect() const;
 		bool isDCflow() const;
 		bool isFirstinYear() const;
 		
-    private:
-        vector<string> Properties;
+	private:
+		vector<string> Properties;
 };
 
 // Find the index for a node property selector

@@ -20,20 +20,20 @@ Node::Node(const Node& rhs) : Properties(rhs.GetVecStr()) {}
 Node::~Node() {}
 
 Node& Node::operator=(const Node& rhs) {
-    Properties = rhs.GetVecStr();
-    return *this;
+	Properties = rhs.GetVecStr();
+	return *this;
 }
 
 // Read a node property in string format
 string Node::Get(const string& selector) const {
-    string temp_output;
+	string temp_output;
 	int index = FindNodeSelector(selector);
-    if (index >= 0) temp_output = Properties[index];
-    else {
-        temp_output = "ERROR";
-        printError("noderead", selector);
-    };
-    return temp_output;
+	if (index >= 0) temp_output = Properties[index];
+	else {
+		temp_output = "ERROR";
+		printError("noderead", selector);
+	};
+	return temp_output;
 };
 
 // Read a property as a double
@@ -51,8 +51,8 @@ vector<string> Node::GetVecStr() const {
 // Modify a property
 void Node::Set(const string& selector, const string& input){
 	int index = FindNodeSelector(selector);
-    if (index >= 0) Properties[index] = input;
-    else printError("nodewrite", selector);
+	if (index >= 0) Properties[index] = input;
+	else printError("nodewrite", selector);
 };
 
 // Multiply stored values by 'value'
@@ -72,82 +72,81 @@ int Node::Time() const {
 }
 
 
-
 // ****** MPS output functions ******
 string Node::NodeNames() const {
-    string temp_output = "";
-    // Create constraint for ach node with a valid demand
-    if ( Get("Demand") != "X" && Get("Code")[0] != 'X' ) {
-        temp_output += " E " + Get("Code") + "\n";
-    } else {
-        temp_output += " N " + Get("Code") + "\n";
-    }
-    return temp_output;
+	string temp_output = "";
+	// Create constraint for ach node with a valid demand
+	if ( Get("Demand") != "X" && Get("Code")[0] != 'X' ) {
+		temp_output += " E " + Get("Code") + "\n";
+	} else {
+		temp_output += " N " + Get("Code") + "\n";
+	}
+	return temp_output;
 }
 
 string Node::NodeUDColumns() const {
-    string temp_output = "";
-    // If unserved demand is allowed, write the appropriate cost
-    if ( Get("CostUD") != "X" ) {
-        temp_output += "    UD_" + Get("Code") + " obj " + Get("CostUD") + "\n";
-        temp_output += "    UD_" + Get("Code") + " " + Get("Code") + " 1\n";
-    }
-    return temp_output;
+	string temp_output = "";
+	// If unserved demand is allowed, write the appropriate cost
+	if ( Get("CostUD") != "X" ) {
+		temp_output += "    UD_" + Get("Code") + " obj " + Get("CostUD") + "\n";
+		temp_output += "    UD_" + Get("Code") + " " + Get("Code") + " 1\n";
+	}
+	return temp_output;
 }
 
 string Node::NodePeakRows() const {
-    string temp_output = "";
-    // If peak demand is available, write the appropriate row
-    if ( (Get("PeakPower") != "X") && isFirstinYear() ) {
-        temp_output += " E pk" + Get("Code") + "\n";
-    }
-    return temp_output;
+	string temp_output = "";
+	// If peak demand is available, write the appropriate row
+	if ( (Get("PeakPower") != "X") && isFirstinYear() ) {
+		temp_output += " E pk" + Get("Code") + "\n";
+	}
+	return temp_output;
 }
 
 string Node::NodeRMColumns() const {
-    string temp_output = "";
-    // If peak demand is available, write reserve margin variable
-    if ( (Get("PeakPower") != "X") && isFirstinYear() ) {
-        temp_output += "    RM_" + Get("Code") + " pk" + Get("Code") + " -" + Get("PeakPower") + "\n";
-    }
-    return temp_output;
+	string temp_output = "";
+	// If peak demand is available, write reserve margin variable
+	if ( (Get("PeakPower") != "X") && isFirstinYear() ) {
+		temp_output += "    RM_" + Get("Code") + " pk" + Get("Code") + " -" + Get("PeakPower") + "\n";
+	}
+	return temp_output;
 }
 
 string Node::NodeRMBounds() const {
-    string temp_output = "";
-    // If peak demand is available, write lower bound for reserve margin
-    if ( (Get("PeakPower") != "X") && isFirstinYear() ) {
-        temp_output += " LO bnd RM_" + Get("Code") + " 1\n";
-    }
-    return temp_output;
+	string temp_output = "";
+	// If peak demand is available, write lower bound for reserve margin
+	if ( (Get("PeakPower") != "X") && isFirstinYear() ) {
+		temp_output += " LO bnd RM_" + Get("Code") + " 1\n";
+	}
+	return temp_output;
 }
 
 string Node::NodeRhs() const {
-    string temp_output = "";
-    // Demand RHS if it's valid
-    if ( (Get("Demand") != "X") && (Get("Demand") != "0") ) {
-        temp_output = " rhs " + Get("Code") + " " + Get("Demand") + "\n";
-    }
-    return temp_output;
+	string temp_output = "";
+	// Demand RHS if it's valid
+	if ( (Get("Demand") != "X") && (Get("Demand") != "0") ) {
+		temp_output = " rhs " + Get("Code") + " " + Get("Demand") + "\n";
+	}
+	return temp_output;
 }
 
 string Node::DCNodesBounds() const {
-    string temp_output = "";
-    // Write minimum and max for DC Power flow anges (-pi and pi)
-    temp_output += " LO bnd th" + Get("Code") + " -3.14\n";
-    temp_output += " UP bnd th" + Get("Code") + " 3.14\n";
-    return temp_output;
+	string temp_output = "";
+	// Write minimum and max for DC Power flow anges (-pi and pi)
+	temp_output += " LO bnd th" + Get("Code") + " -3.14\n";
+	temp_output += " UP bnd th" + Get("Code") + " 3.14\n";
+	return temp_output;
 }
 
 // ****** Boolean functions ******
 // Is Node a DC node?
 bool Node::isDCelect() const {
-    return ( Get("ShortCode").substr(0,2) == DCCode );
+	return ( Get("ShortCode").substr(0,2) == DCCode );
 }
 
 // Is Node and DC node and are we considering DC flow in the model?
 bool Node::isDCflow() const {
-    return isDCelect() && useDCflow;
+	return isDCelect() && useDCflow;
 }
 
 // Is this the first node in a year?

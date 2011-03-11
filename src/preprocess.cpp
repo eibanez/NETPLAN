@@ -14,7 +14,7 @@ using namespace std;
 
 int main() {
 	printHeader("preprocessor");
-
+	
 	cout << "- Reading global parameters...\n";
 	ReadParameters("data/parameters.csv");
 	
@@ -54,7 +54,7 @@ int main() {
 		}
 		AVectorProp.push_back( ReadProperties(file_name.c_str(), ArcDefault[t], 2) );
 	}
-
+	
 	cout << "- Creating transportation network...\n";
 	ReadTrans(ListNodes, ListArcs, "data/trans_List.csv");
 	
@@ -161,34 +161,34 @@ int main() {
 		
 		// Check for a storage arc 
 		bool isStorage = ListArcs[k].isStorage();
-
+		
 		if ((ListArcs[k].Get("FromStep") == "") && (ListArcs[k].Get("ToStep") == "")) {
 			printError("arcstep", ListArcs[k].Get("From") + "_" + ListArcs[k].Get("To"));
 		} else {
 			// Cycle through steps (more complicated here) to expand arcs
 			string TempArcStepCode = max(ListArcs[k].Get("FromStep"), ListArcs[k].Get("ToStep"));
-
+			
 			Step TempStep(SName.size()), TempFromStep(SName.size(), 0), TempToStep(SName.size(), 0);
 			Step NextFromStep(SName.size()), NextToStep(SName.size());
-
+			
 			for (unsigned int l = 0; l < ListArcs[k].Get("FromStep").size(); l++) TempFromStep[l] = 1;
 			for (unsigned int l = ListArcs[k].Get("FromStep").size(); l < SName.size(); l++) TempFromStep[l] = 0;
-
+			
 			if (isStorage) {
 				TempToStep = NextStep(TempFromStep);
 			} else {
 				for (unsigned int l = 0; l < ListArcs[k].Get("ToStep").size(); l++) TempToStep[l] = 1;
 				for (unsigned int l = ListArcs[k].Get("ToStep").size(); l < SName.size(); l++) TempToStep[l] = 0;
 			}
-
+			
 			NextFromStep = (TempFromStep[0] == 1) ? NextStep(TempFromStep) : NextStep(SLength);
 			NextToStep = (TempToStep[0] == 1) ? NextStep(TempToStep) : NextStep(SLength);
-
+			
 			TempStep = ((TempFromStep < TempToStep) && !isStorage ) ? TempToStep : TempFromStep;
-
+			
 			// Find the shortest step, to assign it as a default for 'InvStep'
 			string TempStepStr = (TempFromStep < TempToStep) ? ListArcs[k].Get("ToStep") : ListArcs[k].Get("FromStep");
-
+			
 			while ((TempStep <= SLength) && ( TempToStep <= SLength)) {
 				// Apply information
 				Arc TempArc = ListArcs[k];
@@ -312,7 +312,7 @@ int main() {
 					TempFromStep = NextFromStep;
 					NextFromStep = NextStep(NextFromStep);
 				}
-
+				
 				if (isStorage) {
 					TempToStep = NextToStep;
 					NextToStep = NextStep(NextToStep);

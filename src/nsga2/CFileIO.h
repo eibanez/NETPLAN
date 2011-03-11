@@ -18,12 +18,12 @@ class CFileIO {
 		
 		// File pointers
 		FILE *fpt1;
-	    FILE *fpt2;
-	    FILE *fpt3;
-	    FILE *fpt4;
-	    FILE *fpt5;
+		FILE *fpt2;
+		FILE *fpt3;
+		FILE *fpt4;
+		FILE *fpt5;
 		FILE *fpt6;
-
+	
 	private:
 		// Pointer to CNSGA2 class for access to NSGA2 variables
 		CNSGA2* p_nsga2;

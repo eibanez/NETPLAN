@@ -19,7 +19,7 @@ void WriteOutput(const char* fileinput, Index& idx, vector<string>& values, cons
 	// Open file
 	ofstream myfile;
 	myfile.open(fileinput);
-
+	
 	int Size = idx.GetSize();
 	if (Size > 0) {
 		// Find min and max columns

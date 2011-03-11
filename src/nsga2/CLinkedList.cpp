@@ -20,7 +20,7 @@ void CLinkedList::insert (list *node, int x) {
 	
 	if (node->child != NULL)
 		node->child->parent = temp;
-
+	
 	node->child = temp;
 }
 
@@ -33,10 +33,10 @@ list* CLinkedList::del (list *node) {
 	}
 	temp = node->parent;
 	temp->child = node->child;
-
+	
 	if (temp->child!=NULL)
 		temp->child->parent = temp;
-
+	
 	free (node);
 	return (temp);
 }

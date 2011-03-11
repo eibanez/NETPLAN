@@ -9,37 +9,37 @@
 
 // Declare class to store arc information
 class Arc {
-    public:
-        Arc();
-        Arc(const Arc& rhs);
+	public:
+		Arc();
+		Arc(const Arc& rhs);
 		Arc(const Arc& rhs, const bool reverse);
-        ~Arc();
-        Arc& operator=(const Arc& rhs);
-
-        string Get(const string& selector) const;
-		string GetYear() const;
-        double GetDouble(const string& selector) const;
-        bool GetBool(const string& selector) const;
-        vector<string> GetVecStr(const string& selector) const;
-        void Set(const string& selector, const string& input);
-        void Set(const string& selector, const bool input);
-        void Add(const string& selector, const string& input);
-        void Multiply(const string& selector, const double value);
-        int Time() const;
+		~Arc();
+		Arc& operator=(const Arc& rhs);
 		
-        string WriteEnergy2Trans() const;
-        string WriteTrans2Energy() const;
-
-        string ArcUbNames() const;
-        string ArcCapNames() const;
-        string ArcDcNames() const;
-        string ArcColumns() const;
-        string InvArcColumns() const;
-        string CapArcColumns(int selector) const;
+		string Get(const string& selector) const;
+		string GetYear() const;
+		double GetDouble(const string& selector) const;
+		bool GetBool(const string& selector) const;
+		vector<string> GetVecStr(const string& selector) const;
+		void Set(const string& selector, const string& input);
+		void Set(const string& selector, const bool input);
+		void Add(const string& selector, const string& input);
+		void Multiply(const string& selector, const double value);
+		int Time() const;
+		
+		string WriteEnergy2Trans() const;
+		string WriteTrans2Energy() const;
+		
+		string ArcUbNames() const;
+		string ArcCapNames() const;
+		string ArcDcNames() const;
+		string ArcColumns() const;
+		string InvArcColumns() const;
+		string CapArcColumns(int selector) const;
 		vector<string> Events() const;
-        string ArcRhs() const;
-        string ArcBounds() const;
-        string ArcInvBounds() const;
+		string ArcRhs() const;
+		string ArcBounds() const;
+		string ArcInvBounds() const;
 		
 		bool isFirstinYear() const;
 		bool InvArc() const;
@@ -50,10 +50,10 @@ class Arc {
 		bool isFirstBidirect() const;
 		bool isTransport() const;
 		bool isFirstTransport() const;
-
-    private:
-        vector<string> Properties, Trans2Energy;
-        bool Energy2Trans;
+	
+	private:
+		vector<string> Properties, Trans2Energy;
+		bool Energy2Trans;
 };
 
 // Find the index for a arc property selector

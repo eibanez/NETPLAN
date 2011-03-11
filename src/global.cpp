@@ -19,6 +19,7 @@ void printError(const string& selector, const char* fileinput) {
 		if (outputLevel < 3 )    cout << "\tWarning: File '" << fileinput << "' not found!\n";
 	} else {                     cout << "\tERROR: File '" << fileinput << "' not found!\n"; }
 }
+
 void printError(const string& selector, const string& field) {
 	if      (selector == "noderead")  cout << "\tERROR: Invalid field '" << field << "' for a Node (reading mode)\n";
 	else if (selector == "arcread")   cout << "\tERROR: Invalid field '" << field << "' for an Arc (reading mode)\n";
@@ -96,15 +97,15 @@ void printHeader(const string& selector) {
 		cout << "  Elapsed time: ";
 		if (hours > 0) cout << hours << " h ";
 		if (mins > 0) cout << mins << " m ";
-		cout << difTime << " s" << endl;		
+		cout << difTime << " s" << endl;
 	}
 }
 
 // Remove comments and end of line characters
 void CleanLine(char* line) {
 	line = strtok(line, " %");
-    char *nlptr = strchr(line, '\n');
-    if (nlptr) *nlptr = '\0';
-    char *nlptr2 = strchr(line, '\r');
-    if (nlptr2) *nlptr2 = '\0';
+	char *nlptr = strchr(line, '\n');
+	if (nlptr) *nlptr = '\0';
+	char *nlptr2 = strchr(line, '\r');
+	if (nlptr2) *nlptr2 = '\0';
 }

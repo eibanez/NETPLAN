@@ -113,7 +113,7 @@ void CPLEX::SolveIndividual( double *objective, const double events[], string & 
 				dualcap.add(temparr);
 			}
 			
-			while ((OptCuts+FeasCuts > 0) && ( iter <= 1000)) {		
+			while ((OptCuts+FeasCuts > 0) && ( iter <= 1000)) {
 				++iter; OptCuts = 0; FeasCuts = 0;
 				
 				// Keep track of necessary cuts
@@ -222,7 +222,7 @@ void CPLEX::SolveIndividual( double *objective, const double events[], string & 
 		if ( !optimal ) {
 			// Solution not found, return very large values
 			cout << "\tProblem infeasible!" << endl;
-			for (int i=0; i < Nobj; ++i )
+			for (int i=0; i < Nobj; ++i)
 				objective[i] = 1.0e30;
 		} else {
 			if ( outputLevel < 2 )
@@ -602,17 +602,17 @@ double EmissionIndex(const IloNumArray& v, const int start) {
 		max = max * (1 + increase);
 		// min: best case scenario emissions
 		min -= reduction;
-		if (i > first_year) {
+		if ((i > first_year) && (max > min)) {
 			// Find index for the emissions at year i and carry a sum
 			sum += (v[start+i]-min)/(max-min);
 			++j;
 		}
 	}
 	
+	// Find average value for the index (zero if cannot be calculated)
 	double result = (j == 0) ? 0 : sum/j;
 	
-	// Find average value for the index
-	return result;	
+	return result;
 }
 
 vector<double> SumByRow(const IloNumArray& v, Index Idx, const int start) {
@@ -635,7 +635,7 @@ vector<double> SumByRow(const IloNumArray& v, Index Idx, const int start) {
 	}
 	result.push_back(sum);
 	
-	return result;	
+	return result;
 }
 
 

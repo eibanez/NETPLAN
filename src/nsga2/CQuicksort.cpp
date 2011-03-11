@@ -45,7 +45,7 @@ void CQuicksort::q_sort_front_obj(population *pop, int objcount, int obj_array[]
 
 /* Randomized quick sort routine to sort a population based on crowding distance */
 void CQuicksort::quicksort_dist(population *pop, int *dist, int front_size) {
-    q_sort_dist (pop, dist, 0, front_size-1);
+	q_sort_dist (pop, dist, 0, front_size-1);
 }
 
 /* Actual implementation of the randomized quick sort used to sort a population based on crowding distance */
