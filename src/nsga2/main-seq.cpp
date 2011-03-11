@@ -14,8 +14,8 @@ using namespace std;
 #include <vector>
 #include "../netscore.h"
 
-CNSGA2*	nsga2a = new CNSGA2(true, 1.0);
-CNSGA2*	nsga2b = new CNSGA2(false, 0.33);
+CNSGA2* nsga2a = new CNSGA2(true, 1.0);
+CNSGA2* nsga2b = new CNSGA2(false, 0.33);
 
 int main (int argc, char **argv) {
 	printHeader("nsga-parallel");
@@ -93,7 +93,7 @@ int main (int argc, char **argv) {
 		nsga2b->evaluatePop(nsga2b->child_pop, events);
 		nsga2b->merge(nsga2a->parent_pop, nsga2b->child_pop, nsga2b->mixed_pop);
 		nsga2b->fillNondominatedSort(nsga2b->mixed_pop, nsga2b->parent_pop);
-
+		
 		// Comment following three lines if information for all
 		// generations is not desired, it will speed up the execution 
 		fprintf(nsga2a->fileio->fpt4,"# gen = %dB\n",i);
@@ -102,7 +102,7 @@ int main (int argc, char **argv) {
 		
 		cout << "- Finished generation #" << i << "B" << endl;
 	}
-
+	
 	cout << endl << "- Generations finished, now reporting solutions" << endl;
 	nsga2a->fileio->report_pop(nsga2b->parent_pop,nsga2a->fileio->fpt2);
 	nsga2a->fileio->report_feasible(nsga2b->parent_pop,nsga2a->fileio->fpt3);

@@ -14,8 +14,8 @@ using namespace std;
 #include <vector>
 #include "../netscore.h"
 
-CNSGA2*	nsga2a = new CNSGA2(true, 1.0);
-CNSGA2*	nsga2b = new CNSGA2(false, 0.33);
+CNSGA2* nsga2a = new CNSGA2(true, 1.0);
+CNSGA2* nsga2b = new CNSGA2(false, 0.33);
 
 int main (int argc, char **argv) {
 	printHeader("nsga-parallel");
@@ -99,7 +99,7 @@ int main (int argc, char **argv) {
 		nsga2b->receivePop(nsga2b->child_pop);								// JINXU: This function waits for the solution queue
 		nsga2b->merge(nsga2a->parent_pop, nsga2b->child_pop, nsga2b->mixed_pop);
 		nsga2b->fillNondominatedSort(nsga2b->mixed_pop, nsga2b->parent_pop);
-
+		
 		// -- Report (i)B -- //
 		fprintf(nsga2a->fileio->fpt4,"# gen = %dB\n",i);
 		nsga2a->fileio->report_pop(nsga2b->parent_pop,nsga2a->fileio->fpt4);

@@ -14,7 +14,7 @@ using namespace std;
 #include <vector>
 #include "../netscore.h"
 
-CNSGA2*	nsga2 = new CNSGA2();
+CNSGA2* nsga2 = new CNSGA2();
 
 int main (int argc, char **argv) {
 	printHeader("nsga");
