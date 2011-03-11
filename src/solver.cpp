@@ -608,8 +608,11 @@ double EmissionIndex(const IloNumArray& v, const int start) {
 			++j;
 		}
 	}
+	
+	double result = (j == 0) ? 0 : sum/j;
+	
 	// Find average value for the index
-	return sum/j;	
+	return result;	
 }
 
 vector<double> SumByRow(const IloNumArray& v, Index Idx, const int start) {
