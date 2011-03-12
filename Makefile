@@ -75,8 +75,8 @@ postnsga.o: $(SRCDIR)/postnsga.cpp
 
 nsga2: $(NGSADIR)/main.cpp $(NSGA) $(SUB) $(SOLVER)
 	$(CCC)  $(CCFLAGS) $(NGSADIR)/main.cpp $(NSGA) $(SOLVER) $(SUB) -o nsga2 $(CCLNFLAGS)
-nsga2b: $(NGSADIR)/main-parallel.cpp $(NSGA) $(SUB) $(SOLVER)
-	$(CCC)  $(CCFLAGS) $(NGSADIR)/main-parallel.cpp $(NSGA) $(SOLVER) $(SUB) -o nsga2b $(CCLNFLAGS)
+nsga2b: $(NGSADIR)/main-seq.cpp $(NSGA) $(SUB) $(SOLVER)
+	$(CCC)  $(CCFLAGS) $(NGSADIR)/main-seq.cpp $(NSGA) $(SOLVER) $(SUB) -o nsga2b $(CCLNFLAGS)
 CNSGA2.o: $(NGSADIR)/CNSGA2.cpp $(NGSADIR)/CNSGA2.h
 	$(CCC) -c $(CCFLAGS) $(NGSADIR)/CNSGA2.cpp -o CNSGA2.o
 CRand.o: $(NGSADIR)/CRand.cpp $(NGSADIR)/CRand.h
