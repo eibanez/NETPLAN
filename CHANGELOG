@@ -1,4 +1,7 @@
 Version 2.0.1
+ - Cleaned code and erased unused files
+ - Fixed emission index if number of years is too small
+ - Renamed "nsga2/main-parallel.cpp" to "nsga2/main-seq.cpp" for consistency
 
 Version 2.0
  - Code used for my dissertation
