@@ -24,25 +24,25 @@ int main (int argc, char **argv) {
 	ReadParameters("data/parameters.csv");
 	
 	// -- Initialization of A -- //
-	nsga2a->randgen->randomize();					// Initialize random number generator
-	nsga2a->Init("prepdata/param.in");				// This sets all variables related to GA
-	nsga2a->InitMemory();							// This allocates memory for the populations
-	nsga2a->InitPop(nsga2a->parent_pop, Np_start);	// Initialize parent population randomly
-	nsga2a->fileio->recordConfiguration();			// Records all variables related to GA configuration
+	nsga2a->randgen->randomize();                   // Initialize random number generator
+	nsga2a->Init("prepdata/param.in");              // This sets all variables related to GA
+	nsga2a->InitMemory();                           // This allocates memory for the populations
+	nsga2a->InitPop(nsga2a->parent_pop, Np_start);  // Initialize parent population randomly
+	nsga2a->fileio->recordConfiguration();          // Records all variables related to GA configuration
 	
 	// -- Send 1A -- // 
 	nsga2a->decodePop(nsga2a->parent_pop);
 	nsga2a->sendPop(nsga2a->parent_pop);											// JINXU: This function puts the individuals in the queue
 	
 	// -- Initialization of B -- //
-	nsga2b->randgen->randomize();					// Initialize random number generator
-	nsga2b->Init("prepdata/param.in");				// This sets all variables related to GA
-	nsga2b->InitMemory();							// This allocates memory for the populations
-	nsga2b->InitPop(nsga2b->child_pop, Np_start);	// Initialize child population randomly
+	nsga2b->randgen->randomize();                   // Initialize random number generator
+	nsga2b->Init("prepdata/param.in");              // This sets all variables related to GA
+	nsga2b->InitMemory();                           // This allocates memory for the populations
+	nsga2b->InitPop(nsga2b->child_pop, Np_start);   // Initialize child population randomly
 	
 	// -- Send 1B -- // 
-	nsga2b->decodePop(nsga2b->parent_pop);
-	nsga2b->sendPop(nsga2b->parent_pop);											// JINXU: This function puts the individuals in the queue
+	nsga2b->decodePop(nsga2b->child_pop);
+	nsga2b->sendPop(nsga2b->child_pop);												// JINXU: This function puts the individuals in the queue
 	
 	for ( int i = 1; i <= nsga2a->ngen; i++ ) {
 		// -- Receive (i)A -- //
@@ -56,10 +56,10 @@ int main (int argc, char **argv) {
 		}
 		
 		// -- Report (i)A -- //
-		if (i ==1 )
+		if (i ==1)
 			nsga2a->fileio->report_pop (nsga2a->parent_pop, nsga2a->fileio->fpt1);
 		fprintf(nsga2a->fileio->fpt4,"# gen = %dA\n",i);
-		nsga2a->fileio->report_pop(nsga2a->parent_pop,nsga2a->fileio->fpt4);
+		nsga2a->fileio->report_pop(nsga2a->parent_pop, nsga2a->fileio->fpt4);
 		nsga2a->fileio->flushIO();
 		
 		if (i < nsga2a->ngen) {
@@ -79,9 +79,9 @@ int main (int argc, char **argv) {
 		
 		// -- Report (i)B -- //
 		if (i == 1) 
-			nsga2a->fileio->report_pop(nsga2b->child_pop,nsga2a->fileio->fpt1);
+			nsga2a->fileio->report_pop(nsga2b->child_pop, nsga2a->fileio->fpt1);
 		fprintf(nsga2a->fileio->fpt4,"# gen = %dB\n",i);
-		nsga2a->fileio->report_pop(nsga2b->parent_pop,nsga2a->fileio->fpt4);
+		nsga2a->fileio->report_pop(nsga2b->parent_pop, nsga2a->fileio->fpt4);
 		nsga2a->fileio->flushIO();
 		
 		if (i < nsga2a->ngen) {
@@ -94,8 +94,8 @@ int main (int argc, char **argv) {
 	}
 	
 	// -- Report final solution -- //
-	nsga2a->fileio->report_pop(nsga2b->parent_pop,nsga2a->fileio->fpt2);
-	nsga2a->fileio->report_feasible(nsga2b->parent_pop,nsga2a->fileio->fpt3);
+	nsga2a->fileio->report_pop(nsga2b->parent_pop, nsga2a->fileio->fpt2);
+	nsga2a->fileio->report_feasible(nsga2b->parent_pop, nsga2a->fileio->fpt3);
 	if (nsga2a->nreal!=0) {
 		fprintf(nsga2a->fileio->fpt5,"\n Number of crossover of real variable = %d",nsga2a->nrealcross + nsga2b->nrealcross);
 		fprintf(nsga2a->fileio->fpt5,"\n Number of mutation of real variable = %d",nsga2a->nrealmut + nsga2b->nrealmut);

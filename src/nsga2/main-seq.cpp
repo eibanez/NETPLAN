@@ -27,17 +27,17 @@ int main (int argc, char **argv) {
 	ImportIndices();
 	
 	// -- Initialization of A -- //
-	nsga2a->randgen->randomize();					// Initialize random number generator
-	nsga2a->Init("prepdata/param.in");				// This sets all variables related to GA
-	nsga2a->InitMemory();							// This allocates memory for the populations
-	nsga2a->InitPop(nsga2a->parent_pop, Np_start);	// Initialize parent population randomly
-	nsga2a->fileio->recordConfiguration();			// Records all variables related to GA configuration
+	nsga2a->randgen->randomize();                   // Initialize random number generator
+	nsga2a->Init("prepdata/param.in");              // This sets all variables related to GA
+	nsga2a->InitMemory();                           // This allocates memory for the populations
+	nsga2a->InitPop(nsga2a->parent_pop, Np_start);  // Initialize parent population randomly
+	nsga2a->fileio->recordConfiguration();          // Records all variables related to GA configuration
 	
 	// -- Initialization of B -- //
-	nsga2b->randgen->randomize();					// Initialize random number generator
-	nsga2b->Init("prepdata/param.in");				// This sets all variables related to GA
-	nsga2b->InitMemory();							// This allocates memory for the populations
-	nsga2b->InitPop(nsga2b->child_pop, Np_start);	// Initialize child population randomly
+	nsga2b->randgen->randomize();                   // Initialize random number generator
+	nsga2b->Init("prepdata/param.in");              // This sets all variables related to GA
+	nsga2b->InitMemory();                           // This allocates memory for the populations
+	nsga2b->InitPop(nsga2b->child_pop, Np_start);   // Initialize child population randomly
 	
 	// Vector of capacity losses for events
 	double events[(SLength[0] + IdxCap.GetSize()) * (Nevents+1)];
@@ -45,18 +45,18 @@ int main (int argc, char **argv) {
 	
 	cout << "- Initialization done, now performing first generation" << endl;
 	
-	// -- Start evaluating 1A -- // 
+	// -- Evaluate 1A -- // 
 	nsga2a->decodePop(nsga2a->parent_pop);
 	nsga2a->evaluatePop(nsga2a->parent_pop, events);
 	nsga2a->assignRankCrowdingDistance(nsga2a->parent_pop); 
 	
 	// -- Report 1A -- //
-	nsga2a->fileio->report_pop (nsga2a->parent_pop, nsga2a->fileio->fpt1);		// Initial pop out
+	nsga2a->fileio->report_pop (nsga2a->parent_pop, nsga2a->fileio->fpt1);      // Initial pop out
 	fprintf(nsga2a->fileio->fpt4,"# gen = 1A\n");
-	nsga2a->fileio->report_pop(nsga2a->parent_pop,nsga2a->fileio->fpt4);		// All pop out
+	nsga2a->fileio->report_pop(nsga2a->parent_pop, nsga2a->fileio->fpt4);       // All pop out
 	nsga2a->fileio->flushIO();
 	
-	// -- Start evaluating 1B -- // 
+	// -- Evaluate 1B -- // 
 	nsga2b->decodePop(nsga2b->child_pop);
 	nsga2b->evaluatePop(nsga2b->child_pop, events);
 	nsga2b->assignRankCrowdingDistance(nsga2b->child_pop); 
@@ -64,9 +64,9 @@ int main (int argc, char **argv) {
 	nsga2b->fillNondominatedSort(nsga2b->mixed_pop, nsga2b->parent_pop);
 	
 	// -- Report 1B -- //
-	nsga2a->fileio->report_pop(nsga2b->child_pop,nsga2a->fileio->fpt1);		// Initial pop out
+	nsga2a->fileio->report_pop(nsga2b->child_pop, nsga2a->fileio->fpt1);         // Initial pop out
 	fprintf(nsga2a->fileio->fpt4,"# gen = 1B\n");
-	nsga2a->fileio->report_pop(nsga2b->parent_pop,nsga2a->fileio->fpt4);	// All pop out
+	nsga2a->fileio->report_pop(nsga2b->parent_pop, nsga2a->fileio->fpt4);        // All pop out
 	nsga2a->fileio->flushIO();
 	
 	for ( int i = 2; i <= nsga2a->ngen; i++ ) {
@@ -82,7 +82,7 @@ int main (int argc, char **argv) {
 		
 		// -- Report(i)A -- //
 		fprintf(nsga2a->fileio->fpt4,"# gen = %dA\n",i);
-		nsga2a->fileio->report_pop(nsga2a->parent_pop,nsga2a->fileio->fpt4);
+		nsga2a->fileio->report_pop(nsga2a->parent_pop, nsga2a->fileio->fpt4);
 		nsga2a->fileio->flushIO();  // TODO: this flushes everything, but really we only need to flush fpt4 here.
 		cout << "- Finished generation #" << i << "A" << endl;
 		
@@ -96,22 +96,22 @@ int main (int argc, char **argv) {
 		
 		// -- Report(i)B -- //
 		fprintf(nsga2a->fileio->fpt4,"# gen = %dB\n",i);
-		nsga2a->fileio->report_pop(nsga2b->parent_pop,nsga2a->fileio->fpt4);
+		nsga2a->fileio->report_pop(nsga2b->parent_pop, nsga2a->fileio->fpt4);
 		nsga2a->fileio->flushIO();  // TODO: this flushes everything, but really we only need to flush fpt4 here.
 		
 		cout << "- Finished generation #" << i << "B" << endl;
 	}
 	
 	// -- Report final solution -- //
-	nsga2a->fileio->report_pop(nsga2b->parent_pop,nsga2a->fileio->fpt2);
-	nsga2a->fileio->report_feasible(nsga2b->parent_pop,nsga2a->fileio->fpt3);
+	nsga2a->fileio->report_pop(nsga2b->parent_pop, nsga2a->fileio->fpt2);
+	nsga2a->fileio->report_feasible(nsga2b->parent_pop, nsga2a->fileio->fpt3);
 	if (nsga2a->nreal!=0) {
-		fprintf(nsga2a->fileio->fpt5,"\n Number of crossover of real variable = %d",nsga2a->nrealcross + nsga2b->nrealcross);
-		fprintf(nsga2a->fileio->fpt5,"\n Number of mutation of real variable = %d",nsga2a->nrealmut + nsga2b->nrealmut);
+		fprintf(nsga2a->fileio->fpt5, "\n Number of crossover of real variable = %d", nsga2a->nrealcross + nsga2b->nrealcross);
+		fprintf(nsga2a->fileio->fpt5, "\n Number of mutation of real variable = %d", nsga2a->nrealmut + nsga2b->nrealmut);
 	}
 	if (nsga2a->nbin!=0) {
-		fprintf(nsga2a->fileio->fpt5,"\n Number of crossover of binary variable = %d",nsga2a->nbincross + nsga2b->nbincross);
-		fprintf(nsga2a->fileio->fpt5,"\n Number of mutation of binary variable = %d",nsga2a->nbinmut + nsga2b->nbinmut);
+		fprintf(nsga2a->fileio->fpt5, "\n Number of crossover of binary variable = %d", nsga2a->nbincross + nsga2b->nbincross);
+		fprintf(nsga2a->fileio->fpt5, "\n Number of mutation of binary variable = %d", nsga2a->nbinmut + nsga2b->nbinmut);
 	}
 	
 	printHeader("completed");
