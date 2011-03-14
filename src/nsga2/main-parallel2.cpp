@@ -49,6 +49,7 @@ int main (int argc, char **argv) {
 		if (i == 1) {
 			nsga2a->receivePop(nsga2a->parent_pop);									// JINXU: This function waits for the solution queue
 			nsga2a->assignRankCrowdingDistance(nsga2a->parent_pop); 
+			fprintf(nsga2a->fileio->fpt1,"# gen = 1A\n",i);
 			nsga2a->fileio->report_pop (nsga2a->parent_pop, nsga2a->fileio->fpt1);  // Initial population
 		} else {
 			nsga2a->receivePop(nsga2a->child_pop);									// JINXU: This function waits for the solution queue
@@ -72,7 +73,8 @@ int main (int argc, char **argv) {
 		// -- Receive (i)B -- //
 		nsga2b->receivePop(nsga2b->child_pop);										// JINXU: This function waits for the solution queue
 		if (i == 1) {
-			nsga2b->assignRankCrowdingDistance(nsga2b->parent_pop); 
+			nsga2b->assignRankCrowdingDistance(nsga2b->parent_pop);
+			fprintf(nsga2a->fileio->fpt1,"# gen = 1B\n",i);
 			nsga2a->fileio->report_pop(nsga2b->child_pop, nsga2a->fileio->fpt1);  // Initial population
 		}
 		nsga2b->merge(nsga2a->parent_pop, nsga2b->child_pop, nsga2b->mixed_pop);
@@ -95,11 +97,11 @@ int main (int argc, char **argv) {
 	// -- Report final solution -- //
 	nsga2a->fileio->report_pop(nsga2b->parent_pop, nsga2a->fileio->fpt2);
 	nsga2a->fileio->report_feasible(nsga2b->parent_pop, nsga2a->fileio->fpt3);
-	if (nsga2a->nreal!=0) {
+	if (nsga2a->nreal != 0) {
 		fprintf(nsga2a->fileio->fpt5,"\n Number of crossover of real variable = %d",nsga2a->nrealcross + nsga2b->nrealcross);
 		fprintf(nsga2a->fileio->fpt5,"\n Number of mutation of real variable = %d",nsga2a->nrealmut + nsga2b->nrealmut);
 	}
-	if (nsga2a->nbin!=0) {
+	if (nsga2a->nbin != 0) {
 		fprintf(nsga2a->fileio->fpt5,"\n Number of crossover of binary variable = %d",nsga2a->nbincross + nsga2b->nbincross);
 		fprintf(nsga2a->fileio->fpt5,"\n Number of mutation of binary variable = %d",nsga2a->nbinmut + nsga2b->nbinmut);
 	}
