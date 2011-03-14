@@ -32,57 +32,32 @@ int main (int argc, char **argv) {
 	
 	// -- Send 1A -- // 
 	nsga2a->decodePop(nsga2a->parent_pop);
-	nsga2a->sendPop(nsga2a->parent_pop);									// JINXU: This function puts the individuals in the queue
+	nsga2a->sendPop(nsga2a->parent_pop);											// JINXU: This function puts the individuals in the queue
 	
 	// -- Initialization of B -- //
 	nsga2b->randgen->randomize();					// Initialize random number generator
 	nsga2b->Init("prepdata/param.in");				// This sets all variables related to GA
 	nsga2b->InitMemory();							// This allocates memory for the populations
-	nsga2b->InitPop(nsga2b->parent_pop, Np_start);	// Initialize parent population randomly
+	nsga2b->InitPop(nsga2b->child_pop, Np_start);	// Initialize child population randomly
 	
 	// -- Send 1B -- // 
 	nsga2b->decodePop(nsga2b->parent_pop);
-	nsga2b->sendPop(nsga2b->parent_pop);									// JINXU: This function puts the individuals in the queue
+	nsga2b->sendPop(nsga2b->parent_pop);											// JINXU: This function puts the individuals in the queue
 	
-	// -- Receive 1A -- //
-	nsga2a->receivePop(nsga2a->parent_pop);									// JINXU: This function waits for the solution queue
-	nsga2a->assignRankCrowdingDistance(nsga2a->parent_pop); 
-	
-	// -- Report 1A -- //
-	nsga2a->fileio->report_pop (nsga2a->parent_pop, nsga2a->fileio->fpt1);
-	fprintf(nsga2a->fileio->fpt4,"# gen = 1A\n");
-	nsga2a->fileio->report_pop(nsga2a->parent_pop,nsga2a->fileio->fpt4);
-	nsga2a->fileio->flushIO();
-	
-	// -- Generate and send 2A -- //
-	nsga2a->selection(nsga2a->parent_pop, nsga2a->child_pop);
-	nsga2a->mutatePop(nsga2a->child_pop);
-	nsga2a->decodePop(nsga2a->child_pop);
-	nsga2a->sendPop(nsga2a->child_pop);										// JINXU: This function puts the individuals in the queue
-	
-	// -- Receive 1B -- //
-	nsga2b->receivePop(nsga2b->parent_pop);									// JINXU: This function waits for the solution queue
-	nsga2b->assignRankCrowdingDistance(nsga2b->parent_pop); 
-	
-	// -- Report 1B -- //
-	nsga2a->fileio->report_pop(nsga2b->parent_pop,nsga2a->fileio->fpt1);
-	fprintf(nsga2a->fileio->fpt4,"# gen = 1B\n");
-	nsga2a->fileio->report_pop(nsga2b->parent_pop,nsga2a->fileio->fpt4);
-	nsga2a->fileio->flushIO();
-	
-	for ( int i = 2; i <= nsga2a->ngen; i++ ) {
-		// -- Generate and send (i)B -- //
-		nsga2b->selection(nsga2b->parent_pop, nsga2b->child_pop);
-		nsga2b->mutatePop(nsga2b->child_pop);
-		nsga2b->decodePop(nsga2b->child_pop);
-		nsga2b->sendPop(nsga2b->child_pop);									// JINXU: This function puts the individuals in the queue
-		
+	for ( int i = 1; i <= nsga2a->ngen; i++ ) {
 		// -- Receive (i)A -- //
-		nsga2a->receivePop(nsga2a->child_pop);								// JINXU: This function waits for the solution queue
-		nsga2a->merge(nsga2b->parent_pop, nsga2a->child_pop, nsga2a->mixed_pop);
-		nsga2a->fillNondominatedSort(nsga2a->mixed_pop, nsga2a->parent_pop);
+		if (i == 1) {
+			nsga2a->receivePop(nsga2a->parent_pop);									// JINXU: This function waits for the solution queue
+			nsga2a->assignRankCrowdingDistance(nsga2a->parent_pop); 
+		} else {
+			nsga2a->receivePop(nsga2a->child_pop);									// JINXU: This function waits for the solution queue
+			nsga2a->merge(nsga2b->parent_pop, nsga2a->child_pop, nsga2a->mixed_pop);
+			nsga2a->fillNondominatedSort(nsga2a->mixed_pop, nsga2a->parent_pop);
+		}
 		
 		// -- Report (i)A -- //
+		if (i ==1 )
+			nsga2a->fileio->report_pop (nsga2a->parent_pop, nsga2a->fileio->fpt1);
 		fprintf(nsga2a->fileio->fpt4,"# gen = %dA\n",i);
 		nsga2a->fileio->report_pop(nsga2a->parent_pop,nsga2a->fileio->fpt4);
 		nsga2a->fileio->flushIO();
@@ -96,14 +71,26 @@ int main (int argc, char **argv) {
 		}
 		
 		// -- Receive (i)B -- //
-		nsga2b->receivePop(nsga2b->child_pop);								// JINXU: This function waits for the solution queue
+		nsga2b->receivePop(nsga2b->child_pop);										// JINXU: This function waits for the solution queue
+		if (i == 1) 
+			nsga2b->assignRankCrowdingDistance(nsga2b->parent_pop); 
 		nsga2b->merge(nsga2a->parent_pop, nsga2b->child_pop, nsga2b->mixed_pop);
 		nsga2b->fillNondominatedSort(nsga2b->mixed_pop, nsga2b->parent_pop);
 		
 		// -- Report (i)B -- //
+		if (i == 1) 
+			nsga2a->fileio->report_pop(nsga2b->child_pop,nsga2a->fileio->fpt1);
 		fprintf(nsga2a->fileio->fpt4,"# gen = %dB\n",i);
 		nsga2a->fileio->report_pop(nsga2b->parent_pop,nsga2a->fileio->fpt4);
 		nsga2a->fileio->flushIO();
+		
+		if (i < nsga2a->ngen) {
+			// -- Generate and send (i)B -- //
+			nsga2b->selection(nsga2b->parent_pop, nsga2b->child_pop);
+			nsga2b->mutatePop(nsga2b->child_pop);
+			nsga2b->decodePop(nsga2b->child_pop);
+			nsga2b->sendPop(nsga2b->child_pop);										// JINXU: This function puts the individuals in the queue
+		}
 	}
 	
 	// -- Report final solution -- //
