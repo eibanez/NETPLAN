@@ -26,15 +26,15 @@ int main (int argc, char **argv) {
 	ImportIndices();
 	
 	// -- Initialization -- //
-	nsga2->randgen->randomize();					// Initialize random number generator
-	nsga2->Init("prepdata/param.in");				// This sets all variables related to GA
-	nsga2->InitMemory();							// This allocates memory for the populations
-	nsga2->InitPop(nsga2->parent_pop, Np_start);	// Initialize parent population randomly
-	nsga2->fileio->recordConfiguration();			// Records all variables related to GA configuration
-	if (argc > 1){
+	nsga2->randgen->randomize();                    // Initialize random number generator
+	nsga2->Init("prepdata/param.in");               // This sets all variables related to GA
+	nsga2->InitMemory();                            // This allocates memory for the populations
+	nsga2->InitPop(nsga2->parent_pop, Np_start);    // Initialize parent population randomly
+	nsga2->fileio->recordConfiguration();           // Records all variables related to GA configuration
+	if (argc > 1) {
 		nsga2->ResumePop(nsga2->parent_pop, argv[1]);
 		fprintf(nsga2->fileio->fpt4,"# imported values\n");
-		nsga2->fileio->report_pop(nsga2->parent_pop,nsga2->fileio->fpt4);		// All pop out
+		nsga2->fileio->report_pop(nsga2->parent_pop, nsga2->fileio->fpt4);     // All pop out
 	}
 	
 	// Vector of capacity losses for events
@@ -48,10 +48,10 @@ int main (int argc, char **argv) {
 	nsga2->evaluatePop(nsga2->parent_pop, events);
 	nsga2->assignRankCrowdingDistance(nsga2->parent_pop); 
 	
-	nsga2->fileio->report_pop (nsga2->parent_pop, nsga2->fileio->fpt1);		// Initial pop out
+	nsga2->fileio->report_pop (nsga2->parent_pop, nsga2->fileio->fpt1);       // Initial pop out
 	
 	fprintf(nsga2->fileio->fpt4,"# gen = 1\n");
-	nsga2->fileio->report_pop(nsga2->parent_pop,nsga2->fileio->fpt4);		// All pop out
+	nsga2->fileio->report_pop(nsga2->parent_pop, nsga2->fileio->fpt4);         // All pop out
 	
 	cout << "- Finished generation #1" << endl;
 	nsga2->fileio->flushIO();
@@ -75,15 +75,15 @@ int main (int argc, char **argv) {
 	}
 	
 	cout << endl << "- Generations finished, now reporting solutions" << endl;
-	nsga2->fileio->report_pop(nsga2->parent_pop,nsga2->fileio->fpt2);
-	nsga2->fileio->report_feasible(nsga2->parent_pop,nsga2->fileio->fpt3);
+	nsga2->fileio->report_pop(nsga2->parent_pop, nsga2->fileio->fpt2);
+	nsga2->fileio->report_feasible(nsga2->parent_pop, nsga2->fileio->fpt3);
 	if (nsga2->nreal!=0) {
-		fprintf(nsga2->fileio->fpt5,"\n Number of crossover of real variable = %d",nsga2->nrealcross);
-		fprintf(nsga2->fileio->fpt5,"\n Number of mutation of real variable = %d",nsga2->nrealmut);
+		fprintf(nsga2->fileio->fpt5, "\n Number of crossover of real variable = %d", nsga2->nrealcross);
+		fprintf(nsga2->fileio->fpt5, "\n Number of mutation of real variable = %d", nsga2->nrealmut);
 	}
 	if (nsga2->nbin!=0) {
-		fprintf(nsga2->fileio->fpt5,"\n Number of crossover of binary variable = %d",nsga2->nbincross);
-		fprintf(nsga2->fileio->fpt5,"\n Number of mutation of binary variable = %d",nsga2->nbinmut);
+		fprintf(nsga2->fileio->fpt5, "\n Number of crossover of binary variable = %d", nsga2->nbincross);
+		fprintf(nsga2->fileio->fpt5, "\n Number of mutation of binary variable = %d", nsga2->nbinmut);
 	}
 	
 	printHeader("completed");

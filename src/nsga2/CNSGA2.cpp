@@ -9,19 +9,19 @@ CNSGA2::CNSGA2(void) {
 }
 
 CNSGA2::CNSGA2(bool output, double seed) {
-	randgen	= new CRand(seed);
+	randgen = new CRand(seed);
 	if (output) fileio = new CFileIO(this);
 	quicksort = new CQuicksort(randgen);
 	linkedlist = new CLinkedList();
 }
 
-CNSGA2::~CNSGA2(void) {	
+CNSGA2::~CNSGA2(void) {
 	delete randgen;
 	delete fileio;
 	delete quicksort;
 	delete linkedlist;
 	
-	if ( nreal != 0 ) {
+	if (nreal != 0) {
 		free (min_realvar);
 		free (max_realvar);
 	}
@@ -42,8 +42,8 @@ CNSGA2::~CNSGA2(void) {
 
 void CNSGA2::Init(const char* param) {
 	FILE *file = fopen(param, "r");
-	if ( file != NULL ) {
-		char line [ 100 ];
+	if (file != NULL) {
+		char line [100];
 		// Size of population (multiple of 4)
 		fgets(line, sizeof line, file);
 		popsize = strtol(line, NULL, 10);
@@ -131,9 +131,9 @@ void CNSGA2::Init(const char* param) {
 
 // This function allocates the memory needed for the given populations
 void CNSGA2::InitMemory() {
-	parent_pop 	= (population *)malloc(sizeof(population));
-	child_pop 	= (population *)malloc(sizeof(population));
-	mixed_pop 	= (population *)malloc(sizeof(population));
+	parent_pop  = (population *)malloc(sizeof(population));
+	child_pop   = (population *)malloc(sizeof(population));
+	mixed_pop   = (population *)malloc(sizeof(population));
 	
 	allocate_memory_pop (parent_pop, popsize);
 	allocate_memory_pop (child_pop, popsize);

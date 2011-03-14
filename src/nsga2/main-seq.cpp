@@ -83,7 +83,7 @@ int main (int argc, char **argv) {
 		// -- Report(i)A -- //
 		fprintf(nsga2a->fileio->fpt4,"# gen = %dA\n",i);
 		nsga2a->fileio->report_pop(nsga2a->parent_pop, nsga2a->fileio->fpt4);
-		nsga2a->fileio->flushIO();  // TODO: this flushes everything, but really we only need to flush fpt4 here.
+		nsga2a->fileio->flushIO();
 		cout << "- Finished generation #" << i << "A" << endl;
 		
 		// -- Evaluate (i)B -- //
@@ -97,7 +97,7 @@ int main (int argc, char **argv) {
 		// -- Report(i)B -- //
 		fprintf(nsga2a->fileio->fpt4,"# gen = %dB\n",i);
 		nsga2a->fileio->report_pop(nsga2b->parent_pop, nsga2a->fileio->fpt4);
-		nsga2a->fileio->flushIO();  // TODO: this flushes everything, but really we only need to flush fpt4 here.
+		nsga2a->fileio->flushIO();
 		
 		cout << "- Finished generation #" << i << "B" << endl;
 	}

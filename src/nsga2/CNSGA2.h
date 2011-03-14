@@ -31,9 +31,9 @@ class CNSGA2 {
 		
 		// Initialization methods
 		void Init(const char* param);
-		void InitMemory();	
-		void InitPop(population *pop, double prob);	// Initialize population randomly
-		void InitInd(individual *ind, double prob);	// Initialize individual randomly
+		void InitMemory();
+		void InitPop(population *pop, double prob); // Initialize population randomly
+		void InitInd(individual *ind, double prob); // Initialize individual randomly
 		void ResumePop(population *pop, const char* fileinput); // Resume a population
 		
 		// Memory allocation/deallocation methods
@@ -62,8 +62,8 @@ class CNSGA2 {
 		int checkDominance (individual *a, individual *b);
 		
 		// Tournament Selection
-		void 		selection (population *old_pop, population *new_pop);
-		individual*	tournament (individual *ind1, individual *ind2);
+		void selection (population *old_pop, population *new_pop);
+		individual* tournament (individual *ind1, individual *ind2);
 		
 		// Crossover
 		void crossover (individual *parent1, individual *parent2, individual *child1, individual *child2);
@@ -88,28 +88,28 @@ class CNSGA2 {
 		// void test_problem (double *xreal, double *xbin, int **gene, double *objective, double *constr);
 		
 		// NSGA-II variables
-		int			nreal;
-		int			nbin;
-		int			nobj;
-		int			ncon;
-		int			popsize;
-		double		pcross_real;
-		double		pcross_bin;
-		double		pmut_real;
-		double		pmut_bin;
-		double		eta_c;
-		double		eta_m;
-		int			ngen;
-		int			nbinmut;
-		int			nrealmut;
-		int			nbincross;
-		int			nrealcross;
-		int			*nbits;
-		double		*min_realvar;
-		double		*max_realvar;
-		double		*min_binvar;
-		double		*max_binvar;
-		int			bitlength;
+		int nreal;
+		int nbin;
+		int nobj;
+		int ncon;
+		int popsize;
+		double pcross_real;
+		double pcross_bin;
+		double pmut_real;
+		double pmut_bin;
+		double eta_c;
+		double eta_m;
+		int ngen;
+		int nbinmut;
+		int nrealmut;
+		int nbincross;
+		int nrealcross;
+		int *nbits;
+		double *min_realvar;
+		double *max_realvar;
+		double *min_binvar;
+		double *max_binvar;
+		int bitlength;
 		
 		// Populations
 		population *parent_pop;
@@ -117,8 +117,8 @@ class CNSGA2 {
 		population *mixed_pop;
 		
 		// Helper classes
-		CRand*			randgen;
-		CFileIO*		fileio;
-		CQuicksort*		quicksort;
-		CLinkedList*	linkedlist;
+		CRand* randgen;
+		CFileIO* fileio;
+		CQuicksort* quicksort;
+		CLinkedList* linkedlist;
 };
