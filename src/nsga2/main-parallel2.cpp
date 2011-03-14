@@ -49,6 +49,7 @@ int main (int argc, char **argv) {
 		if (i == 1) {
 			nsga2a->receivePop(nsga2a->parent_pop);									// JINXU: This function waits for the solution queue
 			nsga2a->assignRankCrowdingDistance(nsga2a->parent_pop); 
+			nsga2a->fileio->report_pop (nsga2a->parent_pop, nsga2a->fileio->fpt1);  // Initial population
 		} else {
 			nsga2a->receivePop(nsga2a->child_pop);									// JINXU: This function waits for the solution queue
 			nsga2a->merge(nsga2b->parent_pop, nsga2a->child_pop, nsga2a->mixed_pop);
@@ -56,8 +57,6 @@ int main (int argc, char **argv) {
 		}
 		
 		// -- Report (i)A -- //
-		if (i ==1)
-			nsga2a->fileio->report_pop (nsga2a->parent_pop, nsga2a->fileio->fpt1);
 		fprintf(nsga2a->fileio->fpt4,"# gen = %dA\n",i);
 		nsga2a->fileio->report_pop(nsga2a->parent_pop, nsga2a->fileio->fpt4);
 		nsga2a->fileio->flushIO();
@@ -72,20 +71,20 @@ int main (int argc, char **argv) {
 		
 		// -- Receive (i)B -- //
 		nsga2b->receivePop(nsga2b->child_pop);										// JINXU: This function waits for the solution queue
-		if (i == 1) 
+		if (i == 1) {
 			nsga2b->assignRankCrowdingDistance(nsga2b->parent_pop); 
+			nsga2a->fileio->report_pop(nsga2b->child_pop, nsga2a->fileio->fpt1);  // Initial population
+		}
 		nsga2b->merge(nsga2a->parent_pop, nsga2b->child_pop, nsga2b->mixed_pop);
 		nsga2b->fillNondominatedSort(nsga2b->mixed_pop, nsga2b->parent_pop);
 		
 		// -- Report (i)B -- //
-		if (i == 1) 
-			nsga2a->fileio->report_pop(nsga2b->child_pop, nsga2a->fileio->fpt1);
 		fprintf(nsga2a->fileio->fpt4,"# gen = %dB\n",i);
 		nsga2a->fileio->report_pop(nsga2b->parent_pop, nsga2a->fileio->fpt4);
 		nsga2a->fileio->flushIO();
 		
 		if (i < nsga2a->ngen) {
-			// -- Generate and send (i)B -- //
+			// -- Generate and send (i+1)B -- //
 			nsga2b->selection(nsga2b->parent_pop, nsga2b->child_pop);
 			nsga2b->mutatePop(nsga2b->child_pop);
 			nsga2b->decodePop(nsga2b->child_pop);

@@ -45,40 +45,25 @@ int main (int argc, char **argv) {
 	
 	cout << "- Initialization done, now performing first generation" << endl;
 	
-	// -- Evaluate 1A -- // 
-	nsga2a->decodePop(nsga2a->parent_pop);
-	nsga2a->evaluatePop(nsga2a->parent_pop, events);
-	nsga2a->assignRankCrowdingDistance(nsga2a->parent_pop); 
 	
-	// -- Report 1A -- //
-	nsga2a->fileio->report_pop (nsga2a->parent_pop, nsga2a->fileio->fpt1);      // Initial pop out
-	fprintf(nsga2a->fileio->fpt4,"# gen = 1A\n");
-	nsga2a->fileio->report_pop(nsga2a->parent_pop, nsga2a->fileio->fpt4);       // All pop out
-	nsga2a->fileio->flushIO();
-	
-	// -- Evaluate 1B -- // 
-	nsga2b->decodePop(nsga2b->child_pop);
-	nsga2b->evaluatePop(nsga2b->child_pop, events);
-	nsga2b->assignRankCrowdingDistance(nsga2b->child_pop); 
-	nsga2b->merge(nsga2a->parent_pop, nsga2b->child_pop, nsga2b->mixed_pop);
-	nsga2b->fillNondominatedSort(nsga2b->mixed_pop, nsga2b->parent_pop);
-	
-	// -- Report 1B -- //
-	nsga2a->fileio->report_pop(nsga2b->child_pop, nsga2a->fileio->fpt1);         // Initial pop out
-	fprintf(nsga2a->fileio->fpt4,"# gen = 1B\n");
-	nsga2a->fileio->report_pop(nsga2b->parent_pop, nsga2a->fileio->fpt4);        // All pop out
-	nsga2a->fileio->flushIO();
-	
-	for ( int i = 2; i <= nsga2a->ngen; i++ ) {
+	for ( int i = 1; i <= nsga2a->ngen; i++ ) {
 		printHeader("elapsed");
 		
 		// -- Evaluate (i)A -- //
-		nsga2a->selection(nsga2a->parent_pop, nsga2a->child_pop);
-		nsga2a->mutatePop(nsga2a->child_pop);
+		if (i > 1) {
+			nsga2a->selection(nsga2a->parent_pop, nsga2a->child_pop);
+			nsga2a->mutatePop(nsga2a->child_pop);
+		}
 		nsga2a->decodePop(nsga2a->child_pop);
 		nsga2a->evaluatePop(nsga2a->child_pop, events);
-		nsga2a->merge(nsga2b->parent_pop, nsga2a->child_pop, nsga2a->mixed_pop);
-		nsga2a->fillNondominatedSort(nsga2a->mixed_pop, nsga2a->parent_pop);
+		if (i == 1) {
+			nsga2a->assignRankCrowdingDistance(nsga2a->parent_pop); 
+			fprintf(nsga2a->fileio->fpt1,"# gen = 1A\n",i);
+			nsga2a->fileio->report_pop (nsga2a->parent_pop, nsga2a->fileio->fpt1);   // Initial pop out
+		} else {
+			nsga2a->merge(nsga2b->parent_pop, nsga2a->child_pop, nsga2a->mixed_pop);
+			nsga2a->fillNondominatedSort(nsga2a->mixed_pop, nsga2a->parent_pop);
+		}
 		
 		// -- Report(i)A -- //
 		fprintf(nsga2a->fileio->fpt4,"# gen = %dA\n",i);
@@ -87,10 +72,17 @@ int main (int argc, char **argv) {
 		cout << "- Finished generation #" << i << "A" << endl;
 		
 		// -- Evaluate (i)B -- //
-		nsga2b->selection(nsga2b->parent_pop, nsga2b->child_pop);
-		nsga2b->mutatePop(nsga2b->child_pop);
+		if (i > 1) {
+			nsga2b->selection(nsga2b->parent_pop, nsga2b->child_pop);
+			nsga2b->mutatePop(nsga2b->child_pop);
+		}
 		nsga2b->decodePop(nsga2b->child_pop);
 		nsga2b->evaluatePop(nsga2b->child_pop, events);
+		if (i == 1) {
+			nsga2b->assignRankCrowdingDistance(nsga2b->child_pop); 
+			fprintf(nsga2a->fileio->fpt1,"# gen = 1B\n",i);
+			nsga2a->fileio->report_pop(nsga2b->child_pop, nsga2a->fileio->fpt1);     // Initial pop out
+		}
 		nsga2b->merge(nsga2a->parent_pop, nsga2b->child_pop, nsga2b->mixed_pop);
 		nsga2b->fillNondominatedSort(nsga2b->mixed_pop, nsga2b->parent_pop);
 		
