@@ -46,7 +46,7 @@ void CPLEX::LoadProblem() {
 				//cplex[i].setParam(IloCplex::ScaInd,-1); 
 				cplex[i].setParam(IloCplex::RootAlg, IloCplex::Dual);
 			}
-			if (outputLevel > 0 ) {
+			if (outputLevel > 0) {
 				cplex[i].setOut(env.getNullStream());
 			} else {
 				cout << "Reading " << file_name << endl;
@@ -62,7 +62,7 @@ void CPLEX::LoadProblem() {
 }
 
 // Solves current model
-void CPLEX::SolveIndividual( double *objective, const double events[], string & returnString ) {
+void CPLEX::SolveIndividual(double *objective, const double events[], string & returnString) {
 	int nyears = SLength[0];
 	
 	try {
@@ -73,7 +73,7 @@ void CPLEX::SolveIndividual( double *objective, const double events[], string & 
 		IloArray<IloRangeArray> CapCuts(env, 0);
 		for (int i=1; i <= nyears; ++i) {
 			IloRangeArray tempcon(env, 0);
-			CapCuts.add( tempcon );
+			CapCuts.add(tempcon);
 		}
 		// Store constraints that later will be used to apply capacities
 		vector<int> copied(nyears, 0);
@@ -159,7 +159,7 @@ void CPLEX::SolveIndividual( double *objective, const double events[], string & 
 						cplex[j].getDuals(dualcap[j-1], CapCuts[j-1]);
 						
 						if (outputLevel < 2 ) cout << "f" << j << " ";
-					} else if (mastersol[j-1] <= cplex[j].getObjValue() * 0.999 ) {
+					} else if (mastersol[j-1] <= cplex[j].getObjValue() * 0.999) {
 						// If cost is underestimated, create optimality cut
 						++OptCuts; status[j-1] = true;
 						expr_cut[j-1] = - var[0][j-1];
@@ -205,7 +205,7 @@ void CPLEX::SolveIndividual( double *objective, const double events[], string & 
 					StoreDualSolution();
 				}
 				
-				if (outputLevel < 2 ) {
+				if (outputLevel < 2) {
 					if (OptCuts+FeasCuts == 0) cout << "No cuts - Optimal solution found!";
 					cout << endl;
 				}
@@ -219,20 +219,20 @@ void CPLEX::SolveIndividual( double *objective, const double events[], string & 
 			}
 		}
 		
-		if ( !optimal ) {
+		if (!optimal) {
 			// Solution not found, return very large values
 			cout << "\tProblem infeasible!" << endl;
 			for (int i=0; i < Nobj; ++i)
 				objective[i] = 1.0e30;
 		} else {
-			if ( outputLevel < 2 )
+			if (outputLevel < 2)
 				cout << "\tCost: " << objective[0] << endl;
 			
 			// Sustainability metrics
 			vector<double> emissions = SumByRow(solution, IdxEm, startEm);
 			for (int i=0; i < SustObj.size(); ++i) {
 				// Print results on screen
-				if ( outputLevel < 2 ) {
+				if (outputLevel < 2) {
 					if (SustObj[i] == "EmCO2" || SustObj[i] == "CO2") {
 						cout << "\t" << SustObj[i] << ": ";
 						cout << EmissionIndex(solution, startEm + SLength[0]*i);
@@ -270,14 +270,14 @@ void CPLEX::SolveIndividual( double *objective, const double events[], string & 
 				int startPos = IdxCap.GetSize() * (Nevents + 1);
 				
 				// Evaluate all the events and obtain operating cost
-				if ( outputLevel < 2 ) cout << "- Solving resiliency..." << endl;
+				if (outputLevel < 2) cout << "- Solving resiliency..." << endl;
 				
 				// Initialize operational cost
 				for (int event=1; event <= Nevents; ++event)
 					ResilObj[event-1] = 0;
 				
 				for (int j=1; j <= nyears; ++j) {
-					if ( events[startPos + (j-1) * (Nevents+1)] == 1 ) {
+					if (events[startPos + (j-1) * (Nevents+1)] == 1) {
 						// If Benders is used, the operational cost is already available
 						if (!useBenders) {
 							// Solve subproblem
@@ -286,7 +286,7 @@ void CPLEX::SolveIndividual( double *objective, const double events[], string & 
 						}
 						
 						for (int event=1; event <= Nevents; ++event)
-							if ( events[startPos + (j-1) * (Nevents+1) + event] == 1 )
+							if (events[startPos + (j-1) * (Nevents+1) + event] == 1)
 								ResilObj[event-1] -= cplex[j].getObjValue();
 					}
 				}
@@ -299,7 +299,7 @@ void CPLEX::SolveIndividual( double *objective, const double events[], string & 
 					double years_changed[nyears];
 					
 					for (int j=1; (j <= nyears) & (current_feasible); ++j) {
-						if ( events[startPos + (j-1) * (Nevents+1) + event] == 1 ) {
+						if (events[startPos + (j-1) * (Nevents+1) + event] == 1) {
 							// Solve subproblem
 							cplex[j].solve();
 							years_changed[j-1] = 1;
@@ -313,7 +313,6 @@ void CPLEX::SolveIndividual( double *objective, const double events[], string & 
 							} else {
 								// If subproblem is feasible
 								ResilObj[event-1] += cplex[j].getObjValue();
-								
 							}
 						} else {
 							years_changed[j-1] = 0;
@@ -332,11 +331,11 @@ void CPLEX::SolveIndividual( double *objective, const double events[], string & 
 						if (outputLevel < 2) cout << "\t\tEv: " << j+1 << "\tCost: " << ResilObj[j] << endl;
 					}
 					objective[SustObj.size() + 1] = resiliency / Nevents;
-					if ( outputLevel < 2 )
+					if (outputLevel < 2)
 						cout << "\tResiliency: " << resiliency / Nevents << endl;
 				} else {
 					objective[SustObj.size() + 1] = 1.0e9;
-					if ( outputLevel < 2 )
+					if (outputLevel < 2)
 						cout << "\tResiliency infeasible!" << endl;
 				}
 				
@@ -353,7 +352,7 @@ void CPLEX::SolveIndividual( double *objective, const double events[], string & 
 		}
 		
 		// Erase cuts created with Benders
-		model[0].remove( MasterCuts );
+		model[0].remove(MasterCuts);
 		MasterCuts.end();
 		
 		// Erase capacities from subproblems
@@ -368,9 +367,9 @@ void CPLEX::SolveIndividual( double *objective, const double events[], string & 
 	}
 }
 
-void CPLEX::SolveIndividual( double *objective, const double events[] ) {
+void CPLEX::SolveIndividual(double *objective, const double events[]) {
 	string skipString = "skip";
-	SolveIndividual( objective, events, skipString );
+	SolveIndividual(objective, events, skipString);
 }
 
 // Store complete solution vector
@@ -379,7 +378,7 @@ void CPLEX::StoreSolution() {
 	solution.clear();
 	
 	try {
-		if ( !useBenders ) {
+		if (!useBenders) {
 			// Only one file
 			cplex[0].getValues(solution, var[0]);
 		} else {
@@ -411,34 +410,34 @@ void CPLEX::StoreSolution() {
 			// Recover sustainability metrics
 			for (int j = 0; j < IdxEm.GetSize(); ++j) {
 				int tempYear = IdxArc.GetYear(j);
-				solution.add( varsol[tempYear][position[tempYear]] );
+				solution.add(varsol[tempYear][position[tempYear]]);
 				++position[tempYear];
 			}
 			
 			// Recover reserve margin
 			for (int j = 0; j < IdxRm.GetSize(); ++j) {
-				solution.add( varsol[0][position[0]] );
+				solution.add(varsol[0][position[0]]);
 				++position[0];
 			}
 			
 			// Recover flows
 			for (int j = 0; j < IdxArc.GetSize(); ++j) {
 				int tempYear = IdxArc.GetYear(j);
-				solution.add( varsol[tempYear][position[tempYear]] );
+				solution.add(varsol[tempYear][position[tempYear]]);
 				++position[tempYear];
 			}
 			
 			// Recover unserved demand
 			for (int j = 0; j < IdxUd.GetSize(); ++j) {
 				int tempYear = IdxUd.GetYear(j);
-				solution.add( varsol[tempYear][position[tempYear]] );
+				solution.add(varsol[tempYear][position[tempYear]]);
 				++position[tempYear];
 			}
 			
 			// Recover DC angles
 			for (int j = 0; j < IdxDc.GetSize(); ++j) {
 				int tempYear = IdxDc.GetYear(j);
-				solution.add( varsol[tempYear][position[tempYear]] );
+				solution.add( arsol[tempYear][position[tempYear]]);
 				++position[tempYear];
 			}
 		}
@@ -456,14 +455,14 @@ void CPLEX::StoreDualSolution() {
 		dualsolution[i].clear();
 	
 	try {
-		if ( !useBenders ) {
+		if (!useBenders) {
 			// Only one file
 			IloNumArray tempdual(env);
 			cplex[0].getDuals(tempdual, rng[0]);
 		
 			int start = IdxEm.GetSize() + IdxRm.GetSize();
 			for (int i=0; i < IdxNode.GetSize(); ++i)
-				dualsolution[0].add( tempdual[start +i] );
+				dualsolution[0].add(tempdual[start +i]);
 		} else {
 			// Multiple files (Benders decomposition)
 			IloArray<IloNumArray> dualsol(env, 0);
@@ -474,12 +473,12 @@ void CPLEX::StoreDualSolution() {
 			}
 			
 			// The following array keeps track of what has already been copied
-			vector<int> position( nyears, SustMet.size() );
+			vector<int> position(nyears, SustMet.size());
 			
 			// Recover nodal duals
 			for (int j = 0; j < IdxNode.GetSize(); ++j) {
 				int tempYear = IdxNode.GetYear(j);
-				dualsolution[0].add( dualsol[tempYear-1][position[tempYear-1]] );
+				dualsolution[0].add(dualsol[tempYear-1][position[tempYear-1]]);
 				++position[tempYear-1];
 			}
 		}
@@ -504,16 +503,16 @@ void CPLEX::StoreDualSolution(int event, double *years) {
 		}
 		
 		// The following array keeps track of what has already been copied
-		vector<int> position( nyears, SustMet.size() );
+		vector<int> position(nyears, SustMet.size();
 		int globalposition = 0;
 		
 		// Recover nodal duals
 		for (int j = 0; j < IdxNode.GetSize(); ++j) {
 			int tempYear = IdxNode.GetYear(j);
 			if (years[tempYear-1] == 1) {
-				dualsolution[event].add( dualsol[tempYear-1][position[tempYear-1]] );
+				dualsolution[event].add( dualsol[tempYear-1][position[tempYear-1]]);
 			} else {
-				dualsolution[event].add( dualsolution[0][globalposition] );
+				dualsolution[event].add(dualsolution[0][globalposition]);
 			}
 			++position[tempYear-1]; ++globalposition;
 		}
@@ -534,14 +533,14 @@ void CPLEX::SolveProblem(double *x, double *objective, const double events[]) {
 	// Force minimum investment (x) as lower bound
 	IloRangeArray ConstrLB(env, 0);
 	for (int i = 0; i < IdxNsga.GetSize(); ++i)
-		ConstrLB.add( var[0][startInv + i] >= x[i] );
-	model[0].add( ConstrLB );
+		ConstrLB.add(var[0][startInv + i] >= x[i]);
+	model[0].add(ConstrLB);
 	
 	// Solve problem
-	SolveIndividual( objective, events );
+	SolveIndividual(objective, events);
 	
 	// Eliminate lower bound constraints
-	model[0].remove( ConstrLB );
+	model[0].remove(ConstrLB);
 	ConstrLB.end();
 }
 
@@ -551,7 +550,7 @@ void CPLEX::ApplyMinInv(double *x) {
 	if (useBenders) inv += SLength[0];
 	
 	for (int i = 0; i < IdxNsga.GetSize(); ++i) {
-		var[0][inv + i].setLB( x[i] );
+		var[0][inv + i].setLB(x[i]);
 	}
 }
 
@@ -559,7 +558,7 @@ void CPLEX::ApplyMinInv(double *x) {
 vector<string> CPLEX::SolutionString() {
 	vector<string> solstring(0);
 	for (int i=0; i < solution.getSize(); ++i)
-		solstring.push_back( ToString<IloNum>(solution[i]) );
+		solstring.push_back(ToString<IloNum>(solution[i]));
 	return solstring;
 }
 
@@ -567,7 +566,7 @@ vector<string> CPLEX::SolutionString() {
 vector<string> CPLEX::SolutionDualString(int event) {
 	vector<string> solstring(0);
 	for (int i=0; i < dualsolution[event].getSize(); ++i)
-		solstring.push_back( ToString<IloNum>(dualsolution[event][i]) );
+		solstring.push_back(ToString<IloNum>(dualsolution[event][i]));
 	return solstring;
 }
 
@@ -581,7 +580,7 @@ void CapacityConstraints(IloArray<IloRangeArray>& Cuts, const double events[], c
 		for (int i=0; i < IdxCap.GetSize(); ++i) {
 			int year = IdxCap.GetYear(i);
 			IloNum rhs = events[i * (Nevents+1) + event] * mastersol[offset + i];
-			Cuts[year-1][copied[year-1]].setUB( rhs );
+			Cuts[year-1][copied[year-1]].setUB(rhs);
 			++copied[year-1];
 		}
 	} catch (IloException& e) {
@@ -622,7 +621,7 @@ vector<double> SumByRow(const IloNumArray& v, Index Idx, const int start) {
 	vector<double> result(0);
 	
 	for (int i = 0; i < Idx.GetSize(); ++i) {
-		if ( (last_index != Idx.GetPosition(i)) && (last_index != -1) ) {
+		if ((last_index != Idx.GetPosition(i)) && (last_index != -1)) {
 			result.push_back(sum);
 			sum = 0; j=0;
 			last_index = Idx.GetPosition(i);
@@ -656,17 +655,17 @@ void ImportMin( const char* filename, const int MstartInv ) {
 	int inv = MstartInv;
 	
 	FILE *file;
-	char line [ 200 ];
+	char line [200];
 	
 	file = fopen(filename, "r");
-	if ( file != NULL ) {
+	if (file != NULL) {
 		for (;;) {
 			// Read a line from the file and finish if empty is read
-			if ( fgets(line, sizeof line, file) == NULL )
+			if (fgets(line, sizeof line, file) == NULL)
 				break;
 			double d1;
 			d1 = strtod(line, NULL);
-			model[0].add( var[0][inv] >= d1 );
+			model[0].add(var[0][inv] >= d1);
 			++inv;
 		}
 	}
