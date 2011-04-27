@@ -454,7 +454,7 @@ int CNSGA2::checkDominance (individual *a, individual *b) {
 						if (a->obj[i] > b->obj[i])
 							flag2 = 1;
 					}
-				}                
+				}
 				if (flag1==1 && flag2==0)
 					return (1);
 				else {
@@ -823,7 +823,7 @@ void CNSGA2::realMutateInd (individual *ind) {
 }
 
 /* Routine to merge two populations into one */
-void CNSGA2::merge(population *pop1, population *pop2, population *pop3) {    
+void CNSGA2::merge(population *pop1, population *pop2, population *pop3) {
 	int i, k;
 	for ( i = 0; i < popsize; i++ )
 		copyInd (&(pop1->ind[i]), &(pop3->ind[i]));

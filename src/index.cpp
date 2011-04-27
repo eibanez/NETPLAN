@@ -32,7 +32,7 @@ Index& Index::operator=(const Index& rhs) {
 	Column = rhs.GetColumn(),
 	Year = rhs.GetYear(),
 	Name = rhs.GetName();
-    return *this;
+	return *this;
 }
 
 // Recover information

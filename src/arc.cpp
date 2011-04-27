@@ -45,10 +45,10 @@ Arc::Arc(const Arc& rhs, const bool reverse) :
 Arc::~Arc() {}
 
 Arc& Arc::operator=(const Arc& rhs) {
-    Properties = rhs.GetVecStr("Properties");
-    Energy2Trans = rhs.GetBool("Energy2Trans");
-    Trans2Energy = rhs.GetVecStr("Trans2Energy");
-    return *this;
+	Properties = rhs.GetVecStr("Properties");
+	Energy2Trans = rhs.GetBool("Energy2Trans");
+	Trans2Energy = rhs.GetVecStr("Trans2Energy");
+	return *this;
 }
 
 // Read a property in string format
@@ -291,7 +291,7 @@ string Arc::CapArcColumns(int selector) const {
 	string temp_output = "";
 	
 	// If investment is allowed,
-    if ( isFirstinYear() && Get("OpMax") != "Inf" && Get("TransInfr") == "" ) {
+	if ( isFirstinYear() && Get("OpMax") != "Inf" && Get("TransInfr") == "" ) {
 		if ( selector != 1 ) {
 			// Add capacity as an upper bound for flows withing that year
 			Step step1, step2, stepguide, maxstep;
