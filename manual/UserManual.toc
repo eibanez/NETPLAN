@@ -1,0 +1,31 @@
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}
+\contentsline {section}{\numberline {2}Setting up}{2}{section.2}
+\contentsline {subsection}{\numberline {2.1}Accesing Cplex}{2}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Setting the default folder}{3}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}NETPLAN folder}{3}{subsection.2.3}
+\contentsline {section}{\numberline {3}Basic commands}{4}{section.3}
+\contentsline {section}{\numberline {4}Constructing a model}{5}{section.4}
+\contentsline {subsection}{\numberline {4.1}parameters.csv}{5}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}node\_List.csv}{6}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}arcs\_List.csv}{7}{subsection.4.3}
+\contentsline {subsection}{\numberline {4.4}trans\_List.csv}{7}{subsection.4.4}
+\contentsline {subsection}{\numberline {4.5}Simplification for data storage}{8}{subsection.4.5}
+\contentsline {subsection}{\numberline {4.6}nodes\_[Parameter].csv}{9}{subsection.4.6}
+\contentsline {subsection}{\numberline {4.7}arcs\_[Parameter].csv}{9}{subsection.4.7}
+\contentsline {subsection}{\numberline {4.8}arcs\_TransEnergy.csv}{10}{subsection.4.8}
+\contentsline {subsection}{\numberline {4.9}events/CapacityLossN.csv}{10}{subsection.4.9}
+\contentsline {section}{\numberline {5}Modeling Approach}{10}{section.5}
+\contentsline {subsection}{\numberline {5.1}Energy systems modeling}{11}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Transportation systems modeling}{11}{subsection.5.2}
+\contentsline {section}{\numberline {6}General cost minimization formulation}{12}{section.6}
+\contentsline {subsection}{\numberline {6.1}Nomenclature}{13}{subsection.6.1}
+\contentsline {subsubsection}{\numberline {6.1.1}Decision Variables}{13}{subsubsection.6.1.1}
+\contentsline {subsection}{\numberline {6.2}Sets and networks}{13}{subsection.6.2}
+\contentsline {subsection}{\numberline {6.3}Time and time steps}{13}{subsection.6.3}
+\contentsline {subsection}{\numberline {6.4}Energy Parameters}{14}{subsection.6.4}
+\contentsline {subsection}{\numberline {6.5}Transportation Parameters}{14}{subsection.6.5}
+\contentsline {subsection}{\numberline {6.6}Auxiliary parameters}{15}{subsection.6.6}
+\contentsline {subsection}{\numberline {6.7}Other parameters and functions}{15}{subsection.6.7}
+\contentsline {section}{\numberline {7}General formulation}{15}{section.7}
+\contentsline {subsection}{\numberline {7.1}Compact notation}{17}{subsection.7.1}
+\contentsline {subsection}{\numberline {7.2}Multiobjective solver}{17}{subsection.7.2}
