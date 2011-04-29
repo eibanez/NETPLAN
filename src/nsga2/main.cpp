@@ -13,6 +13,7 @@ using namespace std;
 #include <string>
 #include <vector>
 #include "../netscore.h"
+ILOSTLBEGIN
 
 CNSGA2* nsga2 = new CNSGA2();
 
@@ -21,6 +22,12 @@ int main (int argc, char **argv) {
 	
 	// Read global parameters
 	ReadParameters("data/parameters.csv");
+	
+	// Declare variables to store the optimization model
+	CPLEX netplan;
+	
+	// Read optimization problem and store it in memory
+	netplan.LoadProblem();
 	
 	// Read indices
 	ImportIndices();
@@ -45,7 +52,7 @@ int main (int argc, char **argv) {
 	
 	// -- Go -- //
 	nsga2->decodePop(nsga2->parent_pop);
-	nsga2->evaluatePop(nsga2->parent_pop, events);
+	nsga2->evaluatePop(nsga2->parent_pop, netplan, events);
 	nsga2->assignRankCrowdingDistance(nsga2->parent_pop); 
 	
 	nsga2->fileio->report_pop (nsga2->parent_pop, nsga2->fileio->fpt1);       // Initial pop out
@@ -61,7 +68,7 @@ int main (int argc, char **argv) {
 		nsga2->selection (nsga2->parent_pop, nsga2->child_pop);
 		nsga2->mutatePop (nsga2->child_pop);
 		nsga2->decodePop(nsga2->child_pop);
-		nsga2->evaluatePop(nsga2->child_pop, events);
+		nsga2->evaluatePop(nsga2->child_pop, netplan, events);
 		nsga2->merge (nsga2->parent_pop, nsga2->child_pop, nsga2->mixed_pop);
 		nsga2->fillNondominatedSort(nsga2->mixed_pop, nsga2->parent_pop);
 		

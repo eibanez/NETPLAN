@@ -47,7 +47,7 @@ class CNSGA2 {
 		void decodeInd(individual *ind);
 		
 		// Population evaluate methods
-		void evaluatePop(population *pop, const double events[]);
+		void evaluatePop(population *pop, CPLEX& netplan, const double events[]);
 		void sendPop(population *pop);
 		void receivePop(population *pop);
 		// void evaluateInd(individual *ind, const double events[], CPLEX& netplan);
