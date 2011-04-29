@@ -36,7 +36,7 @@ void CPLEX::LoadProblem() {
 		// Read MPS files
 		for (int i=0; i <= nyears; ++i) {
 			string file_name = "";
-			if ( !useBenders && (i == 0) ) {
+			if (!useBenders && (i == 0)) {
 				file_name = "prepdata/netscore.mps";
 			} else {
 				file_name = "prepdata/bend_" + ToString<int>(i) + ".mps";
@@ -52,6 +52,10 @@ void CPLEX::LoadProblem() {
 				cout << "Reading " << file_name << endl;
 			}
 			cplex[i].importModel(model[i], file_name.c_str(), obj[i], var[i], rng[i]);
+			
+			if (!useBenders && (i == 0))
+				model[0].add(MasterCuts);
+			
 			cplex[i].extract(model[i]);
 		}
 	} catch (IloException& e) {
@@ -66,9 +70,6 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 	int nyears = SLength[0];
 	
 	try {
-		// Store temporary master cuts
-		IloRangeArray MasterCuts(env, 0);
-		
 		// Constraints to apply capacities to subproblems
 		IloArray<IloRangeArray> CapCuts(env, 0);
 		for (int i=1; i <= nyears; ++i) {
@@ -86,7 +87,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 			model[i].add( CapCuts[i-1] );
 		
 		// Keep track of solution
-		bool optimal = true; // IloNumArray solution(env, 0);
+		bool optimal = true;
 		
 		if ( !useBenders ) {
 			// Only one file
@@ -189,8 +190,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 						if (status[j-1]) {
 							MasterCuts.add( expr_cut[j-1] <= 0 );
 							string constraintName = "Cut_y" + ToString<int>(j) + "_iter" + ToString<int>(iter);
-							MasterCuts[MasterCuts.getSize()-1].setName( constraintName.c_str() );
-							model[0].add( MasterCuts[MasterCuts.getSize()-1] );
+							MasterCuts[MasterCuts.getSize()-1].setName(constraintName.c_str());
 						}
 						// Reset solver properties
 						if (cplex[j].getCplexStatus() != CPX_STAT_OPTIMAL) {
@@ -352,8 +352,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 		}
 		
 		// Erase cuts created with Benders
-		model[0].remove(MasterCuts);
-		MasterCuts.end();
+		MasterCuts.endElements();
 		
 		// Erase capacities from subproblems
 		for (int j=1; j <= nyears; ++j)
@@ -437,7 +436,7 @@ void CPLEX::StoreSolution() {
 			// Recover DC angles
 			for (int j = 0; j < IdxDc.GetSize(); ++j) {
 				int tempYear = IdxDc.GetYear(j);
-				solution.add( arsol[tempYear][position[tempYear]]);
+				solution.add(varsol[tempYear][position[tempYear]]);
 				++position[tempYear];
 			}
 		}
@@ -503,7 +502,7 @@ void CPLEX::StoreDualSolution(int event, double *years) {
 		}
 		
 		// The following array keeps track of what has already been copied
-		vector<int> position(nyears, SustMet.size();
+		vector<int> position(nyears, SustMet.size());
 		int globalposition = 0;
 		
 		// Recover nodal duals

@@ -26,7 +26,12 @@ struct CPLEX {
 	IloNumArray solution;
 	IloArray<IloNumArray> dualsolution;
 	
-	CPLEX() : env(), model(env, 0), cplex(env, 0), obj(env, 0), var(env, 0), rng(env, 0), solution(env, 0), dualsolution(env, 0) {};
+	// Variable to store temporary master cuts
+	IloRangeArray MasterCuts;
+	
+	CPLEX(): env(), model(env, 0), cplex(env, 0), obj(env, 0), var(env, 0), rng(env, 0),
+		solution(env, 0), dualsolution(env, 0), MasterCuts(env, 0) {};
+	
 	~CPLEX() {
 		// Remove optimization elements from memory
 		dualsolution.end(); solution.end(); rng.end(); var.end(); obj.end(); model.end(); cplex.end();
