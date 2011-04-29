@@ -52,12 +52,31 @@ void CPLEX::LoadProblem() {
 				cout << "Reading " << file_name << endl;
 			}
 			cplex[i].importModel(model[i], file_name.c_str(), obj[i], var[i], rng[i]);
-			
-			if (!useBenders && (i == 0))
-				model[0].add(MasterCuts);
-			
-			cplex[i].extract(model[i]);
 		}
+		
+		// Variable to store temporary master cuts
+		if (!useBenders)
+			model[0].add(MasterCuts);
+		
+		// Prepare constraints to apply capacities to subproblems
+		for (int i=1; i <= nyears; ++i) {
+			IloRangeArray tempcon(env, 0);
+			CapCuts.add(tempcon);
+		}
+		// Store constraints that later will be used to apply capacities
+		vector<int> copied(nyears, 0);
+		for (int i=0; i < IdxCap.GetSize(); ++i) {
+			int year = IdxCap.GetYear(i);
+			CapCuts[year-1].add(var[year][copied[year-1]] <= 0);
+			++copied[year-1];
+		}
+		for (int i=1; i <= nyears; ++i)
+			model[i].add(CapCuts[i-1]);
+		
+		// Extract models
+		for (int i=0; i <= nyears; ++i)
+			cplex[i].extract(model[i]);
+		
 	} catch (IloException& e) {
 		cerr << "Concert exception caught: " << e << endl;
 	} catch (...) {
@@ -70,22 +89,6 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 	int nyears = SLength[0];
 	
 	try {
-		// Constraints to apply capacities to subproblems
-		IloArray<IloRangeArray> CapCuts(env, 0);
-		for (int i=1; i <= nyears; ++i) {
-			IloRangeArray tempcon(env, 0);
-			CapCuts.add(tempcon);
-		}
-		// Store constraints that later will be used to apply capacities
-		vector<int> copied(nyears, 0);
-		for (int i=0; i < IdxCap.GetSize(); ++i) {
-			int year = IdxCap.GetYear(i);
-			CapCuts[year-1].add( var[year][copied[year-1]] <= 0 );
-			++copied[year-1];
-		}
-		for (int i=1; i<= nyears; ++i)
-			model[i].add( CapCuts[i-1] );
-		
 		// Keep track of solution
 		bool optimal = true;
 		
@@ -353,11 +356,6 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 		
 		// Erase cuts created with Benders
 		MasterCuts.endElements();
-		
-		// Erase capacities from subproblems
-		for (int j=1; j <= nyears; ++j)
-			model[j].remove( CapCuts[j-1] );
-		CapCuts.end();
 		
 	} catch (IloException& e) {
 		cerr << "Concert exception caught: " << e << endl;
