@@ -125,7 +125,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 				
 				// Solve master problem. If master is infeasible, exit loop
 				if (outputLevel < 2 ) cout << "- Solving master problem (Iteration #" << iter << ")" << endl;
-				if ( !cplex[0].solve() ) {
+				if (!cplex[0].solve()) {
 					break;
 				}
 				
