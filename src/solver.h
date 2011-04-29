@@ -62,11 +62,10 @@ struct CPLEX {
 	// Provide solution as a string vector
 	vector<string> SolutionString();
 	vector<string> SolutionDualString(int event);
+	
+	// Apply capacities from master to subproblems
+	void CapacityConstraints(const double events[], const int event, const int offset);
 };
-
-
-// Apply capacities from master to subproblems
-void CapacityConstraints(IloArray<IloRangeArray>& Cuts, const double events[], const int event, const IloNumArray mastersol, const int offset);
 
 // Metrics
 double EmissionIndex(const IloNumArray& v, const int start);

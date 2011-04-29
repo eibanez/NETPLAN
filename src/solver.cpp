@@ -108,7 +108,6 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 		} else {
 			// Use Benders decomposition
 			int OptCuts = 1, FeasCuts = 1, iter = 0;
-			IloNumArray mastersol(env);
 			
 			// Temporary variables to store dual information
 			IloArray<IloNumArray> dualcap(env, 0);
@@ -134,10 +133,10 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 				}
 				
 				// Recover variables (first nyears are estimated obj. val)
-				cplex[0].getValues(mastersol, var[0]);
+				StoreSolution();
 				
 				// Store capacities as constraints
-				CapacityConstraints(CapCuts, events, 0, mastersol, nyears);
+				CapacityConstraints(events, 0, nyears);
 				
 				// Start subproblems
 				if (outputLevel < 2 ) cout << "- Solving subproblems" << endl << "  ";
@@ -163,7 +162,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 						cplex[j].getDuals(dualcap[j-1], CapCuts[j-1]);
 						
 						if (outputLevel < 2 ) cout << "f" << j << " ";
-					} else if (mastersol[j-1] <= cplex[j].getObjValue() * 0.999) {
+					} else if (solution[j-1] <= cplex[j].getObjValue() * 0.999) {
 						// If cost is underestimated, create optimality cut
 						++OptCuts; status[j-1] = true;
 						expr_cut[j-1] = - var[0][j-1];
@@ -284,7 +283,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 						// If Benders is used, the operational cost is already available
 						if (!useBenders) {
 							// Solve subproblem
-							CapacityConstraints(CapCuts, events, 0, solution, 0);
+							CapacityConstraints(events, 0, 0);
 							cplex[j].solve();
 						}
 						
@@ -298,7 +297,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 					bool current_feasible = true;
 					
 					// Store capacities as constraints
-					CapacityConstraints(CapCuts, events, event, solution, 0);
+					CapacityConstraints(events, event, 0);
 					double years_changed[nyears];
 					
 					for (int j=1; (j <= nyears) & (current_feasible); ++j) {
@@ -568,7 +567,7 @@ vector<string> CPLEX::SolutionDualString(int event) {
 }
 
 // Apply capacities from master to subproblems
-void CapacityConstraints(IloArray<IloRangeArray>& Cuts, const double events[], const int event, const IloNumArray mastersol, const int offset) {
+void CPLEX::CapacityConstraints(const double events[], const int event, const int offset) {
 	int nyears = SLength[0];
 	
 	try {
@@ -576,8 +575,8 @@ void CapacityConstraints(IloArray<IloRangeArray>& Cuts, const double events[], c
 		vector<int> copied(nyears, 0);
 		for (int i=0; i < IdxCap.GetSize(); ++i) {
 			int year = IdxCap.GetYear(i);
-			IloNum rhs = events[i * (Nevents+1) + event] * mastersol[offset + i];
-			Cuts[year-1][copied[year-1]].setUB(rhs);
+			IloNum rhs = events[i * (Nevents+1) + event] * solution[offset + i];
+			CapCuts[year-1][copied[year-1]].setUB(rhs);
 			++copied[year-1];
 		}
 	} catch (IloException& e) {
