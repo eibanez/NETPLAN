@@ -96,9 +96,10 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 			// Only one file
 			if (outputLevel < 2 ) cout << "- Solving problem" << endl;
 			
-			if ( cplex[0].solve() ) {
+			if (cplex[0].solve()) {
 				optimal = true;
 				objective[0] = cplex[0].getObjValue();
+				
 				// Store solution if optimal solution found
 				StoreSolution();
 				StoreDualSolution();
@@ -124,7 +125,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 				IloExprArray expr_cut(env, nyears);
 				IloNumArray dual(env);
 				
-				// cplex[0].exportModel("temp.lp");
+				//cplex[0].exportModel("master.lp");
 				
 				// Solve master problem. If master is infeasible, exit loop
 				if (outputLevel < 2 ) cout << "- Solving master problem (Iteration #" << iter << ")" << endl;
@@ -133,7 +134,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 				}
 				
 				// Recover variables (first nyears are estimated obj. val)
-				StoreSolution();
+				StoreSolution(true);
 				
 				// Store capacities as constraints
 				CapacityConstraints(events, 0, nyears);
@@ -144,7 +145,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 				for (int j=1; j <= nyears; ++j) {
 					// Solve subproblem
 					cplex[j].solve();
-						
+					
 					if (cplex[j].getCplexStatus() != CPX_STAT_OPTIMAL) {
 						// If subproblem is infeasible, create feasibility cut
 						++FeasCuts; status[j-1] = true;
@@ -369,12 +370,12 @@ void CPLEX::SolveIndividual(double *objective, const double events[]) {
 }
 
 // Store complete solution vector
-void CPLEX::StoreSolution() {
+void CPLEX::StoreSolution(bool onlymaster) {
 	int nyears = SLength[0];
 	solution.clear();
 	
 	try {
-		if (!useBenders) {
+		if (!useBenders || onlymaster) {
 			// Only one file
 			cplex[0].getValues(solution, var[0]);
 		} else {

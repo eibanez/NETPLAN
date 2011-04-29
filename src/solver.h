@@ -49,7 +49,7 @@ struct CPLEX {
 	void SolveIndividual(double *objective, const double events[]);
 	
 	// Store complete solution vector
-	void StoreSolution();
+	void StoreSolution(bool onlymaster=false);
 	void StoreDualSolution();
 	void StoreDualSolution(int event, double *years);
 	
