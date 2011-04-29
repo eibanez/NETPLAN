@@ -29,9 +29,8 @@ void CPLEX::LoadProblem() {
 			var.add( IloNumVarArray(env) );
 			rng.add( IloRangeArray(env) );
 		}
-		for (int i=0; i <= Nevents; ++i) {
+		for (int i=0; i <= Nevents; ++i)
 			dualsolution.add( IloNumArray(env) );
-		}
 		
 		// Read MPS files
 		for (int i=0; i <= nyears; ++i) {
@@ -42,8 +41,8 @@ void CPLEX::LoadProblem() {
 				file_name = "prepdata/bend_" + ToString<int>(i) + ".mps";
 			}
 			if (i!=0) {
-				//cplex[i].setParam(IloCplex::PreInd,0);
-				//cplex[i].setParam(IloCplex::ScaInd,-1); 
+				//cplex[i].setParam(IloCplex::PreInd, 0);
+				//cplex[i].setParam(IloCplex::ScaInd, -1); 
 				cplex[i].setParam(IloCplex::RootAlg, IloCplex::Dual);
 			}
 			if (outputLevel > 0) {
@@ -519,7 +518,6 @@ void CPLEX::StoreDualSolution(int event, double *years) {
 		cerr << "Unknown exception caught" << endl;
 	}
 }
-
 
 // Function called by the NSGA-II method. It takes the minimum investement (x) and calculates the metrics (objective)
 void CPLEX::SolveProblem(double *x, double *objective, const double events[]) {

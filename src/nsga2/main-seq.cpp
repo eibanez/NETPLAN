@@ -24,12 +24,6 @@ int main (int argc, char **argv) {
 	// Read global parameters
 	ReadParameters("data/parameters.csv");
 	
-	// Declare variables to store the optimization model
-	CPLEX netplan;
-	
-	// Read optimization problem and store it in memory
-	netplan.LoadProblem();
-	
 	// Read indices
 	ImportIndices();
 	
@@ -49,6 +43,12 @@ int main (int argc, char **argv) {
 	// Vector of capacity losses for events
 	double events[(SLength[0] + IdxCap.GetSize()) * (Nevents+1)];
 	ReadEvents(events, "prepdata/bend_events.csv");
+	
+	// Declare variables to store the optimization model
+	CPLEX netplan;
+	
+	// Read optimization problem and store it in memory
+	netplan.LoadProblem();
 	
 	cout << "- Initialization done, now performing first generation" << endl;
 	
