@@ -162,7 +162,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 							expr_cut[j-1] += dual[k] * rng[j][k].getUB();
 						cplex[j].getDuals(dualcap[j-1], CapCuts[j-1]);
 						
-						if (outputLevel < 2 ) cout << "f" << j << " ";
+						if (outputLevel < 2 ) cout << j << " ";
 					} else if (solution[j-1] <= cplex[j].getObjValue() * 0.999) {
 						// If cost is underestimated, create optimality cut
 						++OptCuts; status[j-1] = true;
@@ -172,7 +172,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 							expr_cut[j-1] += dual[k] * rng[j][k].getUB();
 						cplex[j].getDuals(dualcap[j-1], CapCuts[j-1]);
 						
-						if (outputLevel < 2 ) cout << j << " ";
+						if (outputLevel < 2 ) cout << "o" << j << " ";
 					} else {
 						status[j-1] = false;
 					}
