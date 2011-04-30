@@ -23,8 +23,8 @@ struct CPLEX {
 	IloArray<IloObjective> obj;
 	IloArray<IloNumVarArray> var;
 	IloArray<IloRangeArray> rng;
-	IloNumArray solution;
-	IloArray<IloNumArray> dualsolution;
+	IloNumArray solution, TempArray;
+	IloArray<IloNumArray> dualsolution, TempNumArray;
 	
 	// Variable to store temporary master cuts
 	IloRangeArray MasterCuts;
@@ -33,11 +33,14 @@ struct CPLEX {
 	IloArray<IloRangeArray> CapCuts;
 	
 	CPLEX(): env(), model(env, 0), cplex(env, 0), obj(env, 0), var(env, 0), rng(env, 0),
-		solution(env, 0), dualsolution(env, 0), MasterCuts(env, 0), CapCuts(env, 0) {};
+		solution(env, 0), dualsolution(env, 0), MasterCuts(env, 0), CapCuts(env, 0),
+		TempArray(env, 0), TempNumArray(env, 0) {};
 	
 	~CPLEX() {
 		// Remove optimization elements from memory
-		dualsolution.end(); solution.end(); rng.end(); var.end(); obj.end(); model.end(); cplex.end();
+		TempNumArray.end(); TempArray.end();
+		dualsolution.end(); solution.end();
+		rng.end(); var.end(); obj.end(); model.end(); cplex.end();
 		env.end();
 	};
 	

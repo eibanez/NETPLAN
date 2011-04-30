@@ -28,9 +28,9 @@ void CPLEX::LoadProblem() {
 			obj.add( IloObjective(env) );
 			var.add( IloNumVarArray(env) );
 			rng.add( IloRangeArray(env) );
-		}
-		for (int i=0; i <= Nevents; ++i)
 			dualsolution.add( IloNumArray(env) );
+			TempNumArray.add( IloNumArray(env) );
+		}
 		
 		// Read MPS files
 		for (int i=0; i <= nyears; ++i) {
@@ -58,10 +58,9 @@ void CPLEX::LoadProblem() {
 			model[0].add(MasterCuts);
 		
 		// Prepare constraints to apply capacities to subproblems
-		for (int i=1; i <= nyears; ++i) {
-			IloRangeArray tempcon(env, 0);
-			CapCuts.add(tempcon);
-		}
+		for (int i=1; i <= nyears; ++i)
+			CapCuts.add( IloRangeArray(env) );
+		
 		// Store constraints that later will be used to apply capacities
 		vector<int> copied(nyears, 0);
 		for (int i=0; i < IdxCap.GetSize(); ++i) {
@@ -109,20 +108,12 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 			// Use Benders decomposition
 			int OptCuts = 1, FeasCuts = 1, iter = 0;
 			
-			// Temporary variables to store dual information
-			IloArray<IloNumArray> dualcap(env, 0);
-			for (int i=1; i <= nyears; ++i) {
-				IloNumArray temparr(env, 0);
-				dualcap.add(temparr);
-			}
-			
 			while ((OptCuts+FeasCuts > 0) && ( iter <= 1000)) {
 				++iter; OptCuts = 0; FeasCuts = 0;
 				
 				// Keep track of necessary cuts
 				bool status[nyears];
 				IloExprArray expr_cut(env, nyears);
-				IloNumArray dual(env);
 				
 				//cplex[0].exportModel("master.lp");
 				
@@ -156,20 +147,20 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 						cplex[j].solve();
 						
 						IloExpr temp(env); expr_cut[j-1] = temp;
-						cplex[j].getDuals(dual, rng[j]);
-						for (int k=0; k < dual.getSize(); ++k)
-							expr_cut[j-1] += dual[k] * rng[j][k].getUB();
-						cplex[j].getDuals(dualcap[j-1], CapCuts[j-1]);
+						cplex[j].getDuals(TempArray, rng[j]);
+						for (int k=0; k < TempArray.getSize(); ++k)
+							expr_cut[j-1] += TempArray[k] * rng[j][k].getUB();
+						cplex[j].getDuals(TempNumArray[j-1], CapCuts[j-1]);
 						
 						if (outputLevel < 2 ) cout << j << " ";
 					} else if (solution[j-1] <= cplex[j].getObjValue() * 0.999) {
 						// If cost is underestimated, create optimality cut
 						++OptCuts; status[j-1] = true;
 						expr_cut[j-1] = - var[0][j-1];
-						cplex[j].getDuals(dual, rng[j]);
-						for (int k=0; k < dual.getSize(); ++k)
-							expr_cut[j-1] += dual[k] * rng[j][k].getUB();
-						cplex[j].getDuals(dualcap[j-1], CapCuts[j-1]);
+						cplex[j].getDuals(TempArray, rng[j]);
+						for (int k=0; k < TempArray.getSize(); ++k)
+							expr_cut[j-1] += TempArray[k] * rng[j][k].getUB();
+						cplex[j].getDuals(TempNumArray[j-1], CapCuts[j-1]);
 						
 						if (outputLevel < 2 ) cout << "o" << j << " ";
 					} else {
@@ -183,7 +174,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 					for (int i=0; i < IdxCap.GetSize(); ++i) {
 						int year = IdxCap.GetYear(i);
 						if ( status[year-1] )
-							expr_cut[year-1] += dualcap[year-1][copied[year-1]] * var[0][nyears + i];
+							expr_cut[year-1] += TempNumArray[year-1][copied[year-1]] * var[0][nyears + i];
 						++copied[year-1];
 					}
 					
@@ -354,7 +345,8 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 		}
 		
 		// Erase cuts created with Benders
-		MasterCuts.endElements();
+		if (!useBenders)
+			MasterCuts.endElements();
 		
 	} catch (IloException& e) {
 		cerr << "Concert exception caught: " << e << endl;
@@ -379,11 +371,8 @@ void CPLEX::StoreSolution(bool onlymaster) {
 			cplex[0].getValues(solution, var[0]);
 		} else {
 			// Multiple files (Benders decomposition)
-			IloArray<IloNumArray> varsol(env, 0);
 			for (int i=0; i <= nyears; ++i) {
-				IloNumArray temp(env);
-				cplex[i].getValues(temp, var[i]);
-				varsol.add(temp);
+				cplex[i].getValues(TempNumArray[i], var[i]);
 			}
 			
 			// The following array keeps track of what has already been copied
@@ -393,47 +382,47 @@ void CPLEX::StoreSolution(bool onlymaster) {
 			// Recover capacities
 			for (int j = 0; j < IdxCap.GetSize(); ++j) {
 				int tempYear = IdxCap.GetYear(j);
-				solution.add( varsol[0][position[0]] );
+				solution.add(TempNumArray[0][position[0]]);
 				++position[0]; ++position[tempYear];
 			}
 			
 			// Recover investments
 			for (int j = 0; j < IdxInv.GetSize(); ++j) {
-				solution.add( varsol[0][position[0]] );
+				solution.add(TempNumArray[0][position[0]]);
 				++position[0];
 			}
 			
 			// Recover sustainability metrics
 			for (int j = 0; j < IdxEm.GetSize(); ++j) {
 				int tempYear = IdxArc.GetYear(j);
-				solution.add(varsol[tempYear][position[tempYear]]);
+				solution.add(TempNumArray[tempYear][position[tempYear]]);
 				++position[tempYear];
 			}
 			
 			// Recover reserve margin
 			for (int j = 0; j < IdxRm.GetSize(); ++j) {
-				solution.add(varsol[0][position[0]]);
+				solution.add(TempNumArray[0][position[0]]);
 				++position[0];
 			}
 			
 			// Recover flows
 			for (int j = 0; j < IdxArc.GetSize(); ++j) {
 				int tempYear = IdxArc.GetYear(j);
-				solution.add(varsol[tempYear][position[tempYear]]);
+				solution.add(TempNumArray[tempYear][position[tempYear]]);
 				++position[tempYear];
 			}
 			
 			// Recover unserved demand
 			for (int j = 0; j < IdxUd.GetSize(); ++j) {
 				int tempYear = IdxUd.GetYear(j);
-				solution.add(varsol[tempYear][position[tempYear]]);
+				solution.add(TempNumArray[tempYear][position[tempYear]]);
 				++position[tempYear];
 			}
 			
 			// Recover DC angles
 			for (int j = 0; j < IdxDc.GetSize(); ++j) {
 				int tempYear = IdxDc.GetYear(j);
-				solution.add(varsol[tempYear][position[tempYear]]);
+				solution.add(TempNumArray[tempYear][position[tempYear]]);
 				++position[tempYear];
 			}
 		}
@@ -453,20 +442,14 @@ void CPLEX::StoreDualSolution() {
 	try {
 		if (!useBenders) {
 			// Only one file
-			IloNumArray tempdual(env);
-			cplex[0].getDuals(tempdual, rng[0]);
-		
+			cplex[0].getDuals(TempArray, rng[0]);
 			int start = IdxEm.GetSize() + IdxRm.GetSize();
 			for (int i=0; i < IdxNode.GetSize(); ++i)
-				dualsolution[0].add(tempdual[start +i]);
+				dualsolution[0].add(TempArray[start +i]);
 		} else {
 			// Multiple files (Benders decomposition)
-			IloArray<IloNumArray> dualsol(env, 0);
-			for (int i=1; i <= nyears; ++i) {
-				IloNumArray temp(env);
-				cplex[i].getDuals(temp, rng[i]);
-				dualsol.add(temp);
-			}
+			for (int i=1; i <= nyears; ++i)
+				cplex[i].getDuals(TempNumArray[i-1], rng[i]);
 			
 			// The following array keeps track of what has already been copied
 			vector<int> position(nyears, SustMet.size());
@@ -474,7 +457,7 @@ void CPLEX::StoreDualSolution() {
 			// Recover nodal duals
 			for (int j = 0; j < IdxNode.GetSize(); ++j) {
 				int tempYear = IdxNode.GetYear(j);
-				dualsolution[0].add(dualsol[tempYear-1][position[tempYear-1]]);
+				dualsolution[0].add(TempNumArray[tempYear-1][position[tempYear-1]]);
 				++position[tempYear-1];
 			}
 		}
@@ -489,13 +472,11 @@ void CPLEX::StoreDualSolution(int event, double *years) {
 	int nyears = SLength[0];
 	
 	try {
-		IloArray<IloNumArray> dualsol(env, 0);
 		for (int i=1; i <= nyears; ++i) {
-			IloNumArray temp(env);
-			if (years[i-1] == 1) {
-				cplex[i].getDuals(temp, rng[i]);
-			}
-			dualsol.add(temp);
+			if (years[i-1] == 1)
+				cplex[i].getDuals(TempNumArray[i-1], rng[i]);
+			else
+				TempNumArray[i-1].clear();
 		}
 		
 		// The following array keeps track of what has already been copied
@@ -506,7 +487,7 @@ void CPLEX::StoreDualSolution(int event, double *years) {
 		for (int j = 0; j < IdxNode.GetSize(); ++j) {
 			int tempYear = IdxNode.GetYear(j);
 			if (years[tempYear-1] == 1) {
-				dualsolution[event].add( dualsol[tempYear-1][position[tempYear-1]]);
+				dualsolution[event].add(TempNumArray[tempYear-1][position[tempYear-1]]);
 			} else {
 				dualsolution[event].add(dualsolution[0][globalposition]);
 			}
@@ -523,20 +504,23 @@ void CPLEX::StoreDualSolution(int event, double *years) {
 void CPLEX::SolveProblem(double *x, double *objective, const double events[]) {
 	// Start of investment variables
 	int startInv = IdxCap.GetSize();
-	if ( useBenders ) startInv += SLength[0];
+	if (useBenders) startInv += SLength[0];
 	
 	// Force minimum investment (x) as lower bound
-	IloRangeArray ConstrLB(env, 0);
+	/* IloRangeArray ConstrLB(env, 0);
 	for (int i = 0; i < IdxNsga.GetSize(); ++i)
 		ConstrLB.add(var[0][startInv + i] >= x[i]);
-	model[0].add(ConstrLB);
+	model[0].add(ConstrLB); */
+	
+	for (int i = 0; i < IdxNsga.GetSize(); ++i)
+		var[0][startInv + i].setLB(x[i]);
 	
 	// Solve problem
 	SolveIndividual(objective, events);
 	
-	// Eliminate lower bound constraints
+	/* // Eliminate lower bound constraints
 	model[0].remove(ConstrLB);
-	ConstrLB.end();
+	ConstrLB.end(); */
 }
 
 // Apply minimum investments to the master problem
