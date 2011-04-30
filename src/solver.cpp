@@ -57,7 +57,7 @@ void CPLEX::LoadProblem() {
 		if (useBenders)
 			model[0].add(MasterCuts);
 		
-		// Prepare constraints to apply capacities to subproblems
+		/* // Prepare constraints to apply capacities to subproblems
 		for (int i=1; i <= nyears; ++i)
 			CapCuts.add( IloRangeArray(env) );
 		
@@ -69,7 +69,7 @@ void CPLEX::LoadProblem() {
 			++copied[year-1];
 		}
 		for (int i=1; i <= nyears; ++i)
-			model[i].add(CapCuts[i-1]);
+			model[i].add(CapCuts[i-1]); */
 		
 		// Extract models
 		for (int i=0; i <= nyears; ++i)
@@ -108,7 +108,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 			// Use Benders decomposition
 			int OptCuts = 1, FeasCuts = 1, iter = 0;
 			
-			while ((OptCuts+FeasCuts > 0) && ( iter <= 1000)) {
+			while ((OptCuts+FeasCuts > 0) && (iter <= 1000)) {
 				++iter; OptCuts = 0; FeasCuts = 0;
 				
 				// Keep track of necessary cuts
@@ -130,7 +130,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 				CapacityConstraints(events, 0, nyears);
 				
 				// Start subproblems
-				if (outputLevel < 2 ) cout << "- Solving subproblems" << endl << "  ";
+				if (outputLevel < 2) cout << "- Solving subproblems" << endl << "  ";
 				
 				for (int j=1; j <= nyears; ++j) {
 					// Solve subproblem
@@ -150,9 +150,10 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 						cplex[j].getDuals(TempArray, rng[j]);
 						for (int k=0; k < TempArray.getSize(); ++k)
 							expr_cut[j-1] += TempArray[k] * rng[j][k].getUB();
-						cplex[j].getDuals(TempNumArray[j-1], CapCuts[j-1]);
+						cplex[j].getReducedCosts(TempNumArray[j-1], var[j]); ///////////////////////////////////////////////////////////////
+						// cplex[j].getDuals(TempNumArray[j-1], CapCuts[j-1]);
 						
-						if (outputLevel < 2 ) cout << j << " ";
+						if (outputLevel < 2) cout << j << " ";
 					} else if (solution[j-1] <= cplex[j].getObjValue() * 0.999) {
 						// If cost is underestimated, create optimality cut
 						++OptCuts; status[j-1] = true;
@@ -160,7 +161,8 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 						cplex[j].getDuals(TempArray, rng[j]);
 						for (int k=0; k < TempArray.getSize(); ++k)
 							expr_cut[j-1] += TempArray[k] * rng[j][k].getUB();
-						cplex[j].getDuals(TempNumArray[j-1], CapCuts[j-1]);
+						cplex[j].getReducedCosts(TempNumArray[j-1], var[j]); ////////////////////////////////////////////////////////////////
+						// cplex[j].getDuals(TempNumArray[j-1], CapCuts[j-1]);
 						
 						if (outputLevel < 2 ) cout << "o" << j << " ";
 					} else {
@@ -554,12 +556,12 @@ void CPLEX::CapacityConstraints(const double events[], const int event, const in
 	int nyears = SLength[0];
 	
 	try {
-		// Apply capacities and store in the constraint arrays
 		vector<int> copied(nyears, 0);
 		for (int i=0; i < IdxCap.GetSize(); ++i) {
 			int year = IdxCap.GetYear(i);
 			IloNum rhs = events[i * (Nevents+1) + event] * solution[offset + i];
-			CapCuts[year-1][copied[year-1]].setUB(rhs);
+			var[year][copied[year-1]].setUB(rhs);
+			//CapCuts[year-1][copied[year-1]].setUB(rhs);
 			++copied[year-1];
 		}
 	} catch (IloException& e) {
