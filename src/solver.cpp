@@ -337,7 +337,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 					string tempString = "";
 					
 					for (int event=0; event < Nevents; ++event)
-						tempString += "," + ToString<double>( ResilObj[event] );
+						tempString += "," + ToString<double>(ResilObj[event]);
 					
 					returnString = tempString + returnString;
 				}
