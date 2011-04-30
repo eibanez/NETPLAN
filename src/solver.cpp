@@ -54,7 +54,7 @@ void CPLEX::LoadProblem() {
 		}
 		
 		// Variable to store temporary master cuts
-		if (!useBenders)
+		if (useBenders)
 			model[0].add(MasterCuts);
 		
 		// Prepare constraints to apply capacities to subproblems
@@ -345,7 +345,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 		}
 		
 		// Erase cuts created with Benders
-		if (!useBenders)
+		if (useBenders)
 			MasterCuts.endElements();
 		
 	} catch (IloException& e) {
