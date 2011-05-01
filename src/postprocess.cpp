@@ -21,7 +21,7 @@ int main () {
 	ReadParameters("data/parameters.csv");
 	
 	// Set output level so that Benders steps are reported on screen
-	if (outputLevel == 2 ) outputLevel = 1;
+	if (outputLevel == 2) outputLevel = 1;
 	
 	// Import indices to export data
 	ImportIndices();

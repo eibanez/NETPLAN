@@ -19,24 +19,20 @@ void WriteOutput(const char* fileinput, Index& idx, vector<string>& values, cons
 	// Open file
 	ofstream myfile;
 	myfile.open(fileinput);
-	int begin, end;
 	
 	if (idx.size > 0) {
 		// Get the start and the end that is going to be written
-		if (idx.size == values.size()) {
-			begin = 0;
-			end = values.size();
-		} else {
-			begin = idx.start;
-			end = begin + idx.size;
-		}
+		int begin = (idx.size == values.size()) ? 0 : idx.start;
 		
 		// Find min and max columns
-		int maximum = idx.GetColumn(begin), minimum = maximum;
-		for (unsigned int i = begin + 1; i < end; ++i) {
-			if (idx.GetColumn(i) > maximum ) maximum = idx.GetColumn(i);
-			if (idx.GetColumn(i) < minimum ) minimum = idx.GetColumn(i);
+		int maximum = idx.GetColumn(0), minimum = maximum;
+		cout << "max: " << maximum << endl;
+		
+		for (unsigned int i = 0 + 1; i < idx.size; ++i) {
+			if (idx.GetColumn(i) > maximum) maximum = idx.GetColumn(i);
+			if (idx.GetColumn(i) < minimum) minimum = idx.GetColumn(i);
 		}
+		cout << "max: " << maximum << endl;
 		
 		Step start(SName.size(), 0), guide(SName.size());
 		bool got_start = false;
@@ -55,7 +51,8 @@ void WriteOutput(const char* fileinput, Index& idx, vector<string>& values, cons
 		
 		// Write line of time values
 		int k = -1;
-		for (unsigned int i=0; i < SLength.size(); ++i) k += start[i];
+		for (unsigned int i=0; i < SLength.size(); ++i)
+			k += start[i];
 		
 		guide = start;
 		while (Step2Col(start) <= maximum) {
@@ -70,7 +67,7 @@ void WriteOutput(const char* fileinput, Index& idx, vector<string>& values, cons
 		
 		// Write one line of information
 		int prevpos = -1, prevcol = maximum;
-		for (int i = begin; i < end; ++i) {
+		for (int i = 0; i < idx.size; ++i) {
 			if (idx.GetPosition(i) != prevpos) {
 				for (int j = prevcol; j < maximum; ++j) myfile << ",";
 				myfile << "\n" << idx.GetName(i);
@@ -79,7 +76,7 @@ void WriteOutput(const char* fileinput, Index& idx, vector<string>& values, cons
 				prevcol = idx.GetColumn(i)-1;
 			}
 			for (int j=prevcol; j<idx.GetColumn(i); ++j)  myfile << ",";
-			myfile << values[i];
+			myfile << values[begin + i];
 			prevcol = idx.GetColumn(i);
 		}
 	}
