@@ -39,7 +39,7 @@ int main (int argc, char **argv) {
 	}
 	
 	// Vector of capacity losses for events
-	double events[(SLength[0] + IdxCap.GetSize()) * (Nevents+1)];
+	double events[(SLength[0] + IdxCap.size) * (Nevents+1)];
 	ReadEvents(events, "prepdata/bend_events.csv");
 	
 	// Declare variables to store the optimization model

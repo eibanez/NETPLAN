@@ -33,7 +33,7 @@ int main () {
 	netplan.LoadProblem();
 	
 	// Vector of capacity losses for events
-	double events[(SLength[0] + IdxCap.GetSize()) * (Nevents+1)];
+	double events[(SLength[0] + IdxCap.size) * (Nevents+1)];
 	ReadEvents(events, "prepdata/bend_events.csv");
 	
 	// Import minimum (not tested)

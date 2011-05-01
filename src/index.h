@@ -15,24 +15,18 @@ class Index {
 		~Index();
 		Index& operator=(const Index& rhs);
 		
-		int GetPosition(const int idx) const;
-		int GetColumn(const int idx) const;
-		int GetYear(const int idx) const;
-		string GetName(const int idx) const;
-		int GetSize() const;
-		
-		void Add(const int idx, const int col, const string& name);
-		void Add(const int idx, const int col, const int year, const string& name);
-		void Add(const int idx, const Step& col, const string& name);
+		void Add(const int newpos, const int newcol, const string& newname);
+		void Add(const int newpos, const int newcol, const int newyear, const string& newname);
+		void Add(const int newpos, const Step& newcol, const string& newname);
 		void WriteFile(const char* fileinput) const;
 		
 		// Variables
 		int start, size;
 		
-		vector<int> Position;
-		vector<int> Column;
-		vector<int> Year;
-		vector<string> Name;
+		vector<int> position;
+		vector<int> column;
+		vector<int> year;
+		vector<string> name;
 };
 
 Index ReadFile(const char* fileinput);

@@ -31,19 +31,19 @@ int main (int argc, char **argv) {
 	netplan.LoadProblem();
 	
 	// Vector of capacity losses for events
-	double events[(SLength[0] + IdxCap.GetSize()) * (Nevents+1)];
+	double events[(SLength[0] + IdxCap.size) * (Nevents+1)];
 	ReadEvents(events, "prepdata/bend_events.csv");
 	
 	// Read min, max, number of bits
-	double min[IdxNsga.GetSize()], max[IdxNsga.GetSize()];
-	int nbits[IdxNsga.GetSize()];
+	double min[IdxNsga.size], max[IdxNsga.size];
+	int nbits[IdxNsga.size];
 	FILE *file = fopen("prepdata/param.in", "r");
 	if ( file != NULL ) {
 		char line [ 10000 ];
 		for (int i=0; i < 10; ++i)
 			fgets(line, sizeof line, file);
 		
-		for ( int i = 0; i < IdxNsga.GetSize(); i++ ) {
+		for ( int i = 0; i < IdxNsga.size; i++ ) {
 			// The number of bits for binary variable i
 			fgets(line, sizeof line, file);
 			
@@ -91,20 +91,20 @@ int main (int argc, char **argv) {
 		fgets(line, sizeof line, file);
 		fgets(line, sizeof line, file);
 		
-		int individual = 1;
+		int candidate = 1;
 		
 		for (;;) {
 			// Read a line from the file and finish if empty is read
 			char tmp[80];
 			int output = fscanf (file, "%s", tmp);
 			
-			if ( output == EOF ) {
-				if (individual ==1)
+			if (output == EOF) {
+				if (candidate ==1)
 					cout << endl << "\tERROR: No valid NSGA-II solutions found" << endl;
 				break;
 			}
 			
-			cout << "- Solution #" << individual << endl;
+			cout << "- Solution #" << candidate << endl;
 			
 			// Copy objectives
 			//myfile << tmp;
@@ -115,9 +115,9 @@ int main (int argc, char **argv) {
 			
 			// Apply values in the array as LB for investment variables
 			int k = Nobj;
-			double lbValue[IdxNsga.GetSize()];
+			double lbValue[IdxNsga.size];
 			
-			for (int i = 0; i < IdxNsga.GetSize(); ++i) {
+			for (int i = 0; i < IdxNsga.size; ++i) {
 				double actual = 0, maxim = 0;
 				float f;
 				for (int j=0; j < nbits[i]; ++j) {
@@ -141,7 +141,7 @@ int main (int argc, char **argv) {
 			// Solve problem
 			double objective[Nobj];
 			string returnSolution = "";
-			netplan.SolveIndividual( objective, events, returnSolution );
+			netplan.SolveIndividual(objective, events, returnSolution);
 			
 			// Write objectives
 			myfile << objective[0];
@@ -153,10 +153,10 @@ int main (int argc, char **argv) {
 			myfile << returnSolution << endl;
 			
 			// Report solutions (should be made optional)
-			if ( true ) {
+			if (true) {
 				vector<string> solstring( netplan.SolutionString() );
-				string base_name = "bestdata/" + ToString<int>(individual);
-				WriteOutput((base_name + "_emissions.csv").c_str(), IdxEm, solstring, "% Emissions" );
+				string base_name = "bestdata/" + ToString<int>(candidate);
+				WriteOutput((base_name + "_emissions.csv").c_str(), IdxEm, solstring, "% Emissions");
 				WriteOutput((base_name + "_node_rm.csv").c_str(), IdxRm, solstring, "% Reserve margins");
 				WriteOutput((base_name + "_arc_inv.csv").c_str(), IdxInv, solstring, "% Investments");
 				WriteOutput((base_name + "_arc_cap.csv").c_str(), IdxCap, solstring, "% Capacity");
@@ -164,7 +164,7 @@ int main (int argc, char **argv) {
 				WriteOutput((base_name + "_node_ud.csv").c_str(), IdxUd, solstring, "% Demand not served at nodes");
 			}
 			
-			++individual;
+			++candidate;
 		}
 		
 		// Close files

@@ -41,7 +41,7 @@ int main (int argc, char **argv) {
 	nsga2b->InitPop(nsga2b->child_pop, Np_start);   // Initialize child population randomly
 	
 	// Vector of capacity losses for events
-	double events[(SLength[0] + IdxCap.GetSize()) * (Nevents+1)];
+	double events[(SLength[0] + IdxCap.size) * (Nevents+1)];
 	ReadEvents(events, "prepdata/bend_events.csv");
 	
 	// Declare variables to store the optimization model
