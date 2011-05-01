@@ -1,13 +1,6 @@
 #include "../solver.h"
 #include "CNSGA2.h"
 
-CNSGA2::CNSGA2(void) {
-	randgen = new CRand(RAND_SEED);
-	fileio = new CFileIO(this);
-	quicksort = new CQuicksort(randgen);
-	linkedlist = new CLinkedList();
-}
-
 CNSGA2::CNSGA2(bool output, double seed) {
 	randgen = new CRand(seed);
 	if (output) fileio = new CFileIO(this);

@@ -25,8 +25,7 @@ class CLinkedList;
 // ------------------------------------------------ //
 class CNSGA2 {
 	public:
-		CNSGA2();
-		CNSGA2(bool output, double seed);
+		CNSGA2(bool output=true, double seed=RAND_SEED);
 		~CNSGA2(void);
 		
 		// Initialization methods
