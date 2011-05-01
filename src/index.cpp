@@ -14,37 +14,32 @@ using namespace std;
 
 // Contructors and destructor for the Index class
 Index::Index() :
-	Position(0),
-	Column(0),
-	Year(0),
-	Name(0) {}
+	Position(0), Column(0), Year(0), Name(0) { start=0; size=0; }
 
 Index::Index(const Index& rhs) :
-	Position(rhs.GetPosition()),
-	Column(rhs.GetColumn()),
-	Year(rhs.GetYear()),
-	Name(rhs.GetName()) {}
+	Position(rhs.Position),
+	Column(rhs.Column),
+	Year(rhs.Year),
+	Name(rhs.Name) { start=rhs.start; size=rhs.size; }
 
 Index::~Index() {}
 
 Index& Index::operator=(const Index& rhs) {
-	Position = rhs.GetPosition();
-	Column = rhs.GetColumn(),
-	Year = rhs.GetYear(),
-	Name = rhs.GetName();
+	Position = rhs.Position;
+	Column = rhs.Column,
+	Year = rhs.Year,
+	Name = rhs.Name;
+	start = rhs.start;
+	size = rhs.size;
 	return *this;
 }
 
 // Recover information
-vector<int> Index::GetPosition() const { return Position; }
-vector<int> Index::GetColumn() const { return Column; }
-vector<int> Index::GetYear() const { return Year; }
-vector<string> Index::GetName() const { return Name; }
 int Index::GetPosition(const int idx) const { return Position[idx]; }
 int Index::GetColumn(const int idx) const { return Column[idx]; }
 int Index::GetYear(const int idx) const { return Year[idx]; }
 string Index::GetName(const int idx) const { return Name[idx]; }
-int Index::GetSize() const { return Position.size(); }
+int Index::GetSize() const { return size; }
 
 // Add one more element to the index collection
 void Index::Add(const int idx, const int col, const string& name) {
@@ -52,12 +47,14 @@ void Index::Add(const int idx, const int col, const string& name) {
 	Column.push_back(col);
 	Year.push_back(col);
 	Name.push_back(name);
+	++size;
 }
 void Index::Add(const int idx, const int col, const int year, const string& name) {
 	Position.push_back(idx);
 	Column.push_back(col);
 	Year.push_back(year);
 	Name.push_back(name);
+	++size;
 }
 void Index::Add(const int idx, const Step& col, const string& name) {
 	Add(idx, Step2Col(col), col[0], name);

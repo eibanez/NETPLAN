@@ -15,10 +15,6 @@ class Index {
 		~Index();
 		Index& operator=(const Index& rhs);
 		
-		vector<int> GetPosition() const;
-		vector<int> GetColumn() const;
-		vector<int> GetYear() const;
-		vector<string> GetName() const;
 		int GetPosition(const int idx) const;
 		int GetColumn(const int idx) const;
 		int GetYear(const int idx) const;
@@ -30,7 +26,9 @@ class Index {
 		void Add(const int idx, const Step& col, const string& name);
 		void WriteFile(const char* fileinput) const;
 		
-	private:
+		// Variables
+		int start, size;
+		
 		vector<int> Position;
 		vector<int> Column;
 		vector<int> Year;
