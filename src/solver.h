@@ -29,18 +29,13 @@ struct CPLEX {
 	// Variable to store temporary master cuts
 	IloRangeArray MasterCuts;
 	
-	/* // Constraints to apply capacities to subproblems
-	IloArray<IloRangeArray> CapCuts; */
-	
-	CPLEX(): env(), model(env, 0), cplex(env, 0), obj(env, 0), var(env, 0), rng(env, 0),
-		solution(env, 0), dualsolution(env, 0), MasterCuts(env, 0), //CapCuts(env, 0),
-		TempArray(env, 0), TempNumArray(env, 0) {};
+	CPLEX(): env(), model(env, 0), cplex(env, 0), obj(env, 0), var(env, 0), rng(env, 0), solution(env, 0), dualsolution(env, 0),
+		MasterCuts(env, 0), TempArray(env, 0), TempNumArray(env, 0) {};
 	
 	~CPLEX() {
 		// Remove optimization elements from memory
-		TempNumArray.end(); TempArray.end(); /* CapCuts.end(); */ MasterCuts.end();
-		dualsolution.end(); solution.end();
-		rng.end(); var.end(); obj.end(); model.end(); cplex.end();
+		TempNumArray.end(); TempArray.end(); MasterCuts.end();
+		dualsolution.end(); solution.end(); rng.end(); var.end(); obj.end(); model.end(); cplex.end();
 		env.end();
 	};
 	
@@ -75,9 +70,6 @@ double EmissionIndex(const IloNumArray& v, const int start);
 vector<double> SumByRow(const IloNumArray& v, Index Idx, const int start);
 
 /*
-
-// Resets models to improve memory management
-void ResetProblem(IloArray<IloModel>& model, IloArray<IloCplex>& cplex);
 
 // Import Minimum investment into the model from file (not tested)
 void ImportMin( const char* filename, const int MstartInv );

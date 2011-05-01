@@ -53,26 +53,10 @@ void CPLEX::LoadProblem() {
 				cout << "Reading " << file_name << endl;
 			}
 			cplex[i].importModel(model[i], file_name.c_str(), obj[i], var[i], rng[i]);
-		}
-		
-		/* // Prepare constraints to apply capacities to subproblems
-		for (int i=1; i <= nyears; ++i)
-			CapCuts.add( IloRangeArray(env) );
-		
-		// Store constraints that later will be used to apply capacities
-		vector<int> copied(nyears, 0);
-		for (int i=0; i < IdxCap.GetSize(); ++i) {
-			int year = IdxCap.GetYear(i);
-			CapCuts[year-1].add(var[year][copied[year-1]] <= 0);
-			++copied[year-1];
-		}
-		for (int i=1; i <= nyears; ++i)
-			model[i].add(CapCuts[i-1]); */
-		
-		// Extract models
-		for (int i=0; i <= nyears; ++i)
+			
+			// Extract models
 			cplex[i].extract(model[i]);
-		
+		}
 	} catch (IloException& e) {
 		cerr << "Concert exception caught: " << e << endl;
 	} catch (...) {
@@ -150,8 +134,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 						cplex[j].getDuals(TempArray, rng[j]);
 						for (int k=0; k < TempArray.getSize(); ++k)
 							expr_cut[j-1] += TempArray[k] * rng[j][k].getUB();
-						cplex[j].getReducedCosts(TempNumArray[j-1], var[j]); ///////////////////////////////////////////////////////////////
-						// cplex[j].getDuals(TempNumArray[j-1], CapCuts[j-1]);
+						cplex[j].getReducedCosts(TempNumArray[j-1], var[j]);
 						
 						if (outputLevel < 2) cout << j << " ";
 					} else if (solution[j-1] <= cplex[j].getObjValue() * 0.999) {
@@ -161,8 +144,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 						cplex[j].getDuals(TempArray, rng[j]);
 						for (int k=0; k < TempArray.getSize(); ++k)
 							expr_cut[j-1] += TempArray[k] * rng[j][k].getUB();
-						cplex[j].getReducedCosts(TempNumArray[j-1], var[j]); ////////////////////////////////////////////////////////////////
-						// cplex[j].getDuals(TempNumArray[j-1], CapCuts[j-1]);
+						cplex[j].getReducedCosts(TempNumArray[j-1], var[j]);
 						
 						if (outputLevel < 2 ) cout << "o" << j << " ";
 					} else {
@@ -511,21 +493,11 @@ void CPLEX::SolveProblem(double *x, double *objective, const double events[]) {
 	int startInv = IdxCap.GetSize();
 	if (useBenders) startInv += SLength[0];
 	
-	// Force minimum investment (x) as lower bound
-	/* IloRangeArray ConstrLB(env, 0);
-	for (int i = 0; i < IdxNsga.GetSize(); ++i)
-		ConstrLB.add(var[0][startInv + i] >= x[i]);
-	model[0].add(ConstrLB); */
-	
 	for (int i = 0; i < IdxNsga.GetSize(); ++i)
 		var[0][startInv + i].setLB(x[i]);
 	
 	// Solve problem
 	SolveIndividual(objective, events);
-	
-	/* // Eliminate lower bound constraints
-	model[0].remove(ConstrLB);
-	ConstrLB.end(); */
 }
 
 // Apply minimum investments to the master problem
@@ -564,7 +536,6 @@ void CPLEX::CapacityConstraints(const double events[], const int event, const in
 			int year = IdxCap.GetYear(i);
 			IloNum rhs = events[i * (Nevents+1) + event] * solution[offset + i];
 			var[year][copied[year-1]].setUB(rhs);
-			//CapCuts[year-1][copied[year-1]].setUB(rhs);
 			++copied[year-1];
 		}
 	} catch (IloException& e) {
@@ -620,17 +591,6 @@ vector<double> SumByRow(const IloNumArray& v, Index Idx, const int start) {
 	
 	return result;
 }
-
-
-// Resets models to improve memory management
-/* void ResetProblem(IloArray<IloModel>& model, IloArray<IloCplex>& cplex) {
-	for (int i=0; i <= SLength[0]; ++i)
-		cplex[i].clearModel();
-	system("free");
-	for (int i=0; i <= SLength[0]; ++i)
-		cplex[i].extract(model[i]);
-	system("free");
-} */
 
 
 /*
