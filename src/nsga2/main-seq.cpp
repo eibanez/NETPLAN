@@ -13,6 +13,7 @@ using namespace std;
 #include <string>
 #include <vector>
 #include "../netscore.h"
+ILOSTLBEGIN
 
 CNSGA2* nsga2a = new CNSGA2(true, 1.0);
 CNSGA2* nsga2b = new CNSGA2(false, 0.33);
@@ -43,6 +44,12 @@ int main (int argc, char **argv) {
 	double events[(SLength[0] + IdxCap.GetSize()) * (Nevents+1)];
 	ReadEvents(events, "prepdata/bend_events.csv");
 	
+	// Declare variables to store the optimization model
+	CPLEX netplan;
+	
+	// Read optimization problem and store it in memory
+	netplan.LoadProblem();
+	
 	cout << "- Initialization done, now performing first generation" << endl;
 	
 	
@@ -55,7 +62,7 @@ int main (int argc, char **argv) {
 			nsga2a->mutatePop(nsga2a->child_pop);
 		}
 		nsga2a->decodePop(nsga2a->child_pop);
-		nsga2a->evaluatePop(nsga2a->child_pop, events);
+		nsga2a->evaluatePop(nsga2a->child_pop, netplan, events);
 		if (i == 1) {
 			nsga2a->assignRankCrowdingDistance(nsga2a->parent_pop); 
 			fprintf(nsga2a->fileio->fpt1,"# gen = 1A\n",i);
@@ -77,7 +84,7 @@ int main (int argc, char **argv) {
 			nsga2b->mutatePop(nsga2b->child_pop);
 		}
 		nsga2b->decodePop(nsga2b->child_pop);
-		nsga2b->evaluatePop(nsga2b->child_pop, events);
+		nsga2b->evaluatePop(nsga2b->child_pop, netplan, events);
 		if (i == 1) {
 			nsga2b->assignRankCrowdingDistance(nsga2b->child_pop); 
 			fprintf(nsga2a->fileio->fpt1,"# gen = 1B\n",i);

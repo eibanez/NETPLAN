@@ -48,21 +48,23 @@ int main () {
 	
 	// Solve problem
 	double objective[Nobj];
-	netplan.SolveIndividual( objective, events );
+	netplan.SolveIndividual(objective, events);
 	
-	// Report solutions
-	vector<string> solstring( netplan.SolutionString() );
-	WriteOutput("prepdata/post_emissions.csv", IdxEm, solstring, startEm, "% Emissions");
-	WriteOutput("prepdata/post_node_rm.csv", IdxRm, solstring, startRm, "% Reserve margins");
-	WriteOutput("prepdata/post_arc_inv.csv", IdxInv, solstring, startInv, "% Investments");
-	WriteOutput("prepdata/post_arc_cap.csv", IdxCap, solstring, startCap, "% Capacity");
-	WriteOutput("prepdata/post_arc_flow.csv", IdxArc, solstring, startArc, "% Arc flows");
-	WriteOutput("prepdata/post_node_ud.csv", IdxUd, solstring, startUd, "% Demand not served at nodes");
-	
-	for (int i=0; i <= Nevents; ++i) {
-		vector<string> dualstring( netplan.SolutionDualString(i) );
-		string file_name = "prepdata/post_nodal_dual_e" + ToString<int>(i) + ".csv";
-		WriteOutput(file_name.c_str(), IdxNode, dualstring, 0, "% Dual variable at demand nodes");
+	// Report solutions if the problem is feasible
+	if (objective[0] < 1.0e29) {
+		vector<string> solstring(netplan.SolutionString());
+		WriteOutput("prepdata/post_emissions.csv", IdxEm, solstring, startEm, "% Emissions");
+		WriteOutput("prepdata/post_node_rm.csv", IdxRm, solstring, startRm, "% Reserve margins");
+		WriteOutput("prepdata/post_arc_inv.csv", IdxInv, solstring, startInv, "% Investments");
+		WriteOutput("prepdata/post_arc_cap.csv", IdxCap, solstring, startCap, "% Capacity");
+		WriteOutput("prepdata/post_arc_flow.csv", IdxArc, solstring, startArc, "% Arc flows");
+		WriteOutput("prepdata/post_node_ud.csv", IdxUd, solstring, startUd, "% Demand not served at nodes");
+		
+		for (int i=0; i <= Nevents; ++i) {
+			vector<string> dualstring(netplan.SolutionDualString(i));
+			string file_name = "prepdata/post_nodal_dual_e" + ToString<int>(i) + ".csv";
+			WriteOutput(file_name.c_str(), IdxNode, dualstring, 0, "% Dual variable at demand nodes");
+		}
 	}
 	
 	cout << "- Values returned:" << endl;
