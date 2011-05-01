@@ -18,7 +18,7 @@ void CRand::randomize() {
 }
 
 /* Get randomize off and running */
-void CRand::warmup_random (double seed) {
+void CRand::warmup_random(double seed) {
 	int ii;
 	double new_random, prev_random;
 	oldrand[54] = seed;
@@ -40,7 +40,7 @@ void CRand::warmup_random (double seed) {
 }
 
 /* Create next batch of 55 random numbers */
-void CRand::advance_random () {
+void CRand::advance_random() {
 	int j1;
 	double new_random;
 	for(j1=0; j1<24; j1++) {
@@ -70,7 +70,7 @@ double CRand::randomperc() {
 }
 
 /* Fetch a single random integer between low and high including the bounds */
-int CRand::rnd (int low, int high) {
+int CRand::rnd(int low, int high) {
 	int res;
 	if (low >= high) res = low;
 	else {
@@ -81,6 +81,6 @@ int CRand::rnd (int low, int high) {
 }
 
 /* Fetch a single random real number between low and high including the bounds */
-double CRand::rndreal (double low, double high) {
+double CRand::rndreal(double low, double high) {
 	return (low + (high-low)*randomperc());
 }

@@ -7,14 +7,14 @@
 
 // Typedefs
 typedef struct {
-	int		rank;
-	double	constr_violation;
-	double	*xreal;
-	int		**gene;
-	double	*xbin;
-	double	*obj;
-	double	*constr;
-	double	crowd_dist;
+	int    rank;
+	double constr_violation;
+	double *xreal;
+	int    **gene;
+	double *xbin;
+	double *obj;
+	double *constr;
+	double crowd_dist;
 } individual;
 
 typedef struct {

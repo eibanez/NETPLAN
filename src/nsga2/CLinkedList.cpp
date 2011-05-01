@@ -1,16 +1,14 @@
 #include "CLinkedList.h"
 
-CLinkedList::CLinkedList(void) {
-}
+CLinkedList::CLinkedList(void) {}
 
-CLinkedList::~CLinkedList(void) {
-}
+CLinkedList::~CLinkedList(void) {}
 
 /* Insert an element X into the list at location specified by NODE */
 void CLinkedList::insert (list *node, int x) {
 	list *temp;
 	if (node==NULL) {
-		printf("\n Error, asked to enter after a NULL pointer, hence exiting \n");
+		printf("\n Error, asked to enter after a NULL pointer, hence exiting\n");
 		exit(1);
 	}
 	temp = (list *)malloc(sizeof(list));
@@ -28,7 +26,7 @@ void CLinkedList::insert (list *node, int x) {
 list* CLinkedList::del (list *node) {
 	list *temp;
 	if (node==NULL) {
-		printf("\n Error, asked to delete a NULL pointer, hence exiting \n");
+		printf("\n Error, asked to delete a NULL pointer, hence exiting\n");
 		exit(1);
 	}
 	temp = node->parent;

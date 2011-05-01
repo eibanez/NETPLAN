@@ -14,8 +14,8 @@ class CRand {
 		void   warmup_random(double seed);
 		void   advance_random();
 		double randomperc();
-		int    rnd (int low, int high);
-		double rndreal (double low, double high);
+		int    rnd(int low, int high);
+		double rndreal(double low, double high);
 		
 		// Variables
 		double oldrand[55];
