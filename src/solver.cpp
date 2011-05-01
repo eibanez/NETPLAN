@@ -199,7 +199,10 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 		
 		if (!optimal) {
 			// Solution not found, return very large values
-			cout << "\tProblem infeasible!" << endl;
+			if (iter > MAX_ITER)
+				cout << "\tReached max. number of iterations!" << endl;
+			else
+				cout << "\tProblem infeasible!" << endl;
 			for (int i=0; i < Nobj; ++i)
 				objective[i] = 1.0e30;
 		} else {
