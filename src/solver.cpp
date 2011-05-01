@@ -25,13 +25,13 @@ void CPLEX::LoadProblem() {
 		int nyears = SLength[0];
 		
 		for (int i=0; i <= nyears; ++i) {
-			model.add( IloModel(env) );
-			cplex.add ( IloCplex(env) );
-			obj.add( IloObjective(env) );
-			var.add( IloNumVarArray(env) );
-			rng.add( IloRangeArray(env) );
-			dualsolution.add( IloNumArray(env) );
-			TempNumArray.add( IloNumArray(env) );
+			model.add(IloModel(env));
+			cplex.add (IloCplex(env));
+			obj.add(IloObjective(env));
+			var.add(IloNumVarArray(env));
+			rng.add(IloRangeArray(env));
+			dualsolution.add(IloNumArray(env));
+			TempNumArray.add(IloNumArray(env));
 		}
 		
 		// Read MPS files
@@ -44,7 +44,7 @@ void CPLEX::LoadProblem() {
 			}
 			if (i!=0) {
 				//cplex[i].setParam(IloCplex::PreInd, 0);
-				//cplex[i].setParam(IloCplex::ScaInd, -1); 
+				//cplex[i].setParam(IloCplex::ScaInd, -1);
 				cplex[i].setParam(IloCplex::RootAlg, IloCplex::Dual);
 			}
 			if (outputLevel > 0) {
@@ -73,9 +73,9 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 		bool optimal = true;
 		int iter = 0;
 		
-		if ( !useBenders ) {
+		if (!useBenders) {
 			// Only one file
-			if (outputLevel < 2 ) cout << "- Solving problem" << endl;
+			if (outputLevel < 2) cout << "- Solving problem" << endl;
 			
 			if (cplex[0].solve()) {
 				optimal = true;
@@ -102,7 +102,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 				// cplex[0].exportModel("master.lp");
 				
 				// Solve master problem. If master is infeasible, exit loop
-				if (outputLevel < 2 ) cout << "- Solving master problem (Iteration #" << iter << ")" << endl;
+				if (outputLevel < 2) cout << "- Solving master problem (Iteration #" << iter << ")" << endl;
 				if (!cplex[0].solve()) {
 					break;
 				}
@@ -126,7 +126,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 						
 						// Change solver properties to find dual unbouded ray
 						cplex[j].setParam(IloCplex::PreInd,0);
-						cplex[j].setParam(IloCplex::ScaInd,-1); 
+						cplex[j].setParam(IloCplex::ScaInd,-1);
 						cplex[j].setParam(IloCplex::RootAlg, IloCplex::Primal);
 						cplex[j].solve();
 						
@@ -146,7 +146,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 							expr_cut[j-1] += TempArray[k] * rng[j][k].getUB();
 						cplex[j].getReducedCosts(TempNumArray[j-1], var[j]);
 						
-						if (outputLevel < 2 ) cout << "o" << j << " ";
+						if (outputLevel < 2) cout << "o" << j << " ";
 					} else {
 						status[j-1] = false;
 					}
@@ -173,7 +173,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 						// Reset solver properties
 						if (cplex[j].getCplexStatus() != CPX_STAT_OPTIMAL) {
 							cplex[j].setParam(IloCplex::PreInd,1);
-							cplex[j].setParam(IloCplex::ScaInd,0); 
+							cplex[j].setParam(IloCplex::ScaInd,0);
 							cplex[j].setParam(IloCplex::RootAlg, IloCplex::Dual);
 						}
 					}
@@ -236,12 +236,12 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 				
 				// Write total emissions
 				for (int i=0; i < SustMet.size(); ++i)
-					returnString += "," + ToString<double>( emissions[i] );
+					returnString += "," + ToString<double>(emissions[i]);
 				
 				// Write investments
 				/*vector<double> Investments = SumByRow(solution, IdxInv);
 				for (int j=0; j < Investments.size(); ++j)
-					returnString += "," + ToString<double>( Investments[j] );*/
+					returnString += "," + ToString<double>(Investments[j]);*/
 			}
 			
 			// Resiliency calculations

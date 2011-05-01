@@ -90,7 +90,7 @@ void WriteOutput(const char* fileinput, Index& idx, vector<string>& values, cons
 void WriteOutput(const char* fileinput, Index& idx, vector<Node>& Nodes, const string& selector, const string& header) {
 	vector<string> values(0);
 	for (int i = 0; i < idx.size; ++i)
-		values.push_back( Nodes[i].Get(selector) );
+		values.push_back(Nodes[i].Get(selector));
 		
 	WriteOutput(fileinput, idx, values, header);
 }
@@ -99,7 +99,7 @@ void WriteOutput(const char* fileinput, Index& idx, vector<Node>& Nodes, const s
 void WriteOutput(const char* fileinput, Index& idx, vector<Arc>& Arcs, const string& selector, const string& header) {
 	vector<string> values(0);
 	for (int i = 0; i < idx.size; ++i)
-		values.push_back( Arcs[i].Get(selector) );
+		values.push_back(Arcs[i].Get(selector));
 	
 	WriteOutput(fileinput, idx, values, header);
 }

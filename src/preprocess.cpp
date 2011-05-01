@@ -28,7 +28,7 @@ int main() {
 	vector<Arc> ListArcs(0), Arcs(0), ListDCArcs(0);
 	MatrixStr NStep(0), ATransEnergy(0), SustLimits(0);
 	vector<MatrixStr> NVectorProp(0), AVectorProp(0);
-	vector<int> NVectorIndex( NodeProp.size()-NodePropOffset, -1 ), AVectorIndex( ArcProp.size()-ArcPropOffset, -1 );
+	vector<int> NVectorIndex(NodeProp.size()-NodePropOffset, -1), AVectorIndex(ArcProp.size()-ArcPropOffset, -1);
 	
 	cout << "- Reading list of nodes...\n";
 	ListNodes = ReadListNodes("data/nodes_List.csv");
@@ -36,7 +36,7 @@ int main() {
 	NStep = ReadStep("data/nodes_Step.csv");
 	for (unsigned int t=NodePropOffset; t < NodeProp.size(); ++t) {
 		string file_name = "data/nodes_" + NodeProp[t] + ".csv";
-		NVectorProp.push_back( ReadProperties(file_name.c_str(), NodeDefault[t], 1) );
+		NVectorProp.push_back(ReadProperties(file_name.c_str(), NodeDefault[t], 1));
 	}
 	
 	cout << "- Reading list of arcs...\n";
@@ -52,7 +52,7 @@ int main() {
 			// Resiliency properties
 			file_name = "data/events/" + ArcProp[t] + ".csv";
 		}
-		AVectorProp.push_back( ReadProperties(file_name.c_str(), ArcDefault[t], 2) );
+		AVectorProp.push_back(ReadProperties(file_name.c_str(), ArcDefault[t], 2));
 	}
 	
 	cout << "- Creating transportation network...\n";
@@ -75,14 +75,14 @@ int main() {
 		// Copy step information
 		if (StepIndex >= 0) ListNodes[k].Set("Step", NStep[StepIndex][1]);
 		
-		if ( ListNodes[k].Get("Step") == "") {
+		if (ListNodes[k].Get("Step") == "") {
 			printError("nodestep", ListNodes[k].Get("ShortCode"));
 		} else {
 			// Use a temporary node to store information and cycle through steps
-			Step TempStep( SName.size(), 0 );
+			Step TempStep(SName.size(), 0);
 			for (unsigned int l = 0; l < ListNodes[k].Get("Step").size(); l++) TempStep[l] = 1;
 			
-			while ( TempStep <= SLength ) {
+			while (TempStep <= SLength) {
 				// Apply information
 				Node TempNode = ListNodes[k];
 				TempNode.Set("Step", Step2Str(TempStep));
@@ -92,14 +92,14 @@ int main() {
 				
 				for (unsigned int t=0; t < NVectorIndex.size(); ++t) {
 					int tmp_index = NVectorIndex[t];
-					if ( tmp_index >= 0) TempNode.Set( NodeProp[NodePropOffset + t], NVectorProp[t][tmp_index][l] );
+					if (tmp_index >= 0) TempNode.Set(NodeProp[NodePropOffset + t], NVectorProp[t][tmp_index][l]);
 				}
 				
 				// Calculate demand if power demand is given
-				if ( (TempNode.Get("Demand") == "0") && (TempNode.Get("DemandPower") != "X") ) {
+				if ((TempNode.Get("Demand") == "0") && (TempNode.Get("DemandPower") != "X")) {
 					double step_length = TempNode.GetDouble("StepLength");
 					TempNode.Multiply("DemandPower", step_length);
-					TempNode.Set( "Demand", TempNode.Get("DemandPower") );
+					TempNode.Set("Demand", TempNode.Get("DemandPower"));
 				}
 				
 				// Adjust peak demand with increase rate
@@ -107,7 +107,7 @@ int main() {
 				double peak_rate = TempNode.GetDouble("PeakPowerRate");
 				double dem_factor = 1, peak_factor = 1;
 				
-				if ( (dem_rate != 0) || (peak_rate != 0) ) {
+				if ((dem_rate != 0) || (peak_rate != 0)) {
 					for (unsigned int l = 1; l < TempStep[0]; ++l) {
 						dem_factor = dem_factor * (1 + dem_rate);
 						peak_factor = peak_factor * (1 + peak_rate);
@@ -118,18 +118,18 @@ int main() {
 				
 				// Store node for later use
 				Nodes.push_back(TempNode);
-				if ( TempNode.isDCflow() ) {
+				if (TempNode.isDCflow()) {
 					ListDCNodes.push_back(TempNode);
 					IdxDc.Add(k, TempStep, TempNode.Get("ShortCode"));
 				}
 				
 				// Record indices to recover information
 				IdxNode.Add(k, TempStep, TempNode.Get("ShortCode"));
-				if ( TempNode.Get("CostUD") != "X" ) {
+				if (TempNode.Get("CostUD") != "X") {
 					IdxUd.Add(k, TempStep, TempNode.Get("ShortCode"));
 				}
-				if ( (TempNode.Get("PeakPower") != "X") && TempNode.isFirstinYear() ) {
-					Step temp2( SName.size(), 0 );
+				if ((TempNode.Get("PeakPower") != "X") && TempNode.isFirstinYear()) {
+					Step temp2(SName.size(), 0);
 					temp2[0] = TempStep[0];
 					IdxRm.Add(k, temp2, TempNode.Get("ShortCode"));
 				}
@@ -159,7 +159,7 @@ int main() {
 		if (StepFromIndex >= 0) ListArcs[k].Set("FromStep", NStep[StepFromIndex][1]);
 		if (StepToIndex >= 0) ListArcs[k].Set("ToStep", NStep[StepToIndex][1]);
 		
-		// Check for a storage arc 
+		// Check for a storage arc
 		bool isStorage = ListArcs[k].isStorage();
 		
 		if ((ListArcs[k].Get("FromStep") == "") && (ListArcs[k].Get("ToStep") == "")) {
@@ -184,12 +184,12 @@ int main() {
 			NextFromStep = (TempFromStep[0] == 1) ? NextStep(TempFromStep) : NextStep(SLength);
 			NextToStep = (TempToStep[0] == 1) ? NextStep(TempToStep) : NextStep(SLength);
 			
-			TempStep = ((TempFromStep < TempToStep) && !isStorage ) ? TempToStep : TempFromStep;
+			TempStep = ((TempFromStep < TempToStep) && !isStorage) ? TempToStep : TempFromStep;
 			
 			// Find the shortest step, to assign it as a default for 'InvStep'
 			string TempStepStr = (TempFromStep < TempToStep) ? ListArcs[k].Get("ToStep") : ListArcs[k].Get("FromStep");
 			
-			while ((TempStep <= SLength) && ( TempToStep <= SLength)) {
+			while ((TempStep <= SLength) && (TempToStep <= SLength)) {
 				// Apply information
 				Arc TempArc = ListArcs[k];
 				int l = Step2Pos(TempStep) + 2;
@@ -197,15 +197,14 @@ int main() {
 				TempArc.Set("ToStep", Step2Str(TempToStep));
 				TempArc.Set("StepLength", Step2Hours(TempStep));
 				
-				if ( TempArc.isTransport() && TempArc.Get("TransInfr") == "") {
+				if (TempArc.isTransport() && (TempArc.Get("TransInfr") == ""))
 					TempArc.Set("Code", TempArc.Get("From") + Step2Str(TempFromStep));
-				} else {
+				else
 					TempArc.Set("Code", TempArc.Get("From") + Step2Str(TempFromStep) + "_" + TempArc.Get("To") + Step2Str(TempToStep));
-				}
 				
 				for (unsigned int t=0; t < AVectorIndex.size(); ++t) {
 					int tmp_index = AVectorIndex[t];
-					if ( tmp_index >= 0) TempArc.Set( ArcProp[ArcPropOffset + t], AVectorProp[t][tmp_index][l] );
+					if (tmp_index >= 0) TempArc.Set(ArcProp[ArcPropOffset + t], AVectorProp[t][tmp_index][l]);
 				}
 				
 				// Is there a load on the an energy node?
@@ -218,7 +217,7 @@ int main() {
 					string LoadStepCode = DefStep;
 					if (LoadIndex >= 0) LoadStepCode = NStep[LoadIndex][1];
 					
-					if ( LoadStepCode.size() <= TempArcStepCode.size() ) {
+					if (LoadStepCode.size() <= TempArcStepCode.size()) {
 						Step LoadStep = TempStep;
 						for (unsigned int m = LoadStepCode.size(); m < LoadStep.size(); m++) LoadStep[m] = 0;
 						int l2 = Step2Pos(LoadStep) + 2;
@@ -228,7 +227,7 @@ int main() {
 						Step NextTempStep = NextStep(TempStep);
 						Step LoadStep = TempStep;
 						for (unsigned int m = TempArcStepCode.size(); m < LoadStepCode.size(); m++) LoadStep[m] = 1;
-						while ( LoadStep < NextTempStep ) {
+						while (LoadStep < NextTempStep) {
 							int l2 = Step2Pos(LoadStep) + 2;
 							TempArc.Add("Trans2Energy", LoadCode + Step2Str(LoadStep));
 							TempArc.Add("Trans2Energy", ATransEnergy[IndexTemp][l2]);
@@ -254,21 +253,23 @@ int main() {
 				double inv_cost = TempArc.GetDouble("InvCost");
 				double op_cost = TempArc.GetDouble("OpCost");
 				
-				if ( (factor != 1) && ( ( inv_cost != 0 || op_cost != 0 ) ) ) {
+				if ((factor != 1) && ((inv_cost != 0) || (op_cost != 0))) {
 					for (int l = 1; l < TempStep[0]; ++l)
 						dollar_factor = dollar_factor * factor;
 				}
 				
 				// If distance is available adjust costs, emissions, demand for energy...
-				if ( TempArc.Get("Distance") != "X" ) {
+				if (TempArc.Get("Distance") != "X") {
 					double distance = TempArc.GetDouble("Distance");
 					dollar_factor = dollar_factor * distance;
 					
-					for (int j = 0; j < SustMet.size(); ++j) { TempArc.Multiply("Op" + SustMet[j], distance); }
+					for (int j = 0; j < SustMet.size(); ++j)
+						TempArc.Multiply("Op" + SustMet[j], distance);
 					TempArc.Multiply("Trans2Energy", distance);
 				}
 				
-				if (dollar_factor != 1) TempArc.Multiply("OpCost", dollar_factor);
+				if (dollar_factor != 1)
+					TempArc.Multiply("OpCost", dollar_factor);
 				
 				// Need to adjust for investment costs at the end of the simulation period
 				string life_span = TempArc.Get("LifeSpan");
@@ -279,28 +280,29 @@ int main() {
 				}
 				
 				// Store modified investment costs
-				if (dollar_factor != 1) TempArc.Multiply("InvCost", dollar_factor);
+				if (dollar_factor != 1)
+					TempArc.Multiply("InvCost", dollar_factor);
 				
 				// Store Arc for later use
 				Arcs.push_back(TempArc);
-				if ( TempArc.isDCflow() ) ListDCArcs.push_back(TempArc);
+				if (TempArc.isDCflow())
+					ListDCArcs.push_back(TempArc);
 				
 				// Store Arc indices to recover solution information
-				if ( !TempArc.isTransport() || TempArc.Get("TransInfr") != "" ) {
+				if (!TempArc.isTransport() || TempArc.Get("TransInfr") != "") {
 					IdxArc.Add(k, TempStep, TempArc.Get("From") + "_" + TempArc.Get("To"));
 				}
-				if ( TempArc.InvArc()  && TempArc.Get("TransInfr") == "" ) {
+				if (TempArc.InvArc()  && TempArc.Get("TransInfr") == "") {
 					Step YearStep(SName.size(), 0);
 					YearStep[0] = TempStep[0];
 					IdxInv.Add(k, YearStep, TempArc.Get("From") + "_" + TempArc.Get("To"));
-					if ( TempArc.Get("InvMax") != "Inf" ) {
+					if (TempArc.Get("InvMax") != "Inf")
 						IdxNsga.Add(k, YearStep, TempArc.Get("From") + "_" + TempArc.Get("To"));
-					}
 				}
-				if ( TempArc.Get("OpMax") != "Inf"  && TempArc.Get("TransInfr") == "" ) {
+				if (TempArc.Get("OpMax") != "Inf"  && TempArc.Get("TransInfr") == "") {
 					IdxUb.Add(k, TempStep, TempArc.Get("From") + "_" + TempArc.Get("To"));
-					if ( TempArc.isFirstinYear() ) {
-						Step temp2( SName.size(), 0 );
+					if (TempArc.isFirstinYear()) {
+						Step temp2(SName.size(), 0);
 						temp2[0] = TempStep[0];
 						IdxCap.Add(k, temp2, TempArc.Get("From") + "_" + TempArc.Get("To"));
 					}
@@ -318,7 +320,7 @@ int main() {
 					NextToStep = NextStep(NextToStep);
 					// This part of the code eliminates storage connection between different years (interferes with Benders decomposition)
 					// Must have a negative demand on the storage node for the first step in the year and a positive for the last
-					if ( TempFromStep[0] != TempToStep[0] ) {
+					if (TempFromStep[0] != TempToStep[0]) {
 						TempStep = NextStep(TempStep);
 						TempFromStep = NextFromStep;
 						TempToStep = NextToStep;
@@ -349,7 +351,7 @@ int main() {
 	afile.open("prepdata/netscore.mps");
 	for (int i = 0; i <= nyears; ++i) {
 		string file_name = "prepdata/bend_" + ToString<int>(i) + ".mps";
-		myfile[i].open( file_name.c_str() );
+		myfile[i].open(file_name.c_str());
 	}
 	
 	// NAME and ROWS and Cost objective funtion)
@@ -518,13 +520,13 @@ int main() {
 	for (int j = 0; j < SustMet.size(); ++j) {
 		int SustIndex = FindCode(SustMet[j], SustLimits);
 		if (SustIndex >= 0) {
-			Step TempStep( SName.size(), 0 );
+			Step TempStep(SName.size(), 0);
 			for (int i = 1; i <= nyears; ++i) {
 				TempStep[0] = i;
 				string Value = SustLimits[SustIndex][Step2Pos(TempStep)+1];
-				if ( Value != "X" ) {
-					afile << " UP bnd " << SustMet[j] << "_" << Step2Str( TempStep ) << " " << Value << endl;
-					myfile[i] << " UP bnd " << SustMet[j] << "_" << Step2Str( TempStep ) << " " << Value << endl;
+				if (Value != "X") {
+					afile << " UP bnd " << SustMet[j] << "_" << Step2Str(TempStep) << " " << Value << endl;
+					myfile[i] << " UP bnd " << SustMet[j] << "_" << Step2Str(TempStep) << " " << Value << endl;
 				}
 			}
 		}
@@ -548,15 +550,15 @@ int main() {
 	vector<double> YearEvents(nyears*(Nevents+1), 0);
 	
 	for (unsigned int i = 0; i < Arcs.size(); ++i) {
-		vector<string> ArcEvents( Arcs[i].Events() );
+		vector<string> ArcEvents(Arcs[i].Events());
 		// If information is returned
-		if ( ArcEvents.size() > 0 ) {
+		if (ArcEvents.size() > 0) {
 			afile << ArcEvents[0];
 			for (int k = 1; k < ArcEvents.size(); ++k) {
 				afile << "," << ArcEvents[k];
 				if (ArcEvents[k] != "1") {
-					YearEvents[ (Arcs[i].Time()-1) * (Nevents+1) + k ] = 1;
-					YearEvents[ (Arcs[i].Time()-1) * (Nevents+1) ] = 1;
+					YearEvents[(Arcs[i].Time()-1) * (Nevents+1) + k] = 1;
+					YearEvents[(Arcs[i].Time()-1) * (Nevents+1)] = 1;
 				}
 			}
 			afile << endl;
@@ -617,7 +619,7 @@ int main() {
 	int num_var = 0;
 	string text_var = "";
 	for (unsigned int i = 0; i < Arcs.size(); ++i) {
-		if ( Arcs[i].InvArc() && (Arcs[i].Get("TransInfr") == "") && (Arcs[i].Get("InvMax") != "Inf") ) {
+		if (Arcs[i].InvArc() && (Arcs[i].Get("TransInfr") == "") && (Arcs[i].Get("InvMax") != "Inf")) {
 			num_var++;
 			text_var += Nstages + " " + Arcs[i].Get("InvMin") + " " + Arcs[i].Get("InvMax") + "\n";
 		}
@@ -631,7 +633,7 @@ int main() {
 	afile << Npmut_bin << endl;
 	
 	// Close file
-	afile.close();	
+	afile.close();
 	
 	printHeader("completed");
 

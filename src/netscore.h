@@ -35,10 +35,10 @@ vector<string> DCFlowColumns(const vector<Node>& v, const vector<Arc>& w) {
 	vector<string> temp_output(SLength[0]+1, "");
 	for (unsigned int i = 0; i < v.size(); ++i) {
 		for (unsigned int j = 0; j < w.size(); ++j) {
-			if ( w[j].Get("From") < w[j].Get("To") ) {
-				if ( v[i].Get("Code") == (w[j].Get("From") + w[j].Get("FromStep")) ) {
+			if (w[j].Get("From") < w[j].Get("To")) {
+				if (v[i].Get("Code") == (w[j].Get("From") + w[j].Get("FromStep"))) {
 					temp_output[ v[i].Time() ] += "    th" + v[i].Get("Code") + " dcpf" + w[j].Get("Code") + " " + w[j].Get("Suscep") + "\n";
-				} else if ( v[i].Get("Code") == (w[j].Get("To") + w[j].Get("ToStep")) ) {
+				} else if (v[i].Get("Code") == (w[j].Get("To") + w[j].Get("ToStep"))) {
 					temp_output[ v[i].Time() ] += "    th" + v[i].Get("Code") + " dcpf" + w[j].Get("Code") + " -" + w[j].Get("Suscep") + "\n";
 				}
 			}
@@ -121,7 +121,7 @@ int FindCode(const Arc& myarc, const MatrixStr mymatrix) {
 	int output = -1;
 	// Look for properties for the arc in the opposite direction
 	Arc myarc2(myarc, true);
-	if ( myarc.isBidirect() || myarc.isTransport() ) {
+	if (myarc.isBidirect() || myarc.isTransport()) {
 		int code1 = FindCode(myarc.Get("From"), myarc.Get("To"), mymatrix);
 		int code2 = FindCode(myarc2.Get("From"), myarc2.Get("To"), mymatrix);
 		output = (code1 >= code2) ? code1 : code2;

@@ -53,7 +53,7 @@ void Index::Add(const int newpos, const Step& newcol, const string& newname) {
 	Add(newpos, Step2Col(newcol), newcol[0], newname);
 }
 
-// Write a file 
+// Write a file
 void Index::WriteFile(const char* fileinput) const {
 	ofstream myfile;
 	myfile.open(fileinput);
@@ -69,21 +69,21 @@ void Index::WriteFile(const char* fileinput) const {
 // Read a file
 Index ReadFile(const char* fileinput) {
 	Index TempIndex;
-	char line [ 200 ];
+	char line[200];
 	FILE *file = fopen(fileinput, "r");
 	
-	if ( file != NULL ) {
+	if (file != NULL) {
 		int idx, col, year;
 		string name;
 		for (;;) {
 			// Read a line from the file and finish if empty is read
-			if ( fgets(line, sizeof line, file) == NULL ) break;
+			if (fgets(line, sizeof line, file) == NULL) break;
 			idx = strtol(line, NULL, 10);
-			if ( fgets(line, sizeof line, file) == NULL ) break;
+			if (fgets(line, sizeof line, file) == NULL) break;
 			col = strtol(line, NULL, 10);
-			if ( fgets(line, sizeof line, file) == NULL ) break;
+			if (fgets(line, sizeof line, file) == NULL) break;
 			year = strtol(line, NULL, 10);
-			if ( fgets(line, sizeof line, file) == NULL ) break;
+			if (fgets(line, sizeof line, file) == NULL) break;
 			CleanLine(line);
 			name = string(line);
 			

@@ -19,19 +19,19 @@ using namespace std;
 void ReadParameters(const char* fileinput) {
 	char* t_read;
 	string prop, value, discount = "0", inflation = "0", demandrate = "0", peakdemandrate = "0";
-	char line [CHAR_LINE];
+	char line[CHAR_LINE];
 	
 	FILE *file = fopen(fileinput, "r");
-	if ( file != NULL ) {
+	if (file != NULL) {
 		for (;;) {
 			// Read a line from the file and finish if empty is read
-			if ( fgets(line, sizeof line, file) == NULL ) {
+			if (fgets(line, sizeof line, file) == NULL)
 				break;
-			}
+			
 			// Remove comments and end of line characters
 			CleanLine(line);
 			
-			if ( line[0] != '$' && line[0] != '/' && line[0] != '#' && line[0] != '%' ) {
+			if ((line[0] != '$') && (line[0] != '/') && (line[0] != '#') && (line[0] != '%')) {
 				t_read = strtok(line,",");
 				prop = string(t_read);
 				t_read = strtok(NULL,",");
@@ -78,28 +78,32 @@ void ReadParameters(const char* fileinput) {
 	
 	// Calculate how many hours are there for each step and store it in StepHours
 	int laststep = SLength[SName.size()-1], temp_hour = 0;
-	if ( StepHours.size() == 0) {
-		for (int i=0; i < laststep; ++i) StepHours.push_back("1");
+	if (StepHours.size() == 0) {
+		for (int i=0; i < laststep; ++i)
+			StepHours.push_back("1");
 		temp_hour = laststep;
-	} else if ( StepHours.size() == laststep ) {
-		for (int i=0; i < laststep; ++i) {
+	} else if (StepHours.size() == laststep) {
+		for (int i=0; i < laststep; ++i)
 			temp_hour += atoi(StepHours[i].c_str());
-		}
 	} else {
-		if (StepHours.size() > 1) printError("parameter", string("StepHours"));
-		for (int i=1; i < StepHours.size(); ++i) StepHours[i] = StepHours[0];
-		for (int i=StepHours.size(); i < laststep; ++i) StepHours.push_back( StepHours[0] );
+		if (StepHours.size() > 1)
+			printError("parameter", string("StepHours"));
+		for (int i=1; i < StepHours.size(); ++i)
+			StepHours[i] = StepHours[0];
+		for (int i=StepHours.size(); i < laststep; ++i)
+			StepHours.push_back(StepHours[0]);
 		temp_hour = laststep * atoi(StepHours[0].c_str());
 	}
 	for (int j = SName.size()-2; j >= 0; --j) {
-		StepHours.insert( StepHours.begin(), ToString<int>(temp_hour) );
+		StepHours.insert(StepHours.begin(), ToString<int>(temp_hour));
 		temp_hour = temp_hour * SLength[j];
 	}
 	
 	// Number of objectives
 	Nobj = 1 + SustObj.size();
-	if (Nevents > 0) { ++Nobj; }
-	SustMet.insert( SustMet.begin(), SustObj.begin(), SustObj.end() );
+	if (Nevents > 0)
+		++Nobj;
+	SustMet.insert(SustMet.begin(), SustObj.begin(), SustObj.end());
 	
 	// Declare a vector with the node property codes
 	NodeProp.push_back("Code"); NodeDefault.push_back("X");
@@ -159,21 +163,21 @@ MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const in
 	MatrixStr output(0);
 	char* t_read;
 	string t2_read;
-	char line [CHAR_LINE];
+	char line[CHAR_LINE];
 	int i = 0, j = 0;
 	
 	FILE *file = fopen(fileinput, "r");
-	if ( file != NULL ) {
+	if (file != NULL) {
 		for (;;) {
 			// Read a line from the file and finish if empty is read
-			if ( fgets(line, sizeof line, file) == NULL ) {
+			if (fgets(line, sizeof line, file) == NULL)
 				break;
-			}
+			
 			// Remove comments and end of line characters
 			CleanLine(line);
 			
 			// Avoid line comments
-			if ( line[0]!='%' || line[0]!='\0' ) {
+			if ((line[0]!='%') || (line[0]!='\0')) {
 				if (i==0) {
 					// Read column headers and store them
 					i++;
@@ -181,8 +185,8 @@ MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const in
 					// Skip first 'num_fields' columns
 					t_read = strtok(line,",");
 					for (int k=0; k < num_fields; k++) {
-						 t_read = strtok(NULL, ",");
-						 j++;
+						t_read = strtok(NULL, ",");
+						j++;
 					}
 					
 					while (t_read != NULL) {
@@ -217,14 +221,13 @@ MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const in
 									Step Temp_Begin(SName.size(), 0);
 									bool zeros = true;
 									for (int l = 0; (l < SName.size()) & zeros; ++l) {
-										if (Temp_Step[l] == 0) {
+										if (Temp_Step[l] == 0)
 											Temp_Begin[l] = 1;
-										} else {
+										else
 											zeros = false;
-										}
 									}
 									while (Temp_Begin < SLength) {
-										int m = Step2Pos( StepSum(Temp_Step, Temp_Begin) ) + num_fields;
+										int m = Step2Pos(StepSum(Temp_Step, Temp_Begin)) + num_fields;
 										Values[m] = t2_read;
 										Temp_Begin = NextStep(Temp_Begin);
 									}
@@ -232,7 +235,7 @@ MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const in
 									// Step with year
 									int a = Step2Pos(Temp_Step) + num_fields;
 									int b = Step2Pos(NextStep(Temp_Step)) + num_fields;
-									for (int m = a; (m < b) && (m < Values.size()); m++ )  Values[m] = t2_read;
+									for (int m = a; (m < b) && (m < Values.size()); m++)  Values[m] = t2_read;
 								}
 							}
 						}
@@ -252,21 +255,21 @@ MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const in
 vector<Node> ReadListNodes(const char* fileinput) {
 	vector<Node> output(0);
 	char* t_read;
-	char line [CHAR_LINE];
+	char line[CHAR_LINE];
 	int i = 0;
 	
 	FILE *file = fopen(fileinput, "r");
-	if ( file != NULL ) {
+	if (file != NULL) {
 		for (;;) {
 			// Read a line from the file and finish if empty is read
-			if ( fgets(line, sizeof line, file) == NULL ) {
+			if (fgets(line, sizeof line, file) == NULL)
 				break;
-			}
+			
 			// Remove comments and end of line characters
 			CleanLine(line);
 			
 			// Skip first line
-			if ( i!=0 && line[0]!='%' && line[0]!='\0' ) {
+			if ((i!=0 && line[0]!='%') && (line[0]!='\0')) {
 				Node Temp_Node;
 				t_read = strtok(line,",");
 				Temp_Node.Set("ShortCode", string(t_read));
@@ -284,21 +287,21 @@ MatrixStr ReadStep(const char* fileinput) {
 	MatrixStr output(0);
 	VectorStr Temp_Vector(2);
 	//char* t_read;
-	char line [CHAR_LINE];
+	char line[CHAR_LINE];
 	int i = 0;
 
 	FILE *file = fopen(fileinput, "r");
-	if ( file != NULL ) {
+	if (file != NULL) {
 		for (;;) {
 			// Read a line from the file and finish if empty is read
-			if ( fgets(line, sizeof line, file) == NULL ) {
+			if (fgets(line, sizeof line, file) == NULL)
 				break;
-			}
+			
 			// Remove newline character
 			CleanLine(line);
 			
 			// Skip first line, then read the rest
-			if ( i!=0 && line[0]!='%' && line[0]!='\0' ) {
+			if ((i!=0) && (line[0]!='%') && (line[0]!='\0')) {
 				const char *str = line;
 				const char *delims = ",";
 				int k = 0;
@@ -324,30 +327,30 @@ MatrixStr ReadStep(const char* fileinput) {
 vector<Arc> ReadListArcs(const char* fileinput) {
 	vector<Arc> output(0);
 	char* t_read;
-	char line [CHAR_LINE];
+	char line[CHAR_LINE];
 	int i = 0;
 	
 	FILE *file = fopen(fileinput, "r");
-	if ( file != NULL ) {
+	if (file != NULL) {
 		for (;;) {
 			// Read a line from the file and finish if empty is read
-			if ( fgets(line, sizeof line, file) == NULL ) {
+			if (fgets(line, sizeof line, file) == NULL)
 				break;
-			}
+			
 			// Remove comments and end of line characters
 			CleanLine(line);
 			
 			// Skip first line, then read the rest
-			if ( i!=0 && line[0]!='%' && line[0]!='\0' ) {
+			if ((i!=0) && (line[0]!='%') && (line[0]!='\0')) {
 				Arc Temp_Arc;
 				t_read = strtok(line,",");
 				Temp_Arc.Set("From", string(t_read));
 				t_read = strtok(NULL,",");
 				Temp_Arc.Set("To", string(t_read));
 				output.push_back(Temp_Arc);
-				if ( Temp_Arc.isBidirect() ) {
+				if (Temp_Arc.isBidirect()) {
 					Arc Temp_Arc2(Temp_Arc, true);
-					output.push_back( Temp_Arc2 );
+					output.push_back(Temp_Arc2);
 				}
 			}
 			i++;
@@ -374,21 +377,21 @@ void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput) {
 	vector<bool> TableColumn(NFleet, false);
 	
 	// For each line in the definition of infrastructures
-	for (unsigned int i = 0; i < NInfra; ++i) {	
+	for (unsigned int i = 0; i < NInfra; ++i) {
 		Infra.push_back(TransInfra[i][0]);
 		
 		// Create an arc (for infrastructure capacity constraints)
-		DefFrom.push_back( TransInfra[i].substr(0,1) + TransInfra[i].substr(0,1) );
-		DefTo.push_back( "XX" );
-		DefInf.push_back( "" );
+		DefFrom.push_back(TransInfra[i].substr(0,1) + TransInfra[i].substr(0,1));
+		DefTo.push_back("XX");
+		DefInf.push_back("");
 		ArcTable.push_back(TableColumn);
 		
 		// For each fleet within that infrastructure
 		for (unsigned int j = 1; j < TransInfra[i].size(); ++j) {
 			// Create an arc (for fleet capacity constraints)
-			DefFrom.push_back( TransInfra[i].substr(j,1) + TransInfra[i].substr(j,1) );
-			DefTo.push_back( "XX" );
-			DefInf.push_back( "" );
+			DefFrom.push_back(TransInfra[i].substr(j,1) + TransInfra[i].substr(j,1));
+			DefTo.push_back("XX");
+			DefInf.push_back("");
 			ArcTable.push_back(TableColumn);
 			
 			Fleet.push_back(TransInfra[i][j]);
@@ -403,7 +406,7 @@ void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput) {
 	// For each commodity
 	for (unsigned int i = 0; i < NComm; ++i) {
 		Comm.push_back(TransComm[i][0]);
-		DefNodes.push_back( TransComm[i].substr(0,1) + "T" );
+		DefNodes.push_back(TransComm[i].substr(0,1) + "T");
 		NodeTable.push_back(TableColumn);
 		
 		for (unsigned int j = 1; j < TransComm[i].size(); ++j) {
@@ -411,9 +414,9 @@ void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput) {
 			k = Fleet.find(TransComm[i][j]);
 			if (k >= 0) {
 				// Create arc
-				DefFrom.push_back( Fleet.substr(k,1) + Fleet.substr(k,1) );
-				DefTo.push_back( TransComm[i].substr(0,1) + "T" );
-				DefInf.push_back( FleetInf.substr(k,1) + FleetInf.substr(k,1) );
+				DefFrom.push_back(Fleet.substr(k,1) + Fleet.substr(k,1));
+				DefTo.push_back(TransComm[i].substr(0,1) + "T");
+				DefInf.push_back(FleetInf.substr(k,1) + FleetInf.substr(k,1));
 				ArcTable.push_back(TableColumn);
 				
 				ArcTable[ArcTable.size()-1][k] = true;
@@ -423,7 +426,7 @@ void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput) {
 	}
 	
 	char* t_read;
-	char line [CHAR_LINE];
+	char line[CHAR_LINE];
 	int i = 0;
 	
 	TempNode.Set("Step", TransStep);
@@ -431,12 +434,12 @@ void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput) {
 	TempArc.Set("ToStep", TransStep);
 	
 	FILE *file = fopen(fileinput, "r");
-	if ( file != NULL ) {
+	if (file != NULL) {
 		for (;;) {
 			// Read a line from the file and finish if empty is read
-			if ( fgets(line, sizeof line, file) == NULL ) {
+			if (fgets(line, sizeof line, file) == NULL)
 				break;
-			}
+			
 			// Remove comments and end of line characters
 			CleanLine(line);
 			
@@ -480,24 +483,23 @@ void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput) {
 				// To account for both directions and avoid repetitions
 				swapindex = 0;
 				
-				while ( (swapindex==0) || ((swapindex==1) && (from!=to)) ) {
+				while ((swapindex==0) || ((swapindex==1) && (from!=to))) {
 					for (unsigned int k1 = 0; k1 < ShowNode.size(); ++k1) {
 						if (ShowNode[k1]) {
 							TempNode.Set("ShortCode", DefNodes[k1] + from + to);
 							Nodes.push_back(TempNode);
 							
 							//Coal to transportation
-							if ( (swapindex==0) && (from!=to) && (DefNodes[k1]!=TransDummy) && (DefNodes[k1][1]=='T') ) {
+							if ((swapindex==0) && (from!=to) && (DefNodes[k1]!=TransDummy) && (DefNodes[k1][1]=='T')) {
 								kk = TransCoal.find(DefNodes[k1][0]);
 								if (kk >= 0) {
 									// Check if nodes exist, if not it creates it
 									bool fromexists = false, toexists = false;
 									for (unsigned int k2 = 0; k2 < Nodes.size(); ++k2) {
-										if ( Nodes[k2].Get("ShortCode") == DefNodes[k1] + from ) {
+										if (Nodes[k2].Get("ShortCode") == DefNodes[k1] + from)
 											fromexists = true;
-										} else if ( Nodes[k2].Get("ShortCode") == DefNodes[k1] + to ) {
+										else if (Nodes[k2].Get("ShortCode") == DefNodes[k1] + to)
 											toexists = true;
-										}
 									}
 									if (!fromexists) {
 										TempNode.Set("ShortCode", DefNodes[k1] + from);
@@ -545,16 +547,16 @@ void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput) {
 // Read step lengths for capacitated arcs
 void ReadEvents(double output[], const char* fileinput) {
 	char* t_read;
-	char line [CHAR_LINE];
-	int i=0;
+	char line[CHAR_LINE];
+	int i = 0;
 	
 	FILE *file = fopen(fileinput, "r");
-	if ( file != NULL ) {
+	if (file != NULL) {
 		for (;;) {
 			// Read a line from the file and finish if empty is read
-			if ( fgets(line, sizeof line, file) == NULL ) {
+			if (fgets(line, sizeof line, file) == NULL)
 				break;
-			}
+			
 			// Remove comments and end of line characters
 			CleanLine(line);
 			t_read = strtok(line,",");

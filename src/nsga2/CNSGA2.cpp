@@ -36,7 +36,7 @@ CNSGA2::~CNSGA2(void) {
 void CNSGA2::Init(const char* param) {
 	FILE *file = fopen(param, "r");
 	if (file != NULL) {
-		char line [100];
+		char line[100];
 		// Size of population (multiple of 4)
 		fgets(line, sizeof line, file);
 		popsize = strtol(line, NULL, 10);
@@ -57,7 +57,7 @@ void CNSGA2::Init(const char* param) {
 		if (nreal != 0) {
 			min_realvar = (double *)malloc(nreal*sizeof(double));
 			max_realvar = (double *)malloc(nreal*sizeof(double));
-			for ( int i = 0; i < nreal; i++ ) {
+			for (int i = 0; i < nreal; i++) {
 				fgets(line, sizeof line, file);
 				char* t_read = strtok(line," ");
 				min_realvar[i] = strtod(t_read, NULL);
@@ -69,7 +69,7 @@ void CNSGA2::Init(const char* param) {
 		// the probability of crossover of real variable (0.6-1.0)
 		fgets(line, sizeof line, file);
 		pcross_real = strtod(line, NULL);
-		// the probablity of mutation of real variables (1/nreal) 
+		// the probablity of mutation of real variables (1/nreal)
 		fgets(line, sizeof line, file);
 		pmut_real = strtod(line, NULL);
 		// the value of distribution index for crossover (5-20)
@@ -89,7 +89,7 @@ void CNSGA2::Init(const char* param) {
 			min_binvar = (double *)malloc(nbin*sizeof(double));
 			max_binvar = (double *)malloc(nbin*sizeof(double));
 			
-			for ( int i = 0; i < nbin; i++ ) {
+			for (int i = 0; i < nbin; i++) {
 				// the number of bits for binary variable i
 				fgets(line, sizeof line, file);
 				char* t_read = strtok(line," ");
@@ -110,7 +110,7 @@ void CNSGA2::Init(const char* param) {
 			pmut_bin = strtod(line, NULL);
 		}
 		
-		for ( int i = 0; i < nbin; i++ )
+		for (int i = 0; i < nbin; i++)
 			bitlength += nbits[i];
 	}
 	
@@ -184,7 +184,7 @@ void CNSGA2::deallocate_memory_ind(individual *ind) {
 
 // Initialize a population randomly
 void CNSGA2::InitPop(population *pop, double prob) {
-	for ( int i = 0; i < popsize; i++)
+	for (int i = 0; i < popsize; i++)
 		InitInd(&(pop->ind[i]), prob);
 }
 
@@ -212,7 +212,7 @@ void CNSGA2::InitInd(individual *ind, double prob) {
 // Resume a population
 void CNSGA2::ResumePop(population *pop, const char* fileinput) {
 	FILE *file = fopen(fileinput, "r");
-	char line [10000];
+	char line[10000];
 	int number_imports = 0;
 	
 	if (file != NULL) {
@@ -220,7 +220,7 @@ void CNSGA2::ResumePop(population *pop, const char* fileinput) {
 		fgets(line, sizeof line, file);
 		fgets(line, sizeof line, file);
 		
-		for ( int i = 0; i < popsize; i++ ) {
+		for (int i = 0; i < popsize; i++) {
 			// Read a line from the file and finish if empty is read
 			char tmp[80];
 			int output = fscanf(file, "%s", tmp);
@@ -434,7 +434,7 @@ int CNSGA2::checkDominance(individual *a, individual *b) {
 			if (a->constr_violation == 0 && b->constr_violation <0)
 				return (1);
 			else {
-				for ( int i = 0; i < nobj; i++) {
+				for (int i = 0; i < nobj; i++) {
 					if (a->obj[i] < b->obj[i])
 						flag1 = 1;
 					else {
@@ -480,7 +480,7 @@ void CNSGA2::assignCrowdingDistanceList(population *pop, list *lst, int front_si
 	for (int i = 0; i < nobj; i++)
 		obj_array[i] = (int *)malloc(front_size*sizeof(int));
 	
-	for ( int i = 0; i < front_size; i++) {
+	for (int i = 0; i < front_size; i++) {
 		dist[i] = temp->index;
 		temp = temp->child;
 	}
@@ -638,7 +638,7 @@ void CNSGA2::realcross(individual *parent1, individual *parent2, individual *chi
 	if (randgen->randomperc() <= pcross_real) {
 		nrealcross++;
 		for (i=0; i<nreal; i++) {
-			if (randgen->randomperc()<=0.5 ) {
+			if (randgen->randomperc()<=0.5) {
 				if (fabs(parent1->xreal[i]-parent2->xreal[i]) > EPS) {
 					if (parent1->xreal[i] < parent2->xreal[i]) {
 						y1 = parent1->xreal[i];
@@ -760,7 +760,7 @@ void CNSGA2::mutateInd (individual *ind) {
 
 /* Routine for binary mutation of an individual */
 void CNSGA2::binMutateInd (individual *ind) {
-	for (int j = 0; j < nbin; j++) { 
+	for (int j = 0; j < nbin; j++) {
 		for (int k = 0; k < nbits[j]; k++) {
 			if (randgen->randomperc() <= pmut_bin) {
 				if (ind->gene[j][k] == 0)
@@ -909,7 +909,7 @@ void CNSGA2::fillNondominatedSort (population *mixed_pop, population *new_pop) {
 		} while (temp1 != NULL);
 		temp2 = elite->child;
 		j=i;
-		if ( (archieve_size+front_size) <= popsize) {
+		if ((archieve_size+front_size) <= popsize) {
 			do {
 				copyInd (&mixed_pop->ind[temp2->index], &new_pop->ind[i]);
 				new_pop->ind[i].rank = rank;
@@ -984,7 +984,7 @@ void CNSGA2::crowdingFill(population *mixed_pop, population *new_pop, int count,
 	
 	double g, h;
 	g = 0.0f;
-	for (int i = 1; i < 10; i++ ) {
+	for (int i = 1; i < 10; i++) {
 		g += xreal[i];
 	}
 	

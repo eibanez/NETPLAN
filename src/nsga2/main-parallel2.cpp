@@ -30,7 +30,7 @@ int main (int argc, char **argv) {
 	nsga2a->InitPop(nsga2a->parent_pop, Np_start);  // Initialize parent population randomly
 	nsga2a->fileio->recordConfiguration();          // Records all variables related to GA configuration
 	
-	// -- Send 1A -- // 
+	// -- Send 1A -- //
 	nsga2a->decodePop(nsga2a->parent_pop);
 	nsga2a->sendPop(nsga2a->parent_pop);											// JINXU: This function puts the individuals in the queue
 	
@@ -40,15 +40,15 @@ int main (int argc, char **argv) {
 	nsga2b->InitMemory();                           // This allocates memory for the populations
 	nsga2b->InitPop(nsga2b->child_pop, Np_start);   // Initialize child population randomly
 	
-	// -- Send 1B -- // 
+	// -- Send 1B -- //
 	nsga2b->decodePop(nsga2b->child_pop);
 	nsga2b->sendPop(nsga2b->child_pop);												// JINXU: This function puts the individuals in the queue
 	
-	for ( int i = 1; i <= nsga2a->ngen; i++ ) {
+	for (int i = 1; i <= nsga2a->ngen; i++) {
 		// -- Receive (i)A -- //
 		if (i == 1) {
 			nsga2a->receivePop(nsga2a->parent_pop);									// JINXU: This function waits for the solution queue
-			nsga2a->assignRankCrowdingDistance(nsga2a->parent_pop); 
+			nsga2a->assignRankCrowdingDistance(nsga2a->parent_pop);
 			fprintf(nsga2a->fileio->fpt1,"# gen = 1A\n",i);
 			nsga2a->fileio->report_pop (nsga2a->parent_pop, nsga2a->fileio->fpt1);  // Initial population
 		} else {

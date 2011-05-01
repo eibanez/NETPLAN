@@ -16,8 +16,10 @@ time_t startTime, endTime;
 // Print error messages
 void printError(const string& selector, const char* fileinput) {
 	if (selector == "warning") {
-		if (outputLevel < 3 )    cout << "\tWarning: File '" << fileinput << "' not found!\n";
-	} else {                     cout << "\tERROR: File '" << fileinput << "' not found!\n"; }
+		if (outputLevel < 3)
+			cout << "\tWarning: File '" << fileinput << "' not found!\n";
+	} else
+		cout << "\tERROR: File '" << fileinput << "' not found!\n";
 }
 
 void printError(const string& selector, const string& field) {

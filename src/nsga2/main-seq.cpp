@@ -52,8 +52,7 @@ int main (int argc, char **argv) {
 	
 	cout << "- Initialization done, now performing first generation" << endl;
 	
-	
-	for ( int i = 1; i <= nsga2a->ngen; i++ ) {
+	for (int i = 1; i <= nsga2a->ngen; i++) {
 		printHeader("elapsed");
 		
 		// -- Evaluate (i)A -- //
@@ -64,7 +63,7 @@ int main (int argc, char **argv) {
 		nsga2a->decodePop(nsga2a->child_pop);
 		nsga2a->evaluatePop(nsga2a->child_pop, netplan, events);
 		if (i == 1) {
-			nsga2a->assignRankCrowdingDistance(nsga2a->parent_pop); 
+			nsga2a->assignRankCrowdingDistance(nsga2a->parent_pop);
 			fprintf(nsga2a->fileio->fpt1,"# gen = 1A\n",i);
 			nsga2a->fileio->report_pop (nsga2a->parent_pop, nsga2a->fileio->fpt1);   // Initial pop out
 		} else {
@@ -86,7 +85,7 @@ int main (int argc, char **argv) {
 		nsga2b->decodePop(nsga2b->child_pop);
 		nsga2b->evaluatePop(nsga2b->child_pop, netplan, events);
 		if (i == 1) {
-			nsga2b->assignRankCrowdingDistance(nsga2b->child_pop); 
+			nsga2b->assignRankCrowdingDistance(nsga2b->child_pop);
 			fprintf(nsga2a->fileio->fpt1,"# gen = 1B\n",i);
 			nsga2a->fileio->report_pop(nsga2b->child_pop, nsga2a->fileio->fpt1);     // Initial pop out
 		}

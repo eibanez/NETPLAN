@@ -29,15 +29,15 @@ Arc::Arc(const Arc& rhs, const bool reverse) :
 	Energy2Trans(rhs.GetBool("Energy2Trans")),
 	Trans2Energy(rhs.GetVecStr("Trans2Energy")) {
 		if (reverse) {
-			if ( !isTransport() ) {
+			if (!isTransport()) {
 				string temp = Get("To");
 				Set("To", Get("From"));
 				Set("From", temp);
 			} else {
 				string temp = Get("From");
-				Set( "From", temp.substr(0,2) + temp.substr(4,2) + temp.substr(2,2) );
+				Set("From", temp.substr(0,2) + temp.substr(4,2) + temp.substr(2,2));
 				temp = Get("To");
-				Set( "To", temp.substr(0,2) + temp.substr(4,2) + temp.substr(2,2) );
+				Set("To", temp.substr(0,2) + temp.substr(4,2) + temp.substr(2,2));
 			}
 		}
 	}
@@ -72,7 +72,7 @@ string Arc::GetYear() const {
 // Read a property and convert to double
 double Arc::GetDouble(const string& selector) const {
 	double output;
-	output = (Get(selector) != "X") ? atof( Get(selector).c_str() ) : 0;
+	output = (Get(selector) != "X") ? atof(Get(selector).c_str()) : 0;
 	return output;
 }
 
@@ -88,23 +88,30 @@ bool Arc::GetBool(const string& selector) const {
 // Read an entire vector of string properties
 vector<string> Arc::GetVecStr(const string& selector) const {
 	vector<string> temp_output;
-	if (selector == "Properties") temp_output = Properties;
-	else if (selector == "Trans2Energy") temp_output = Trans2Energy;
-	else printError("arcread", selector);
+	if (selector == "Properties")
+		temp_output = Properties;
+	else if (selector == "Trans2Energy")
+		temp_output = Trans2Energy;
+	else
+		printError("arcread", selector);
 	return temp_output;
 };
 
 // Modify a propery
 void Arc::Set(const string& selector, const string& input){
-	int index = FindArcSelector(selector);	
-	if (index >= 0) Properties[index] = input;
-	else printError("arcwrite", selector);
+	int index = FindArcSelector(selector);
+	if (index >= 0)
+		Properties[index] = input;
+	else
+		printError("arcwrite", selector);
 };
 
 // Modify a boolean property
 void Arc::Set(const string& selector, const bool input){
-	if (selector == "Energy2Trans") Energy2Trans = input;
-	else printError("arcwrite", selector);
+	if (selector == "Energy2Trans")
+		Energy2Trans = input;
+	else
+		printError("arcwrite", selector);
 };
 
 // Add a new line to the Trans2Energy vector, where the consumption of energy
@@ -120,7 +127,7 @@ void Arc::Multiply(const string& selector, const double value) {
 	if (selector == "Trans2Energy") {
 		// Adjust values
 		for (unsigned int i = 1; i < Trans2Energy.size(); i += 2) {
-			Trans2Energy[i] = ToString<double>( value * atof(Trans2Energy[i].c_str()) );
+			Trans2Energy[i] = ToString<double>(value * atof(Trans2Energy[i].c_str()));
 		}
 	} else if (index >= 0) {
 		double actual = GetDouble(selector);
@@ -135,16 +142,16 @@ void Arc::Multiply(const string& selector, const double value) {
 string Arc::ArcUbNames() const {
 	string temp_output = "";
 	// Create upper bound constraint
-	if ( isTransport()  && Get("TransInfr") == "" ) {
+	if (isTransport()  && Get("TransInfr") == "") {
 		// Transportation arc
-		if ( Get("OpMax") != "Inf" ) {
+		if (Get("OpMax") != "Inf") {
 			temp_output += " L ub" + Get("Code") + "\n";
 		} else {
 			temp_output += " N ub" + Get("Code") + "\n";
 		}
-	} else if ( !isTransport() ) {
+	} else if (!isTransport()) {
 		// Energy arc
-		if ( Get("OpMax") != "Inf" ) {
+		if (Get("OpMax") != "Inf") {
 			temp_output += " L ub" + Get("Code") + "\n";
 		}
 	}
@@ -154,14 +161,14 @@ string Arc::ArcUbNames() const {
 string Arc::ArcCapNames() const {
 	string temp_output = "";
 	// Create capacity-investment constraint for arcs with valid investment
-	if ( isFirstinYear() && isTransport()  && Get("TransInfr") == "" ) {
+	if (isFirstinYear() && isTransport()  && Get("TransInfr") == "") {
 		// Transportation arc
-		if ( Get("OpMax") != "Inf" ) {
+		if (Get("OpMax") != "Inf") {
 			temp_output += " E inv2cap" + Get("Code") + "\n";
 		}
-	} else if ( isFirstinYear() && !isTransport() ) {
+	} else if (isFirstinYear() && !isTransport()) {
 		// Energy arc
-		if ( Get("OpMax") != "Inf" ) {
+		if (Get("OpMax") != "Inf") {
 			temp_output += " E inv2cap" + Get("Code") + "\n";
 		}
 	}
@@ -171,7 +178,7 @@ string Arc::ArcCapNames() const {
 string Arc::ArcDcNames() const {
 	string temp_output = "";
 	// Create a constraint for DC power flow branches
-	if ( isDCflow() && (Get("From") < Get("To")) ) {
+	if (isDCflow() && (Get("From") < Get("To"))) {
 		temp_output += " E dcpf" + Get("Code") + "\n";
 	}
 	return temp_output;
@@ -180,60 +187,60 @@ string Arc::ArcDcNames() const {
 string Arc::ArcColumns() const {
 	string temp_output = "";
 	string temp_code;
-	if ( !isTransport() || Get("TransInfr") != "" ) {
+	if (!isTransport() || (Get("TransInfr") != "")) {
 		// Cost objective function
-		if ( Get("OpCost") != "0" ) {
+		if (Get("OpCost") != "0") {
 			temp_output += "    " + Get("Code") + " obj " + Get("OpCost") + "\n";
 		}
 		// Sustainability metrics
-		for (int j = 0; j < SustMet.size(); ++j)		
-			if ( Get("Op" + SustMet[j]) != "0" )
+		for (int j = 0; j < SustMet.size(); ++j)
+			if (Get("Op" + SustMet[j]) != "0")
 				temp_output += "    " + Get("Code") + " " + SustMet[j] + GetYear() + " " + Get("Op" + SustMet[j]) + "\n";
 	}
 	
-	if ( !isTransport() ) {
+	if (!isTransport()) {
 		// Put arc in the constraint of the origin node
-		if ( Get("From")[0] != 'X' ) {
+		if (Get("From")[0] != 'X') {
 			temp_output += "    " + Get("Code") + " " + Get("From") + Get("FromStep") + " -1\n";
 		}
 		// Put arc in the constraint of the destination node
-		if ( Get("To")[0] != 'X' ) {
-			if ( InvertEff() ) {
+		if (Get("To")[0] != 'X') {
+			if (InvertEff()) {
 				temp_output += "    " + Get("Code") + " " + Get("To") + Get("ToStep") + " 1\n";
 			} else {
 				temp_output += "    " + Get("Code") + " " + Get("To") + Get("ToStep") + " " + Get("Eff") + "\n";
 			}
 		}
 		// Upper limit for flows
-		if ( Get("OpMax") != "Inf" ) {
+		if (Get("OpMax") != "Inf") {
 			temp_output += "    " + Get("Code") + " ub" + Get("Code") + " 1\n";
 		}
-	} else if ( Get("TransInfr") != "" ) {
+	} else if (Get("TransInfr") != "") {
 		// Put arc in the constraint of the destination node
-		if ( Get("To")[0] != 'X' ) {
+		if (Get("To")[0] != 'X') {
 			temp_output += "    " + Get("Code") + " " + Get("To") + Get("ToStep") + " 1\n";
 		}
 		// Upper limit due to fleet
-		if ( Get("OpMax") != "Inf" ) {
+		if (Get("OpMax") != "Inf") {
 			string fleetcode = Get("From") + Get("FromStep");
 			fleetcode[1] = fleetcode[0];
 			temp_output += "    " + Get("Code") + " ub" + fleetcode + " 1\n";
-		}		
+		}
 		// Upper limit due to infrastructure
-		if ( Get("OpMax") != "Inf" ) {
+		if (Get("OpMax") != "Inf") {
 			string infcode = Get("From") + Get("FromStep");
 			infcode[0] = Get("TransInfr")[0];
 			infcode[1] = Get("TransInfr")[0];
 			temp_output += "    " + Get("Code") + " ub" + infcode + " 1\n";
 		}
 	}
-	if ( !isTransport() || Get("TransInfr") != "" ) {
+	if (!isTransport() || (Get("TransInfr") != "")) {
 		temp_output += WriteEnergy2Trans();
 		temp_output += WriteTrans2Energy();
 	}
 	// Put arc in DC power flow constraint if appropriate
-	if ( isDCflow() ) {
-		if ( Get("From") < Get("To") ) {
+	if (isDCflow()) {
+		if (Get("From") < Get("To")) {
 			temp_output += "    " + Get("Code") + " dcpf" + Get("Code") + " -1\n";
 		} else {
 			temp_code = Get("To") + Get("ToStep") + "_" + Get("From") + Get("FromStep");
@@ -247,16 +254,16 @@ string Arc::InvArcColumns() const {
 	string temp_output = "";
 	string temp_code;
 	// If investment allowed
-	if ( InvArc() && Get("TransInfr") == "" ) {
+	if (InvArc() && Get("TransInfr") == "") {
 		// Cost of investment
 		temp_output += "    inv" + Get("Code") + " obj " + Get("InvCost") + "\n";
 		
 		// Investment added to the next upper bound contraints
 		Step step1, step2, stepguide, maxstep;
-		step1 = Str2Step( Get("FromStep") );
-		step2 = Str2Step( Get("ToStep") );
-		if ( Get("LifeSpan") != "X" ) {
-			maxstep = StepSum( step1, Str2Step(Get("LifeSpan")) );
+		step1 = Str2Step(Get("FromStep"));
+		step2 = Str2Step(Get("ToStep"));
+		if (Get("LifeSpan") != "X") {
+			maxstep = StepSum(step1, Str2Step(Get("LifeSpan")));
 			maxstep = (maxstep > SLength) ? SLength : maxstep;
 		} else {
 			maxstep = SLength;
@@ -266,15 +273,15 @@ string Arc::InvArcColumns() const {
 		while (stepguide <= maxstep) {
 			temp_output += "    inv" + Get("Code") + " inv2cap";
 			temp_output += Get("From") + Step2Str(step1);
-			if ( !isTransport() ) {
+			if (!isTransport())
 				temp_output += "_" + Get("To") + Step2Str(step2);
-			}
+			
 			temp_output += " -1\n";
-			if ( isFirstBidirect() || isFirstTransport() ) {
+			if (isFirstBidirect() || isFirstTransport()) {
 				Arc Arc2(*this, true);
 				temp_output += "    inv" + Get("Code") + " inv2cap";
 				temp_output += Arc2.Get("From") + Step2Str(step1);
-				if ( !isTransport() ) {
+				if (!isTransport()) {
 					temp_output += "_" + Arc2.Get("To") + Step2Str(step2);
 				}
 				temp_output += " -1\n";
@@ -291,27 +298,27 @@ string Arc::CapArcColumns(int selector) const {
 	string temp_output = "";
 	
 	// If investment is allowed,
-	if ( isFirstinYear() && Get("OpMax") != "Inf" && Get("TransInfr") == "" ) {
-		if ( selector != 1 ) {
+	if (isFirstinYear() && Get("OpMax") != "Inf" && Get("TransInfr") == "") {
+		if (selector != 1) {
 			// Add capacity as an upper bound for flows withing that year
 			Step step1, step2, stepguide, maxstep;
-			step1 = Str2Step( Get("FromStep") );
-			step2 = Str2Step( Get("ToStep") );
+			step1 = Str2Step(Get("FromStep"));
+			step2 = Str2Step(Get("ToStep"));
 			stepguide = (step1 > step2) ? step1 : step2;
-			maxstep = ( isStorage() ) ? step1 : stepguide;
+			maxstep = (isStorage()) ? step1 : stepguide;
 			++maxstep[0];
 			
 			string common = "    cap" + Get("Code") + " ub";
 			while (stepguide < maxstep) {
 				temp_output += common;
 				temp_output += Get("From") + Step2Str(step1);
-				if ( !isTransport() ) {
+				if (!isTransport())
 					temp_output += "_" + Get("To") + Step2Str(step2);
-				}
-				if ( InvertEff() ) {
-					string reduced_cap = ToString<double>( GetDouble("Eff") * atof( Step2Hours(stepguide).c_str() ) );
+				
+				if (InvertEff()) {
+					string reduced_cap = ToString<double>(GetDouble("Eff") * atof(Step2Hours(stepguide).c_str()));
 					temp_output += " -" + reduced_cap + "\n";
-				} else if ( Get("InvertEff") == "1" ) {
+				} else if (Get("InvertEff") == "1") {
 					temp_output += " -1\n";
 				} else {
 					temp_output += " -" + Step2Hours(stepguide) + "\n";
@@ -330,7 +337,7 @@ string Arc::CapArcColumns(int selector) const {
 			temp_output += "    cap" + Get("Code") + " inv2cap" + Get("Code") + " 1\n";
 			
 			// Contribution to peak load
-			if ( Get("CapacityFactor") != "0" ) {
+			if (Get("CapacityFactor") != "0") {
 				temp_output += "    cap" + Get("Code");
 				temp_output += " pk" + Get("To") + Get("ToStep") + " " + Get("CapacityFactor") + "\n";
 			}
@@ -343,13 +350,13 @@ vector<string> Arc::Events() const {
 	vector<string> temp_output(0);
 	
 	// If investment is allowed,
-	if ( isFirstinYear() && Get("OpMax") != "Inf" && Get("TransInfr") == "" ) {
+	if (isFirstinYear() && (Get("OpMax") != "Inf") && (Get("TransInfr") == "")) {
 		// Base case
-		temp_output.push_back( "1" );
+		temp_output.push_back("1");
 		for (int event = 1; event <= Nevents; ++event) {
 			// For events
 			string property = "CapacityLoss" + ToString<int>(event);
-			temp_output.push_back( Get(property)  );
+			temp_output.push_back(Get(property));
 		}
 	}
 	return temp_output;
@@ -358,31 +365,29 @@ vector<string> Arc::Events() const {
 string Arc::ArcRhs() const {
 	string temp_output = "";
 	// RHS in the upper bound constraints, for the capacity existing at t=0
-	if ( isFirstinYear() && Get("OpMax") != "Inf"  && Get("TransInfr") == "" ) {
+	if (isFirstinYear() && (Get("OpMax") != "Inf")  && (Get("TransInfr") == ""))
 		temp_output += " rhs inv2cap" + Get("Code") + " " + Get("OpMax") + "\n";
-	}
+	
 	return temp_output;
 }
 
 string Arc::ArcBounds() const {
 	string temp_output = "";
 	// Write minimum for operational flow
-	if ( Get("OpMin") != "0"  && Get("TransInfr") == "" ) {
+	if ((Get("OpMin") != "0") && (Get("TransInfr") == ""))
 		temp_output += " LO bnd " + Get("Code") + " " + Get("OpMin") + "\n";
-	}
+	
 	return temp_output;
 }
 
 string Arc::ArcInvBounds() const {
 	string temp_output = "";
-	if ( InvArc()  && Get("TransInfr") == "" ) {
+	if (InvArc() && (Get("TransInfr") == "")) {
 		// Investment min and maximum when investment is allowed
-		if ( Get("InvMin") != "0" ) {
+		if (Get("InvMin") != "0")
 			temp_output += " LO bnd inv" + Get("Code") + " " + Get("InvMin") + "\n";
-		}
-		if ( Get("InvMax") != "Inf" ) {
+		if (Get("InvMax") != "Inf")
 			temp_output += " UP bnd inv" + Get("Code") + " " + Get("InvMax") + "\n";
-		}
 	}
 	return temp_output;
 }
@@ -390,20 +395,18 @@ string Arc::ArcInvBounds() const {
 string Arc::WriteEnergy2Trans() const {
 	string temp_output = "";
 	// Load on the transportation side created by a coal/energy arc
-	if (Energy2Trans) {
+	if (Energy2Trans)
 		temp_output += "    " + Get("Code") + " " + Get("From") + Get("To").substr(2,2) + Get("ToStep") + " -1\n";
-	}
+	
 	return temp_output;
 }
 
 string Arc::WriteTrans2Energy() const {
 	string temp_output = "";
-	unsigned int k=0;
 	// Energy demand for a transportation node that requires it
-	while ( k+1 < Trans2Energy.size() ) {
+	for (int k=0; k+1 < Trans2Energy.size(); k+=2)
 		temp_output += "    " + Get("Code") + " " + Trans2Energy[k] + " -" + Trans2Energy[k+1] + "\n";
-		k++; k++;
-	}
+	
 	return temp_output;
 }
 
@@ -419,11 +422,11 @@ int Arc::Time() const {
 bool Arc::isFirstinYear() const {
 	bool output = true;
 	Step step1, step2, stepguide;
-	step1 = Str2Step( Get("FromStep") );
-	step2 = Str2Step( Get("ToStep") );
-	stepguide = ( (step1 > step2) || isStorage() ) ? step1 : step2;
-	for ( unsigned int k = Get("InvStep").size(); k < SName.size(); k++) {
-		output = output && ( (stepguide[k]==0) || (stepguide[k]==1) );
+	step1 = Str2Step(Get("FromStep"));
+	step2 = Str2Step(Get("ToStep"));
+	stepguide = ((step1 > step2) || isStorage()) ? step1 : step2;
+	for (unsigned int k = Get("InvStep").size(); k < SName.size(); k++) {
+		output = output && ((stepguide[k]==0) || (stepguide[k]==1));
 	}
 	return output;
 }
@@ -435,13 +438,13 @@ bool Arc::InvArc() const {
 	// It's the first if the arc is bidirectional
 	output = output && (!isTransport() && (!isBidirect() || isFirstBidirect()) || isFirstTransport() );
 	// Technology is available
-	output = output && ( Str2Step(Get("FromStep")) >= Str2Step(Get("InvStart")) );
+	output = output && (Str2Step(Get("FromStep")) >= Str2Step(Get("InvStart")));
 	return output;
 }
 
 // Is efficiency inverted? (Used with electrical generators)
 bool Arc::InvertEff() const {
-	return ( Get("InvertEff") == "Y" || Get("InvertEff") == "y" );
+	return ((Get("InvertEff") == "Y") || (Get("InvertEff") == "y"));
 }
 
 // Is the arc part of DC flow constraints?
@@ -462,9 +465,9 @@ bool Arc::isBidirect() const {
 	return output;
 }
 
-// Is the arc bidirectional and and the first alphabetically? 
+// Is the arc bidirectional and and the first alphabetically?
 bool Arc::isFirstBidirect() const {
-	return isBidirect() && (Get("From") < Get("To") );
+	return isBidirect() && (Get("From") < Get("To"));
 }
 
 // Is is a transportation arc?

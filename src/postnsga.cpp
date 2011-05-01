@@ -19,7 +19,7 @@ int main (int argc, char **argv) {
 	ReadParameters("data/parameters.csv");
 	
 	// Set output level so that Benders steps are reported on screen
-	if (outputLevel == 2 ) outputLevel = 1;
+	if (outputLevel == 2) outputLevel = 1;
 	
 	// Import indices to export data
 	ImportIndices();
@@ -38,12 +38,12 @@ int main (int argc, char **argv) {
 	double min[IdxNsga.size], max[IdxNsga.size];
 	int nbits[IdxNsga.size];
 	FILE *file = fopen("prepdata/param.in", "r");
-	if ( file != NULL ) {
-		char line [ 10000 ];
+	if (file != NULL) {
+		char line[10000];
 		for (int i=0; i < 10; ++i)
 			fgets(line, sizeof line, file);
 		
-		for ( int i = 0; i < IdxNsga.size; i++ ) {
+		for (int i = 0; i < IdxNsga.size; i++) {
 			// The number of bits for binary variable i
 			fgets(line, sizeof line, file);
 			
@@ -61,13 +61,13 @@ int main (int argc, char **argv) {
 	
 	// Open best_pop.out
 	char* t_read;
-	char line [ 256 ];
+	char line[256];
 	if (argc == 1)
 		file = fopen("nsgadata/best_pop.out", "r");
 	else
-		file = fopen( argv[1], "r" );
+		file = fopen(argv[1], "r");
 	
-	if ( file != NULL ) {
+	if (file != NULL) {
 		// Output file
 		ofstream myfile;
 		myfile.open("bestdata/NSGA_summary.csv");
@@ -154,7 +154,7 @@ int main (int argc, char **argv) {
 			
 			// Report solutions (should be made optional)
 			if (true) {
-				vector<string> solstring( netplan.SolutionString() );
+				vector<string> solstring(netplan.SolutionString());
 				string base_name = "bestdata/" + ToString<int>(candidate);
 				WriteOutput((base_name + "_emissions.csv").c_str(), IdxEm, solstring, "% Emissions");
 				WriteOutput((base_name + "_node_rm.csv").c_str(), IdxRm, solstring, "% Reserve margins");

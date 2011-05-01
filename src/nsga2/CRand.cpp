@@ -10,7 +10,7 @@ CRand::~CRand(void) {
 
 /* Get seed number for random and start it up */
 void CRand::randomize() {
-	for( int j1 = 0; j1 <= 54; j1++ )
+	for(int j1 = 0; j1 <= 54; j1++)
 		oldrand[j1] = 0.0;
 	
 	jrand = 0;
@@ -24,11 +24,11 @@ void CRand::warmup_random(double seed) {
 	oldrand[54] = seed;
 	new_random = 0.000000001;
 	prev_random = seed;
-	for(int j1 = 1; j1 <= 54; j1++ ) {
+	for(int j1 = 1; j1 <= 54; j1++) {
 		ii = (21*j1)%54;
 		oldrand[ii] = new_random;
 		new_random = prev_random-new_random;
-		if( new_random < 0.0 )
+		if(new_random < 0.0)
 			new_random += 1.0;
 	
 		prev_random = oldrand[ii];

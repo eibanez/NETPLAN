@@ -39,7 +39,7 @@ string Node::Get(const string& selector) const {
 // Read a property as a double
 double Node::GetDouble(const string& selector) const {
 	double output;
-	output = (Get(selector) != "X") ? atof( Get(selector).c_str() ) : 0;
+	output = (Get(selector) != "X") ? atof(Get(selector).c_str()) : 0;
 	return output;
 }
 
@@ -76,7 +76,7 @@ int Node::Time() const {
 string Node::NodeNames() const {
 	string temp_output = "";
 	// Create constraint for ach node with a valid demand
-	if ( Get("Demand") != "X" && Get("Code")[0] != 'X' ) {
+	if ((Get("Demand") != "X") && (Get("Code")[0] != 'X')) {
 		temp_output += " E " + Get("Code") + "\n";
 	} else {
 		temp_output += " N " + Get("Code") + "\n";
@@ -87,7 +87,7 @@ string Node::NodeNames() const {
 string Node::NodeUDColumns() const {
 	string temp_output = "";
 	// If unserved demand is allowed, write the appropriate cost
-	if ( Get("CostUD") != "X" ) {
+	if (Get("CostUD") != "X") {
 		temp_output += "    UD_" + Get("Code") + " obj " + Get("CostUD") + "\n";
 		temp_output += "    UD_" + Get("Code") + " " + Get("Code") + " 1\n";
 	}
@@ -97,7 +97,7 @@ string Node::NodeUDColumns() const {
 string Node::NodePeakRows() const {
 	string temp_output = "";
 	// If peak demand is available, write the appropriate row
-	if ( (Get("PeakPower") != "X") && isFirstinYear() ) {
+	if ((Get("PeakPower") != "X") && isFirstinYear()) {
 		temp_output += " E pk" + Get("Code") + "\n";
 	}
 	return temp_output;
@@ -106,7 +106,7 @@ string Node::NodePeakRows() const {
 string Node::NodeRMColumns() const {
 	string temp_output = "";
 	// If peak demand is available, write reserve margin variable
-	if ( (Get("PeakPower") != "X") && isFirstinYear() ) {
+	if ((Get("PeakPower") != "X") && isFirstinYear()) {
 		temp_output += "    RM_" + Get("Code") + " pk" + Get("Code") + " -" + Get("PeakPower") + "\n";
 	}
 	return temp_output;
@@ -115,7 +115,7 @@ string Node::NodeRMColumns() const {
 string Node::NodeRMBounds() const {
 	string temp_output = "";
 	// If peak demand is available, write lower bound for reserve margin
-	if ( (Get("PeakPower") != "X") && isFirstinYear() ) {
+	if ((Get("PeakPower") != "X") && isFirstinYear()) {
 		temp_output += " LO bnd RM_" + Get("Code") + " 1\n";
 	}
 	return temp_output;
@@ -124,7 +124,7 @@ string Node::NodeRMBounds() const {
 string Node::NodeRhs() const {
 	string temp_output = "";
 	// Demand RHS if it's valid
-	if ( (Get("Demand") != "X") && (Get("Demand") != "0") ) {
+	if ((Get("Demand") != "X") && (Get("Demand") != "0")) {
 		temp_output = " rhs " + Get("Code") + " " + Get("Demand") + "\n";
 	}
 	return temp_output;
@@ -147,10 +147,10 @@ bool Node::isDCflow() const {
 // Is this the first node in a year?
 bool Node::isFirstinYear() const {
 	bool output = true;
-	Step tempstep = Str2Step( Get("Step") );
-	for ( unsigned int k = 1; k < SName.size(); k++) {
-		output = output && ( (tempstep[k]==0) || (tempstep[k]==1) );
-	}
+	Step tempstep = Str2Step(Get("Step"));
+	for (unsigned int k = 1; k < SName.size(); k++)
+		output = output && ((tempstep[k]==0) || (tempstep[k]==1));
+	
 	return output;
 }
 

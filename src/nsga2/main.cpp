@@ -53,7 +53,7 @@ int main (int argc, char **argv) {
 	// -- Go -- //
 	nsga2->decodePop(nsga2->parent_pop);
 	nsga2->evaluatePop(nsga2->parent_pop, netplan, events);
-	nsga2->assignRankCrowdingDistance(nsga2->parent_pop); 
+	nsga2->assignRankCrowdingDistance(nsga2->parent_pop);
 	
 	nsga2->fileio->report_pop (nsga2->parent_pop, nsga2->fileio->fpt1);       // Initial pop out
 	
@@ -63,7 +63,7 @@ int main (int argc, char **argv) {
 	cout << "- Finished generation #1" << endl;
 	nsga2->fileio->flushIO();
 
-	for ( int i = 2; i <= nsga2->ngen; i++ ) {
+	for (int i = 2; i <= nsga2->ngen; i++) {
 		printHeader("elapsed");
 		nsga2->selection (nsga2->parent_pop, nsga2->child_pop);
 		nsga2->mutatePop (nsga2->child_pop);
@@ -73,7 +73,7 @@ int main (int argc, char **argv) {
 		nsga2->fillNondominatedSort(nsga2->mixed_pop, nsga2->parent_pop);
 		
 		// Comment following three lines if information for all
-		// generations is not desired, it will speed up the execution 
+		// generations is not desired, it will speed up the execution
 		fprintf(nsga2->fileio->fpt4,"# gen = %d\n",i);
 		nsga2->fileio->report_pop(nsga2->parent_pop,nsga2->fileio->fpt4);
 		nsga2->fileio->flushIO();  // TODO: this flushes everything, but really we only need to flush fpt4 here.

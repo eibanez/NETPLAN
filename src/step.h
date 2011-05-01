@@ -29,8 +29,7 @@ int Step2Pos(const Step& mystep);
 // It goes like this: 'const' 'y1' 'y2' ... 'y1m1' 'y1m2' ... 'y1m1h1' 'y1m1h2' etc.
 int Step2Col(const Step& mystep);
 
-// Given a 'Step', find its length in hours, which is stored in the global 
-// variable StepHours
+// Given a 'Step', find its length in hours, which is stored in the global variable StepHours
 string Step2Hours(const Step& mystep);
 
 #endif  // _STEP_H_
