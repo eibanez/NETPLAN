@@ -19,26 +19,33 @@ void WriteOutput(const char* fileinput, Index& idx, vector<string>& values, cons
 	// Open file
 	ofstream myfile;
 	myfile.open(fileinput);
+	int begin, end;
 	
-	int Size = idx.GetSize();
-	if (Size > 0) {
+	if (idx.size > 0) {
+		// Get the start and the end that is going to be written
+		if (idx.size == values.size()) {
+			begin = 0;
+			end = values.size();
+		} else {
+			begin = idx.start;
+			end = begin + idx.size;
+		}
+		
 		// Find min and max columns
-		int maximum = idx.GetColumn(0), minimum = maximum;
-		for (unsigned int i = 1; i < Size; ++i) {
+		int maximum = idx.GetColumn(begin), minimum = maximum;
+		for (unsigned int i = begin + 1; i < end; ++i) {
 			if (idx.GetColumn(i) > maximum ) maximum = idx.GetColumn(i);
 			if (idx.GetColumn(i) < minimum ) minimum = idx.GetColumn(i);
 		}
 		
-		Step start(SName.size(), 0), guide( SName.size() );
+		Step start(SName.size(), 0), guide(SName.size());
 		bool got_start = false;
 		start[0] = 1;
-		for (unsigned int i=1; i < SLength.size(); ++i) {
-			if (!got_start) {
-				start[i] = 1;
-				if ( Step2Col(start) > minimum) {
-					got_start = true;
-					start[i] = 0;
-				}
+		for (unsigned int i=1; (i < SLength.size()) && !got_start; ++i) {
+			start[i] = 1;
+			if (Step2Col(start) > minimum) {
+				got_start = true;
+				start[i] = 0;
 			}
 		}
 		minimum = Step2Col(start);
@@ -51,10 +58,10 @@ void WriteOutput(const char* fileinput, Index& idx, vector<string>& values, cons
 		for (unsigned int i=0; i < SLength.size(); ++i) k += start[i];
 		
 		guide = start;
-		while ( Step2Col(start) <= maximum) {
+		while (Step2Col(start) <= maximum) {
 			myfile << "," << Step2Str(start);
 			start = NextStep(start);
-			if ( (start > SLength) && (k < SLength.size()-1) ) {
+			if ((start > SLength) && (k < SLength.size()-1)) {
 				k++;
 				guide[k] = 1;
 				start = guide;
@@ -63,7 +70,7 @@ void WriteOutput(const char* fileinput, Index& idx, vector<string>& values, cons
 		
 		// Write one line of information
 		int prevpos = -1, prevcol = maximum;
-		for (int i = 0; i < Size; ++i) {
+		for (int i = begin; i < end; ++i) {
 			if (idx.GetPosition(i) != prevpos) {
 				for (int j = prevcol; j < maximum; ++j) myfile << ",";
 				myfile << "\n" << idx.GetName(i);
@@ -81,14 +88,6 @@ void WriteOutput(const char* fileinput, Index& idx, vector<string>& values, cons
 	
 	// Close file
 	myfile.close();
-}
-
-// Write data output from an array (partially)
-void WriteOutput(const char* fileinput, Index& idx, vector<string>& values, const int start, const string& header) {
-	vector<string> ValuesStr(0);
-	for (int i = start; i < idx.GetSize() + start; ++i)
-		ValuesStr.push_back( values[i] );
-	WriteOutput(fileinput, idx, ValuesStr, header);
 }
 
 // Write data output for a collection of nodes

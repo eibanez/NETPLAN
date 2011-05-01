@@ -53,12 +53,12 @@ int main () {
 	// Report solutions if the problem is feasible
 	if (objective[0] < 1.0e29) {
 		vector<string> solstring(netplan.SolutionString());
-		WriteOutput("prepdata/post_emissions.csv", IdxEm, solstring, startEm, "% Emissions");
-		WriteOutput("prepdata/post_node_rm.csv", IdxRm, solstring, startRm, "% Reserve margins");
-		WriteOutput("prepdata/post_arc_inv.csv", IdxInv, solstring, startInv, "% Investments");
-		WriteOutput("prepdata/post_arc_cap.csv", IdxCap, solstring, startCap, "% Capacity");
-		WriteOutput("prepdata/post_arc_flow.csv", IdxArc, solstring, startArc, "% Arc flows");
-		WriteOutput("prepdata/post_node_ud.csv", IdxUd, solstring, startUd, "% Demand not served at nodes");
+		WriteOutput("prepdata/post_emissions.csv", IdxEm, solstring, "% Emissions");
+		WriteOutput("prepdata/post_node_rm.csv", IdxRm, solstring, "% Reserve margins");
+		WriteOutput("prepdata/post_arc_inv.csv", IdxInv, solstring, "% Investments");
+		WriteOutput("prepdata/post_arc_cap.csv", IdxCap, solstring, "% Capacity");
+		WriteOutput("prepdata/post_arc_flow.csv", IdxArc, solstring, "% Arc flows");
+		WriteOutput("prepdata/post_node_ud.csv", IdxUd, solstring, "% Demand not served at nodes");
 		
 		for (int i=0; i <= Nevents; ++i) {
 			vector<string> dualstring(netplan.SolutionDualString(i));

@@ -156,12 +156,12 @@ int main (int argc, char **argv) {
 			if ( true ) {
 				vector<string> solstring( netplan.SolutionString() );
 				string base_name = "bestdata/" + ToString<int>(individual);
-				WriteOutput( (base_name + "_emissions.csv").c_str(), IdxEm, solstring, startEm, "% Emissions" );
-				WriteOutput( (base_name + "_node_rm.csv").c_str(), IdxRm, solstring, startRm, "% Reserve margins");
-				WriteOutput( (base_name + "_arc_inv.csv").c_str(), IdxInv, solstring, startInv, "% Investments");
-				WriteOutput( (base_name + "_arc_cap.csv").c_str(), IdxCap, solstring, startCap, "% Capacity");
-				WriteOutput( (base_name + "_arc_flow.csv").c_str(), IdxArc, solstring, startArc, "% Arc flows");
-				WriteOutput( (base_name + "_node_ud.csv").c_str(), IdxUd, solstring, startUd, "% Demand not served at nodes");
+				WriteOutput((base_name + "_emissions.csv").c_str(), IdxEm, solstring, "% Emissions" );
+				WriteOutput((base_name + "_node_rm.csv").c_str(), IdxRm, solstring, "% Reserve margins");
+				WriteOutput((base_name + "_arc_inv.csv").c_str(), IdxInv, solstring, "% Investments");
+				WriteOutput((base_name + "_arc_cap.csv").c_str(), IdxCap, solstring, "% Capacity");
+				WriteOutput((base_name + "_arc_flow.csv").c_str(), IdxArc, solstring, "% Arc flows");
+				WriteOutput((base_name + "_node_ud.csv").c_str(), IdxUd, solstring, "% Demand not served at nodes");
 			}
 			
 			++individual;

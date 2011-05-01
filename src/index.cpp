@@ -110,21 +110,21 @@ Index ReadFile(const char* fileinput) {
 // Loads all necessary index files in memory
 void ImportIndices() {
 	IdxNode = ReadFile("prepdata/idx_node.csv");
-	IdxUd = ReadFile("prepdata/idx_ud.csv");
-	IdxRm = ReadFile("prepdata/idx_rm.csv");
-	IdxArc = ReadFile("prepdata/idx_arc.csv");
-	IdxInv = ReadFile("prepdata/idx_inv.csv");
+	IdxUd   = ReadFile("prepdata/idx_ud.csv");
+	IdxRm   = ReadFile("prepdata/idx_rm.csv");
+	IdxArc  = ReadFile("prepdata/idx_arc.csv");
+	IdxInv  = ReadFile("prepdata/idx_inv.csv");
 	IdxNsga = ReadFile("prepdata/idx_nsga.csv");
-	IdxCap = ReadFile("prepdata/idx_cap.csv");
-	IdxUb = ReadFile("prepdata/idx_ub.csv");
-	IdxEm = ReadFile("prepdata/idx_em.csv");
-	IdxDc = ReadFile("prepdata/idx_dc.csv");
+	IdxCap  = ReadFile("prepdata/idx_cap.csv");
+	IdxUb   = ReadFile("prepdata/idx_ub.csv");
+	IdxEm   = ReadFile("prepdata/idx_em.csv");
+	IdxDc   = ReadFile("prepdata/idx_dc.csv");
 	
-	startCap = 0;
-	startInv = startCap + IdxCap.GetSize();
-	startEm = startInv + IdxInv.GetSize();
-	startRm = startEm + IdxEm.GetSize();
-	startArc = startRm + IdxRm.GetSize();
-	startUd = startArc + IdxArc.GetSize();
-	startDc = startUd + IdxUd.GetSize();
+	IdxCap.start = 0;
+	IdxInv.start = IdxCap.start + IdxCap.size;
+	IdxEm.start  = IdxInv.start + IdxInv.size;
+	IdxRm.start  = IdxEm.start + IdxEm.size;
+	IdxArc.start = IdxRm.start + IdxRm.size;
+	IdxUd.start  = IdxArc.start + IdxArc.size;
+	IdxDc.start  = IdxUd.start + IdxUd.size;
 }
