@@ -12,7 +12,6 @@
 #include "write.h"
 
 // Global variables
-const int CharLine = 15000;
 string SName;
 Step SLength;
 bool useDCflow = false, useBenders = false;

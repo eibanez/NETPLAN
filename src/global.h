@@ -17,7 +17,6 @@ typedef vector<string> VectorStr;
 typedef vector<VectorStr> MatrixStr;
 
 // Global variables
-extern const int CharLine;
 extern string SName;
 extern Step SLength;
 extern bool useDCflow, useBenders;

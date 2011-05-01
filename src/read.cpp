@@ -13,12 +13,13 @@ using namespace std;
 #include "node.h"
 #include "arc.h"
 
+#define CHAR_LINE 15000
 
 // Read global parameters
 void ReadParameters(const char* fileinput) {
 	char* t_read;
 	string prop, value, discount = "0", inflation = "0", demandrate = "0", peakdemandrate = "0";
-	char line [ CharLine ];
+	char line [CHAR_LINE];
 	
 	FILE *file = fopen(fileinput, "r");
 	if ( file != NULL ) {
@@ -158,7 +159,7 @@ MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const in
 	MatrixStr output(0);
 	char* t_read;
 	string t2_read;
-	char line [ CharLine ];
+	char line [CHAR_LINE];
 	int i = 0, j = 0;
 	
 	FILE *file = fopen(fileinput, "r");
@@ -251,7 +252,7 @@ MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const in
 vector<Node> ReadListNodes(const char* fileinput) {
 	vector<Node> output(0);
 	char* t_read;
-	char line [ CharLine ];
+	char line [CHAR_LINE];
 	int i = 0;
 	
 	FILE *file = fopen(fileinput, "r");
@@ -283,7 +284,7 @@ MatrixStr ReadStep(const char* fileinput) {
 	MatrixStr output(0);
 	VectorStr Temp_Vector(2);
 	//char* t_read;
-	char line [ CharLine ];
+	char line [CHAR_LINE];
 	int i = 0;
 
 	FILE *file = fopen(fileinput, "r");
@@ -323,7 +324,7 @@ MatrixStr ReadStep(const char* fileinput) {
 vector<Arc> ReadListArcs(const char* fileinput) {
 	vector<Arc> output(0);
 	char* t_read;
-	char line [ CharLine ];
+	char line [CHAR_LINE];
 	int i = 0;
 	
 	FILE *file = fopen(fileinput, "r");
@@ -422,7 +423,7 @@ void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput) {
 	}
 	
 	char* t_read;
-	char line [ CharLine ];
+	char line [CHAR_LINE];
 	int i = 0;
 	
 	TempNode.Set("Step", TransStep);
@@ -544,7 +545,7 @@ void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput) {
 // Read step lengths for capacitated arcs
 void ReadEvents(double output[], const char* fileinput) {
 	char* t_read;
-	char line [ CharLine ];
+	char line [CHAR_LINE];
 	int i=0;
 	
 	FILE *file = fopen(fileinput, "r");
