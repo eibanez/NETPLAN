@@ -139,14 +139,9 @@ string Node::DCNodesBounds() const {
 }
 
 // ****** Boolean functions ******
-// Is Node a DC node?
-bool Node::isDCelect() const {
-	return ( Get("ShortCode").substr(0,2) == DCCode );
-}
-
-// Is Node and DC node and are we considering DC flow in the model?
+// Is Node a DC node and are we considering DC flow in the model?
 bool Node::isDCflow() const {
-	return isDCelect() && useDCflow;
+	return (Get("ShortCode").substr(0,2) == DCCode) && useDCflow;
 }
 
 // Is this the first node in a year?
