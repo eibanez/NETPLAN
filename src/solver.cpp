@@ -595,28 +595,3 @@ vector<double> SumByRow(const IloNumArray& v, Index Idx) {
 	
 	return result;
 }
-
-
-/*
-// Import Minimum investment into the model from file (not tested)
-void ImportMin(const char* filename, const int MstartInv) {
-	int inv = MstartInv;
-	
-	FILE *file;
-	char line [200];
-	
-	file = fopen(filename, "r");
-	if (file != NULL) {
-		for (;;) {
-			// Read a line from the file and finish if empty is read
-			if (fgets(line, sizeof line, file) == NULL)
-				break;
-			double d1;
-			d1 = strtod(line, NULL);
-			model[0].add(var[0][inv] >= d1);
-			++inv;
-		}
-	}
-}
-
-*/

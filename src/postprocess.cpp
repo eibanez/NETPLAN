@@ -36,9 +36,6 @@ int main () {
 	double events[(SLength[0] + IdxCap.size) * (Nevents+1)];
 	ReadEvents(events, "prepdata/bend_events.csv");
 	
-	// Import minimum (not tested)
-	// ImportMin(argv[1], model, var)
-	
 	// Solve problem
 	double objective[Nobj];
 	netplan.SolveIndividual(objective, events);
