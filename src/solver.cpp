@@ -15,6 +15,8 @@ using namespace std;
 #include "write.h"
 #include "solver.h"
 
+#define MAX_ITER 1000
+
 // Loads the problem from MPS files into memory
 void CPLEX::LoadProblem() {
 	cout << "- Reading problem..." << endl;
@@ -89,6 +91,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 	try {
 		// Keep track of solution
 		bool optimal = true;
+		int iter = 0;
 		
 		if ( !useBenders ) {
 			// Only one file
@@ -106,9 +109,9 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 			}
 		} else {
 			// Use Benders decomposition
-			int OptCuts = 1, FeasCuts = 1, iter = 0;
+			int OptCuts = 1, FeasCuts = 1;
 			
-			while ((OptCuts+FeasCuts > 0) && (iter <= 1000)) {
+			while ((OptCuts+FeasCuts > 0) && (iter <= MAX_ITER)) {
 				++iter; OptCuts = 0; FeasCuts = 0;
 				
 				// Keep track of necessary cuts
@@ -206,7 +209,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 				}
 			}
 			
-			if (cplex[0].getCplexStatus() == CPX_STAT_OPTIMAL) {
+			if ((cplex[0].getCplexStatus() == CPX_STAT_OPTIMAL) && (iter <= MAX_ITER)) {
 				optimal = true;
 				objective[0] = cplex[0].getObjValue();
 			} else {
