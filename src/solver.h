@@ -67,12 +67,12 @@ struct CPLEX {
 
 // Metrics
 double EmissionIndex(const IloNumArray& v, const int start);
-vector<double> SumByRow(const IloNumArray& v, Index Idx, const int start);
+vector<double> SumByRow(const IloNumArray& v, Index Idx);
 
 /*
 
 // Import Minimum investment into the model from file (not tested)
-void ImportMin( const char* filename, const int MstartInv );
+void ImportMin(const char* filename, const int MstartInv);
 
 */
 

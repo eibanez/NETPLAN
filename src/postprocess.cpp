@@ -37,14 +37,7 @@ int main () {
 	ReadEvents(events, "prepdata/bend_events.csv");
 	
 	// Import minimum (not tested)
-	// ImportMin( argv[1], model, var )
-	//RandomMin( startInv );
-	/*int inv = IdxCap.GetSize();
-	if (useBenders) inv += SLength[0];
-	for (int i=0; i < IdxInv.GetSize(); ++i) {
-		model[0].add( var[0][inv] >= 2 );
-		++inv;
-	}*/
+	// ImportMin(argv[1], model, var)
 	
 	// Solve problem
 	double objective[Nobj];
@@ -63,7 +56,7 @@ int main () {
 		for (int i=0; i <= Nevents; ++i) {
 			vector<string> dualstring(netplan.SolutionDualString(i));
 			string file_name = "prepdata/post_nodal_dual_e" + ToString<int>(i) + ".csv";
-			WriteOutput(file_name.c_str(), IdxNode, dualstring, 0, "% Dual variable at demand nodes");
+			WriteOutput(file_name.c_str(), IdxNode, dualstring, "% Dual variable at demand nodes");
 		}
 	}
 	

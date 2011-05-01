@@ -210,13 +210,13 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 				cout << "\tCost: " << objective[0] << endl;
 			
 			// Sustainability metrics
-			vector<double> emissions = SumByRow(solution, IdxEm, startEm);
+			vector<double> emissions = SumByRow(solution, IdxEm);
 			for (int i=0; i < SustObj.size(); ++i) {
 				// Print results on screen
 				if (outputLevel < 2) {
 					if (SustObj[i] == "EmCO2" || SustObj[i] == "CO2") {
 						cout << "\t" << SustObj[i] << ": ";
-						cout << EmissionIndex(solution, startEm + SLength[0]*i);
+						cout << EmissionIndex(solution, IdxEm.start + SLength[0]*i);
 						cout << " (Sum: " << emissions[i] << ")" << endl;
 					} else {
 						cout << "\t" << SustObj[i] << ": " << emissions[i] << endl;
@@ -225,7 +225,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 				
 				// Return sustainability metric
 				if (SustObj[i] == "EmCO2" || SustObj[i] == "CO2")
-					objective[1+i] = EmissionIndex(solution, startEm + SLength[0]*i);
+					objective[1+i] = EmissionIndex(solution, IdxEm.start + SLength[0]*i);
 				else
 					objective[1+i] = emissions[i];
 			}
@@ -239,7 +239,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 					returnString += "," + ToString<double>( emissions[i] );
 				
 				// Write investments
-				/*vector<double> Investments = SumByRow(solution, IdxInv, startInv);
+				/*vector<double> Investments = SumByRow(solution, IdxInv);
 				for (int j=0; j < Investments.size(); ++j)
 					returnString += "," + ToString<double>( Investments[j] );*/
 			}
@@ -493,11 +493,11 @@ void CPLEX::StoreDualSolution(int event, double *years) {
 // Function called by the NSGA-II method. It takes the minimum investement (x) and calculates the metrics (objective)
 void CPLEX::SolveProblem(double *x, double *objective, const double events[]) {
 	// Start of investment variables
-	int startInv = IdxCap.GetSize();
-	if (useBenders) startInv += SLength[0];
+	int inv = IdxCap.size;
+	if (useBenders) inv += SLength[0];
 	
 	for (int i = 0; i < IdxNsga.GetSize(); ++i)
-		var[0][startInv + i].setLB(x[i]);
+		var[0][inv + i].setLB(x[i]);
 	
 	// Solve problem
 	SolveIndividual(objective, events);
@@ -505,7 +505,8 @@ void CPLEX::SolveProblem(double *x, double *objective, const double events[]) {
 
 // Apply minimum investments to the master problem
 void CPLEX::ApplyMinInv(double *x) {
-	int inv = IdxCap.GetSize();
+	// Start of investment variables
+	int inv = IdxCap.size;
 	if (useBenders) inv += SLength[0];
 	
 	for (int i = 0; i < IdxNsga.GetSize(); ++i) {
@@ -572,7 +573,7 @@ double EmissionIndex(const IloNumArray& v, const int start) {
 	return result;
 }
 
-vector<double> SumByRow(const IloNumArray& v, Index Idx, const int start) {
+vector<double> SumByRow(const IloNumArray& v, Index Idx) {
 	// This function sums each row for an index across years
 	int last_index = -1, j=0;
 	double sum = 0;
@@ -586,7 +587,7 @@ vector<double> SumByRow(const IloNumArray& v, Index Idx, const int start) {
 		} else {
 			if (last_index == -1)
 				last_index = Idx.GetPosition(i);
-			sum += v[start + i];
+			sum += v[Idx.start + i];
 			++j;
 		}
 	}
@@ -598,7 +599,7 @@ vector<double> SumByRow(const IloNumArray& v, Index Idx, const int start) {
 
 /*
 // Import Minimum investment into the model from file (not tested)
-void ImportMin( const char* filename, const int MstartInv ) {
+void ImportMin(const char* filename, const int MstartInv) {
 	int inv = MstartInv;
 	
 	FILE *file;

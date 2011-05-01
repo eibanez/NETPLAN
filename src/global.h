@@ -28,7 +28,6 @@ extern vector<string> ArcProp, ArcDefault, NodeProp, NodeDefault, TransInfra, Tr
 extern int NodePropOffset, ArcPropOffset, outputLevel;
 // Store indices to recover data after optimization
 extern Index IdxNode, IdxUd, IdxRm, IdxArc, IdxInv, IdxCap, IdxUb, IdxEm, IdxDc, IdxNsga;
-// extern int startCap, startInv, startEm, startRm, startArc, startUd, startDc;
 
 // Print error messages
 void printError(const string& selector, const char* fileinput);

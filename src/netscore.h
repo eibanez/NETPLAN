@@ -23,7 +23,6 @@ vector<string> ArcProp(0), ArcDefault(0), NodeProp(0), NodeDefault(0), TransInfr
 int NodePropOffset = 0, ArcPropOffset = 0, outputLevel = 2;
 // Store indices to recover data after optimization
 Index IdxNode, IdxUd, IdxRm, IdxArc, IdxInv, IdxCap, IdxUb, IdxEm, IdxDc, IdxNsga;
-// int startCap, startInv, startEm, startRm, startArc, startUd, startDc;
 
 int FindCode(const string& mystr, const MatrixStr mymatrix);
 int FindCode(const string& strfrom, const string& strto, const MatrixStr mymatrix);
