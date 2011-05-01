@@ -55,10 +55,6 @@ void CPLEX::LoadProblem() {
 			cplex[i].importModel(model[i], file_name.c_str(), obj[i], var[i], rng[i]);
 		}
 		
-		// Variable to store temporary master cuts
-		if (useBenders)
-			model[0].add(MasterCuts);
-		
 		/* // Prepare constraints to apply capacities to subproblems
 		for (int i=1; i <= nyears; ++i)
 			CapCuts.add( IloRangeArray(env) );
@@ -118,7 +114,8 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 				bool status[nyears];
 				IloExprArray expr_cut(env, nyears);
 				
-				//cplex[0].exportModel("master.lp");
+				// Save master problem with added cuts
+				// cplex[0].exportModel("master.lp");
 				
 				// Solve master problem. If master is infeasible, exit loop
 				if (outputLevel < 2 ) cout << "- Solving master problem (Iteration #" << iter << ")" << endl;
@@ -186,9 +183,10 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 					// Apply cuts to master
 					for (int j=1; j <= nyears; ++j) {
 						if (status[j-1]) {
-							MasterCuts.add( expr_cut[j-1] <= 0 );
+							MasterCuts.add(expr_cut[j-1] <= 0);
 							string constraintName = "Cut_y" + ToString<int>(j) + "_iter" + ToString<int>(iter);
 							MasterCuts[MasterCuts.getSize()-1].setName(constraintName.c_str());
+							model[0].add(MasterCuts[MasterCuts.getSize()-1]);
 						}
 						// Reset solver properties
 						if (cplex[j].getCplexStatus() != CPX_STAT_OPTIMAL) {
@@ -350,8 +348,10 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 		}
 		
 		// Erase cuts created with Benders
-		if (useBenders)
+		if (useBenders) {
+			model[0].remove(MasterCuts);
 			MasterCuts.endElements();
+		}
 		
 	} catch (IloException& e) {
 		cerr << "Concert exception caught: " << e << endl;
