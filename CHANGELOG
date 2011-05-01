@@ -1,3 +1,7 @@
+Version 2.0.2
+ - Improved speed in the NSGA-II algorithm. All the Cplex objects are reused to reduce memory problems
+ - Fixed problem when maximum number of iterations is reached.
+
 Version 2.0.1
  - Cleaned code and erased unused files
  - Fixed emission index if number of years is too small
