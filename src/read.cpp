@@ -10,8 +10,7 @@ using namespace std;
 #include <string>
 #include <vector>
 #include "global.h"
-#include "node.h"
-#include "arc.h"
+#include "read.h"
 
 #define CHAR_LINE 15000
 
