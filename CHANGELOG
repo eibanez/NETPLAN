@@ -1,3 +1,7 @@
+Version 2.0.3
+ - Simplified definition and use of indices
+ - Style cleanup
+
 Version 2.0.2
  - Improved speed in the NSGA-II algorithm. All the Cplex objects are reused to reduce memory problems
  - Fixed problem when maximum number of iterations is reached.
