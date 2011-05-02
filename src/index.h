@@ -15,14 +15,12 @@ class Index {
 		~Index();
 		Index& operator=(const Index& rhs);
 		
-		void Add(const int newpos, const int newcol, const string& newname);
 		void Add(const int newpos, const int newcol, const int newyear, const string& newname);
 		void Add(const int newpos, const Step& newcol, const string& newname);
 		void WriteFile(const char* fileinput) const;
 		
 		// Variables
 		int start, size;
-		
 		vector<int> position;
 		vector<int> column;
 		vector<int> year;

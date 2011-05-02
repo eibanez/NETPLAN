@@ -35,13 +35,6 @@ Index& Index::operator=(const Index& rhs) {
 }
 
 // Add one more element to the index collection
-void Index::Add(const int newpos, const int newcol, const string& newname) {
-	position.push_back(newpos);
-	column.push_back(newcol);
-	year.push_back(newcol);
-	name.push_back(newname);
-	++size;
-}
 void Index::Add(const int newpos, const int newcol, const int newyear, const string& newname) {
 	position.push_back(newpos);
 	column.push_back(newcol);
@@ -49,6 +42,7 @@ void Index::Add(const int newpos, const int newcol, const int newyear, const str
 	name.push_back(newname);
 	++size;
 }
+
 void Index::Add(const int newpos, const Step& newcol, const string& newname) {
 	Add(newpos, Step2Col(newcol), newcol[0], newname);
 }
