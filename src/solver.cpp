@@ -14,11 +14,20 @@ using namespace std;
 #include "read.h"
 #include "write.h"
 #include "solver.h"
+//#include "myNetplan.h"
+#include <time.h>
+#include <iomanip>
+#include <cmath>
 
 // Loads the problem from MPS files into memory
 void CPLEX::LoadProblem() {
 	cout << "- Reading problem..." << endl;
-	
+	#ifdef DEBUG_TIMING
+	time_t startTime, endTime; 
+	double dif;
+	time (&startTime);	
+	#endif
+	//string file_name_temp = ""; int tempi =0; string file_nameT="";
 	try {
 		int nyears = SLength[0];
 		
@@ -59,11 +68,22 @@ void CPLEX::LoadProblem() {
 	} catch (...) {
 		cerr << "Unknown exception caught" << endl;
 	}
+	#ifdef DEBUG_TIMING
+	time (&endTime);	
+	cout << "Reading problem takes " << difftime(endTime,startTime) << " seconds " << endl;  
+	#endif
 }
 
 // Solves current model
 void CPLEX::SolveIndividual( double *objective, const double events[], string & returnString ) {
-	int nyears = SLength[0];
+	int nyears = SLength[0]; double tempDouble = 0.0; 
+	#ifdef DEBUG_SOLVEIND
+	cout << "I am in CPLEX::SolveIndividual with returnString now " << endl; // djx
+	time_t startTime, endTime; 
+	double dif;
+	time(&startTime);	
+	#endif
+	objReturnSize = 0;
 	
 	try {
 		// Store temporary master cuts
@@ -331,7 +351,13 @@ void CPLEX::SolveIndividual( double *objective, const double events[], string & 
 						resiliency += ResilObj[j];
 						if (outputLevel < 2) cout << "\t\tEv: " << j+1 << "\tCost: " << ResilObj[j] << endl;
 					}
-					objective[SustObj.size() + 1] = resiliency / Nevents;
+					// http://www.cplusplus.com/forum/beginner/3600/
+					// rounding fucntion 
+					// ceil( ( num * pow( 10,x ) ) - 0.49 ) / pow( 10,x );
+					tempDouble = resiliency / (double)Nevents; 
+					tempDouble = ceil((tempDouble* pow( 10.0, PRECISION_NUM))-0.5)/pow(10.0,PRECISION_NUM);
+
+					objective[SustObj.size() + 1] = tempDouble;
 					if ( outputLevel < 2 )
 						cout << "\tResiliency: " << resiliency / Nevents << endl;
 				} else {
@@ -360,12 +386,15 @@ void CPLEX::SolveIndividual( double *objective, const double events[], string & 
 		for (int j=1; j <= nyears; ++j)
 			model[j].remove( CapCuts[j-1] );
 		CapCuts.end();
-		
 	} catch (IloException& e) {
 		cerr << "Concert exception caught: " << e << endl;
 	} catch (...) {
 		cerr << "Unknown exception caught" << endl;
 	}
+	#ifdef DEBUG_SOLVEIND
+	time (&endTime);	
+	cout << "solving ind takes " << difftime(endTime,startTime) << " seconds \n" << endl;
+	#endif
 }
 
 void CPLEX::SolveIndividual( double *objective, const double events[] ) {
@@ -528,6 +557,12 @@ void CPLEX::StoreDualSolution(int event, double *years) {
 // Function called by the NSGA-II method. It takes the minimum investement (x) and calculates the metrics (objective)
 void CPLEX::SolveProblem(double *x, double *objective, const double events[]) {
 	// Start of investment variables
+	#ifdef DEBUG_SOLVEPROBLEM
+	cout << "I am in CPLEX::SolveProblem now " << endl;// djx
+	time_t startTime, endTime; 
+	double dif;
+	time(&startTime);	
+	#endif
 	int startInv = IdxCap.GetSize();
 	if ( useBenders ) startInv += SLength[0];
 	
@@ -543,6 +578,10 @@ void CPLEX::SolveProblem(double *x, double *objective, const double events[]) {
 	// Eliminate lower bound constraints
 	model[0].remove( ConstrLB );
 	ConstrLB.end();
+	#ifdef DEBUG_SOLVEPROBLEM
+	time(&endTime);	
+	cout << "Solve problem takes " << difftime(endTime,startTime) << " seconds \n\n " << endl;  
+	#endif
 }
 
 // Apply minimum investments to the master problem
