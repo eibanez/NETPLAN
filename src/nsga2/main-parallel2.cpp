@@ -73,7 +73,7 @@ int main (int argc, char **argv) {
 		// -- Receive (i)B -- //
 		nsga2b->receivePop(nsga2b->child_pop);										// JINXU: This function waits for the solution queue
 		if (i == 1) {
-			nsga2b->assignRankCrowdingDistance(nsga2b->parent_pop);
+			nsga2b->assignRankCrowdingDistance(nsga2b->child_pop);
 			fprintf(nsga2a->fileio->fpt1,"# gen = 1B\n",i);
 			nsga2a->fileio->report_pop(nsga2b->child_pop, nsga2a->fileio->fpt1);  // Initial population
 		}
