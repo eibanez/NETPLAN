@@ -1,11 +1,21 @@
 #include "../solver.h"
+//#include "../myNetplan.h"
 #include "CNSGA2.h"
+
+CPLEX netplan;
 
 CNSGA2::CNSGA2(void) {
 	randgen = new CRand(RAND_SEED);
 	fileio = new CFileIO(this);
 	quicksort = new CQuicksort(randgen);
 	linkedlist = new CLinkedList();
+	popsize = 0;
+}
+CNSGA2::CNSGA2(int noFileIO){popsize = 0 ; fileio = NULL; nreal = 0; nbin = 0;}
+
+newCNSGA2::newCNSGA2(int noFileIO): CNSGA2(noFileIO)
+{
+	memallo = false;
 }
 
 CNSGA2::CNSGA2(bool output, double seed) {
@@ -13,13 +23,35 @@ CNSGA2::CNSGA2(bool output, double seed) {
 	if (output) fileio = new CFileIO(this);
 	quicksort = new CQuicksort(randgen);
 	linkedlist = new CLinkedList();
+	popsize = 0;
 }
+// only for evalaute() in worker
+// CNSGA2(int myclass)
+/*
+CNSGA2::CNSGA2(int myClass) {
+	popsize = 0 ;
+	if (myClass > 0)
+	{
+		memallo = false;	
+	}
+	else
+	{
+		memallo = true;	
+	}
+}
+*/
+
+//newCNSGA2::~newCNSGA2() {}
 
 CNSGA2::~CNSGA2(void) {	
+     if (popsize != 0)  
+     {
 	delete randgen;
 	delete fileio;
 	delete quicksort;
 	delete linkedlist;
+	}
+	
 	
 	if ( nreal != 0 ) {
 		free (min_realvar);
@@ -30,6 +62,9 @@ CNSGA2::~CNSGA2(void) {
 		free (max_binvar);
 		free (nbits);
 	}
+    if (popsize != 0)  // djx
+    {	
+
 	
 	deallocate_memory_pop (parent_pop, popsize);
 	deallocate_memory_pop (child_pop, popsize);
@@ -287,21 +322,97 @@ void CNSGA2::decodeInd(individual *ind) {
 
 /* Routine to evaluate objective function values and constraints for a population */
 void CNSGA2::evaluatePop (population *pop, const double events[]) {
+	static int evaCounter = 0;
 	// Declare variables to store the optimization model
 	CPLEX netplan;
-	
-	// Read optimization problem and store it in memory
-	netplan.LoadProblem();
+	if (evaCounter == 0)
+	{
+		//CPLEX netplan;
+		#ifdef DEBUG_EVALUATEPOP	
+		cout << "In CNSGA2::evaluatePop, popsize is " << popsize << endl;
+		#endif
+		// Read optimization problem and store it in memory
+		// what parameters are loaded ? where are the data located ? 
+		netplan.LoadProblem();
+		++evaCounter;
+	}
 	
 	for (int i=0; i<popsize; i++) {
-		cout << "\tIndividual: " << i+1 << endl;
+		
 		netplan.SolveProblem( (&pop->ind[i])->xbin, (&pop->ind[i])->obj, events);
 		(&pop->ind[i])->constr_violation = 0.0;
+		#ifdef DEBUG_EVALUATEPOP
+		//cout << "\t after netplan.SolveProblem , try to solve Individual: " << i+1 << " netplan.objReturnSize is " << netplan.objReturnSize << endl;
+		#endif
+		//evaluateInd (&(pop->ind[i]), events, netplan);
+	}
+}
+/* Routine to evaluate objective function values and constraints for a population ind */
+// nsga2->evaluatePopInd(myPop, events, resultTaskPackageT12, beginInd); 	// master solve all pop
+//void CNSGA2::evaluatePopInd (population* pop, const double events[], int beginInd, int& objRSize, int myRank, CPLEX* netplan) {
+void CNSGA2::evaluatePopInd (population* pop, const double events[], int beginInd, int& objRSize, int myRank) {
+	static int callCounter = 0 ;
+	// Declare variables to store the optimization model
+	CPLEX netplan;
+	if (callCounter == 0)
+	{	
+	// Read optimization problem and store it in memory
+	netplan.LoadProblem();
+	netplan.objReturnSize = 0;
+	++callCounter;
+	}  
+	for (int i=beginInd; i<= beginInd; i++) 
+ 	{
+		//netplan.SolveProblem( (&pop->ind[i])->xbin, (&pop->ind[i])->obj, events);
+		netplan.SolveProblem( (&pop->ind[i])->xbin, (&pop->ind[i])->obj, events);
+		#ifdef DEBUG_evaluatePopInd
+		cout << "I am rank " << myRank << " in evaluatePopInd() worker run Individual: " << i << " netplan.objReturnSize is " << netplan.objReturnSize <<  "\n" << endl;
+		#endif
+		objRSize = netplan.objReturnSize; 
+		//netplan.SolveProblem( myIndXreal, objValue, events);
+
+		(&pop->ind[i])->constr_violation = 0.0;
+	
+	}
+}
+// master use it 
+//void CNSGA2::mEvaluatePopInd (population* pop, const double events[], vector<double>& mResultTaskPackageT12, int beginInd, int nobj, int genNum, char canTag, int myRank, CPLEX* netplan) {
+void CNSGA2::mEvaluatePopInd (population* pop, const double events[], vector<double>& mResultTaskPackageT12, int beginInd, int nobj, int genNum, char canTag, int myRank) {
+	static int callCounter = 0 ;
+	// Declare variables to store the optimization model
+	//CPLEX netplan;
+	if (callCounter == 0)
+	{
+	// Read optimization problem and store it in memory
+	netplan.LoadProblem();
+	netplan.objReturnSize    =  0;
+	++callCounter; 
+	}	
+	double* objValue = NULL;
+ 	mResultTaskPackageT12[0] =  genNum;
+	mResultTaskPackageT12[1] =  canTag;
+	mResultTaskPackageT12[2] =  beginInd;
+	
+	for (int i=beginInd; i<= beginInd; i++) {
+		netplan.SolveProblem( (&pop->ind[i])->xbin, (&pop->ind[i])->obj, events);
+		objValue = (&pop->ind[i])->obj;
+		#ifdef DEBUG_mEvaluatePopInd
+		cout << "I am rank " << myRank << " in mEvaluatePopInd master run left Individual: " << i << " netplan->objReturnSize = " << netplan.objReturnSize << "\n\n" << endl;
+		#endif
+		//netplan.SolveProblem( myIndXreal, objValue, events);
+		// for (int ii =0 ; ii < nobj ; ii++)
+		for (int ii =0 ; ii < netplan.objReturnSize ; ii++)
+		{
+			mResultTaskPackageT12[ii+4] = objValue[ii]; // get solved obj value
+		}
+		(&pop->ind[i])->constr_violation = 0.0;
+		mResultTaskPackageT12[3] = ((&pop->ind[i])->constr_violation); // get solved obj value
 		//evaluateInd (&(pop->ind[i]), events, netplan);
 	}
 }
 
 /* Routine to evaluate objective function values and constraints for a population */
+/*
 void CNSGA2::sendPop(population *pop) {
 	for (int i=0; i<popsize; i++) {
 		// Send to queue:		(&pop->ind[i])->xbin,
@@ -310,14 +421,35 @@ void CNSGA2::sendPop(population *pop) {
 		//evaluateInd (&(pop->ind[i]), events, netplan);
 	}
 }
-
+*/
+/* Routine to send data to worker nodes */
+/*
+void CNSGA2::sendPop(population *pop) {
+	for (int i=0; i<popsize; i++) {
+		// Send the following array to worker nodes (there it is called "variables")
+		(&pop->ind[i])->xbin;
+	}
+}
+*/
+/* Routine to receive data from worker nodes */
+/*
+void CNSGA2::receivePop(population *pop) {
+	for (int i=0; i<popsize; i++) {
+		// JINXU: Receive "objectives" array from worker node and store it in the variable below
+		(&pop->ind[i])->obj;
+		(&pop->ind[i])->constr_violation = 0.0;							// JINXU: Leave this line in
+	}
+}
+*/
 /* Routine to evaluate objective function values and constraints for a population */
+/*
 void CNSGA2::receivePop(population *pop) {
 	for (int i=0; i<popsize; i++) {
 		// Receive from workers:  (&pop->ind[i])->obj			// JINXU: Connect this line to nsga2-individual.cpp
 		(&pop->ind[i])->constr_violation = 0.0;
 	}
 }
+*/
 
 /* Routine to evaluate objective function values and constraints for an individual */
 /*void CNSGA2::evaluateInd (individual *ind, const double events[], CPLEX& netplan) {
