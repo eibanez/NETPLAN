@@ -49,4 +49,6 @@ string ToString(T t) {
 	return ss.str();
 }
 
+#define  PRECISION_NUM 6
+
 #endif  // _GLOBAL_H_
