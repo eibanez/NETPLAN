@@ -21,7 +21,7 @@ int main () {
 	ReadParameters("data/parameters.csv");
 	
 	// Set output level so that Benders steps are reported on screen
-	if (outputLevel == 2 ) outputLevel = 1;
+	if (outputLevel == 2) outputLevel = 1;
 	
 	// Import indices to export data
 	ImportIndices();
@@ -33,36 +33,28 @@ int main () {
 	netplan.LoadProblem();
 	
 	// Vector of capacity losses for events
-	double events[(SLength[0] + IdxCap.GetSize()) * (Nevents+1)];
+	double events[(SLength[0] + IdxCap.size) * (Nevents+1)];
 	ReadEvents(events, "prepdata/bend_events.csv");
-	
-	// Import minimum (not tested)
-	// ImportMin( argv[1], model, var )
-	//RandomMin( startInv );
-	/*int inv = IdxCap.GetSize();
-	if (useBenders) inv += SLength[0];
-	for (int i=0; i < IdxInv.GetSize(); ++i) {
-		model[0].add( var[0][inv] >= 2 );
-		++inv;
-	}*/
 	
 	// Solve problem
 	double objective[Nobj];
-	netplan.SolveIndividual( objective, events );
+	netplan.SolveIndividual(objective, events);
 	
-	// Report solutions
-	vector<string> solstring( netplan.SolutionString() );
-	WriteOutput("prepdata/post_emissions.csv", IdxEm, solstring, startEm, "% Emissions");
-	WriteOutput("prepdata/post_node_rm.csv", IdxRm, solstring, startRm, "% Reserve margins");
-	WriteOutput("prepdata/post_arc_inv.csv", IdxInv, solstring, startInv, "% Investments");
-	WriteOutput("prepdata/post_arc_cap.csv", IdxCap, solstring, startCap, "% Capacity");
-	WriteOutput("prepdata/post_arc_flow.csv", IdxArc, solstring, startArc, "% Arc flows");
-	WriteOutput("prepdata/post_node_ud.csv", IdxUd, solstring, startUd, "% Demand not served at nodes");
-	
-	for (int i=0; i <= Nevents; ++i) {
-		vector<string> dualstring( netplan.SolutionDualString(i) );
-		string file_name = "prepdata/post_nodal_dual_e" + ToString<int>(i) + ".csv";
-		WriteOutput(file_name.c_str(), IdxNode, dualstring, 0, "% Dual variable at demand nodes");
+	// Report solutions if the problem is feasible
+	if (objective[0] < 1.0e29) {
+		vector<string> solstring(netplan.SolutionString());
+		WriteOutput("prepdata/post_emissions.csv", IdxEm, solstring, "% Emissions");
+		WriteOutput("prepdata/post_node_rm.csv", IdxRm, solstring, "% Reserve margins");
+		WriteOutput("prepdata/post_arc_inv.csv", IdxInv, solstring, "% Investments");
+		WriteOutput("prepdata/post_arc_cap.csv", IdxCap, solstring, "% Capacity");
+		WriteOutput("prepdata/post_arc_flow.csv", IdxArc, solstring, "% Arc flows");
+		WriteOutput("prepdata/post_node_ud.csv", IdxUd, solstring, "% Demand not served at nodes");
+		
+		for (int i=0; i <= Nevents; ++i) {
+			vector<string> dualstring(netplan.SolutionDualString(i));
+			string file_name = "prepdata/post_nodal_dual_e" + ToString<int>(i) + ".csv";
+			WriteOutput(file_name.c_str(), IdxNode, dualstring, "% Dual variable at demand nodes");
+		}
 	}
 	
 	cout << "- Values returned:" << endl;

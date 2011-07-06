@@ -67,7 +67,7 @@ Step StepSum(const Step& a, const Step& b) {
 	Step output = a;
 	for (int k = SLength.size()-1; k >= 0; --k) {
 		output[k] += b[k];
-		while ( (output[k] > SLength[k]) && (k>0) ) {
+		while ((output[k] > SLength[k]) && (k>0)) {
 			output[k] -= SLength[k];
 			output[k-1] += 1;
 		}
@@ -113,7 +113,7 @@ int Step2Col(const Step& mystep) {
 // Given a 'Step', find its length in hours, which is stored in the global variable StepHours
 string Step2Hours(const Step& mystep) {
 	int idx;
-	if ( mystep[SName.size()-1] != 0) {
+	if (mystep[SName.size()-1] != 0) {
 		idx = (SName.size() -1) + (mystep[SName.size()-1] - 1);
 	} else {
 		idx = -1;

@@ -18,7 +18,7 @@ class CLinkedList {
 		CLinkedList(void);
 		~CLinkedList(void);
 		
-		void  insert (list *node, int x);
-		list* del (list *node);
+		void  insert(list *node, int x);
+		list* del(list *node);
 };
 

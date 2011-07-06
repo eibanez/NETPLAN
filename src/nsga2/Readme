@@ -1,6 +1,5 @@
-NOTE: This is the Readme file for NSGA-II ORIGINAL code.
-      The version that NETPLAN uses is differs from this.
-
+NOTE: This is the Readme file for NSGA-II ORIGINAL code
+      The version that NETPLAN uses differs from this.
 
 About the Algorithm
 --------------------------------------------------------------------------
@@ -18,7 +17,7 @@ Pages: 182-197
 ---------------------------------------------------------------------------
 
 
-How to compile and run the program 
+How to compile and run the program
 [NOTE: This part differs from the NETPLAN implementation, but that might change]
 ---------------------------------------------------------------------------
 Makefile has been provided for compiling the program on linux (and unix-like)

@@ -15,7 +15,7 @@ CFileIO::CFileIO(CNSGA2* nsga2) {
 	p_nsga2 = nsga2;
 }
 
-CFileIO::~CFileIO(void) {    
+CFileIO::~CFileIO(void) {
 	flushIO();
 	
 	fclose(fpt1);
@@ -41,7 +41,7 @@ void CFileIO::recordConfiguration() {
 	fprintf(fpt5,"\n Number of constraints = %d",p_nsga2->ncon);
 	fprintf(fpt5,"\n Number of real variables = %d",p_nsga2->nreal);
 	if (p_nsga2->nreal!=0) {
-		for ( int i=0; i < p_nsga2->nreal; i++ ) {
+		for (int i=0; i < p_nsga2->nreal; i++) {
 			fprintf(fpt5,"\n Lower limit of real variable %d = %e",i+1,p_nsga2->min_realvar[i]);
 			fprintf(fpt5,"\n Upper limit of real variable %d = %e",i+1,p_nsga2->max_realvar[i]);
 		}
@@ -52,7 +52,7 @@ void CFileIO::recordConfiguration() {
 	}
 	fprintf(fpt5,"\n Number of binary variables = %d",p_nsga2->nbin);
 	if (p_nsga2->nbin!=0) {
-		for ( int i = 0; i < p_nsga2->nbin; i++ ) {
+		for (int i = 0; i < p_nsga2->nbin; i++) {
 			fprintf(fpt5,"\n Number of bits for binary variable %d = %d",i+1,p_nsga2->nbits[i]);
 			fprintf(fpt5,"\n Lower limit of binary variable %d = %e",i+1,p_nsga2->min_binvar[i]);
 			fprintf(fpt5,"\n Upper limit of binary variable %d = %e",i+1,p_nsga2->max_binvar[i]);
@@ -76,22 +76,21 @@ void CFileIO::report_pop (population *pop, FILE *fpt) {
 			fprintf(fpt,"%e\t",pop->ind[i].obj[j]);
 		
 		// Constraints?
-		if ( p_nsga2->ncon != 0 ) {
+		if (p_nsga2->ncon != 0) {
 			for (int j=0; j<p_nsga2->ncon; j++)
 				fprintf(fpt,"%e\t",pop->ind[i].constr[j]);
 		}
 		
 		// Reals?
-		if ( p_nsga2->nreal != 0 ) {
+		if (p_nsga2->nreal != 0) {
 			for (int j=0; j<p_nsga2->nreal; j++)
 				fprintf(fpt,"%e\t",pop->ind[i].xreal[j]);
 		}
 		
 		// Binary?
 		if (p_nsga2->nbin!=0) {
-			for ( int j=0; j < p_nsga2->nbin; j++ )
-			{
-				for ( int k=0; k < p_nsga2->nbits[j]; k++ )
+			for (int j=0; j < p_nsga2->nbin; j++) {
+				for (int k=0; k < p_nsga2->nbits[j]; k++)
 					fprintf(fpt,"%d\t",pop->ind[i].gene[j][k]);
 			}
 		}
@@ -107,18 +106,18 @@ void CFileIO::report_pop (population *pop, FILE *fpt) {
 void CFileIO::report_feasible (population *pop, FILE *fpt) {
 	for (int i=0; i<p_nsga2->popsize; i++) {
 		if (pop->ind[i].constr_violation == 0.0 && pop->ind[i].rank==1) {
-			for ( int j = 0; j < p_nsga2->nobj; j++)
+			for (int j = 0; j < p_nsga2->nobj; j++)
 				fprintf(fpt,"%e\t",pop->ind[i].obj[j]);
 			
 			// Constraints?
 			if (p_nsga2->ncon!=0) {
-				for ( int j = 0; j < p_nsga2->ncon; j++)
+				for (int j = 0; j < p_nsga2->ncon; j++)
 					fprintf(fpt,"%e\t",pop->ind[i].constr[j]);
 			}
 			
 			// Real?
 			if (p_nsga2->nreal!=0) {
-				for ( int j = 0 ; j < p_nsga2->nreal; j++)
+				for (int j = 0 ; j < p_nsga2->nreal; j++)
 					fprintf(fpt,"%e\t",pop->ind[i].xreal[j]);
 			}
 			

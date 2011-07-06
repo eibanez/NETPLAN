@@ -21,7 +21,7 @@ class Node {
 		void Set(const string& selector, const string& input);
 		void Multiply(const string& selector, const double value);
 		int Time() const;
-
+		
 		string NodeNames() const;
 		string NodeUDColumns() const;
 		string NodePeakRows() const;
@@ -30,7 +30,6 @@ class Node {
 		string NodeRhs() const;
 		string DCNodesBounds() const;
 		
-		bool isDCelect() const;
 		bool isDCflow() const;
 		bool isFirstinYear() const;
 		

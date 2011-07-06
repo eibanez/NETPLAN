@@ -1,0 +1,7 @@
+# Ignore temporary LaTex files #
+
+*.aux
+*.log
+*.out
+*.gz
+*.toc

@@ -8,7 +8,6 @@
 #define _WRITE_H_
 
 void WriteOutput(const char* fileinput, Index& idx, vector<string>& values, const string& header);
-void WriteOutput(const char* fileinput, Index& idx, vector<string>& values, const int start, const string& header);
 void WriteOutput(const char* fileinput, Index& idx, vector<Node>& Nodes, const string& selector, const string& header);
 void WriteOutput(const char* fileinput, Index& idx, vector<Arc>& Arcs, const string& selector, const string& header);
 

@@ -2,29 +2,20 @@
 //#include "../myNetplan.h"
 #include "CNSGA2.h"
 
-CPLEX netplan;
-
-CNSGA2::CNSGA2(void) {
-	randgen = new CRand(RAND_SEED);
-	fileio = new CFileIO(this);
-	quicksort = new CQuicksort(randgen);
-	linkedlist = new CLinkedList();
-	popsize = 0;
-}
-CNSGA2::CNSGA2(int noFileIO){popsize = 0 ; fileio = NULL; nreal = 0; nbin = 0;}
-
-newCNSGA2::newCNSGA2(int noFileIO): CNSGA2(noFileIO)
-{
-	memallo = false;
-}
-
 CNSGA2::CNSGA2(bool output, double seed) {
-	randgen	= new CRand(seed);
+	randgen = new CRand(seed);
 	if (output) fileio = new CFileIO(this);
 	quicksort = new CQuicksort(randgen);
 	linkedlist = new CLinkedList();
 	popsize = 0;
 }
+
+CNSGA2::CNSGA2(int noFileIO){popsize = 0 ; fileio = NULL; nreal = 0; nbin = 0;}
+
+newCNSGA2::newCNSGA2(int noFileIO): CNSGA2(noFileIO) {
+	memallo = false;
+}
+
 // only for evalaute() in worker
 // CNSGA2(int myclass)
 /*
@@ -32,28 +23,26 @@ CNSGA2::CNSGA2(int myClass) {
 	popsize = 0 ;
 	if (myClass > 0)
 	{
-		memallo = false;	
+		memallo = false;
 	}
 	else
 	{
-		memallo = true;	
+		memallo = true;
 	}
 }
 */
 
 //newCNSGA2::~newCNSGA2() {}
 
-CNSGA2::~CNSGA2(void) {	
-     if (popsize != 0)  
-     {
-	delete randgen;
-	delete fileio;
-	delete quicksort;
-	delete linkedlist;
+CNSGA2::~CNSGA2(void) {
+	if (popsize != 0) {
+		delete randgen;
+		delete fileio;
+		delete quicksort;
+		delete linkedlist;
 	}
 	
-	
-	if ( nreal != 0 ) {
+	if (nreal != 0) {
 		free (min_realvar);
 		free (max_realvar);
 	}
@@ -62,23 +51,21 @@ CNSGA2::~CNSGA2(void) {
 		free (max_binvar);
 		free (nbits);
 	}
-    if (popsize != 0)  // djx
-    {	
-
-	
-	deallocate_memory_pop (parent_pop, popsize);
-	deallocate_memory_pop (child_pop, popsize);
-	deallocate_memory_pop (mixed_pop, 2*popsize);
-	
-	free (parent_pop);
-	free (child_pop);
-	free (mixed_pop);
+	if (popsize != 0) {  // djx
+		deallocate_memory_pop (parent_pop, popsize);
+		deallocate_memory_pop (child_pop, popsize);
+		deallocate_memory_pop (mixed_pop, 2*popsize);
+		
+		free (parent_pop);
+		free (child_pop);
+		free (mixed_pop);
+	}
 }
 
 void CNSGA2::Init(const char* param) {
 	FILE *file = fopen(param, "r");
-	if ( file != NULL ) {
-		char line [ 100 ];
+	if (file != NULL) {
+		char line[100];
 		// Size of population (multiple of 4)
 		fgets(line, sizeof line, file);
 		popsize = strtol(line, NULL, 10);
@@ -99,7 +86,7 @@ void CNSGA2::Init(const char* param) {
 		if (nreal != 0) {
 			min_realvar = (double *)malloc(nreal*sizeof(double));
 			max_realvar = (double *)malloc(nreal*sizeof(double));
-			for ( int i = 0; i < nreal; i++ ) {
+			for (int i = 0; i < nreal; i++) {
 				fgets(line, sizeof line, file);
 				char* t_read = strtok(line," ");
 				min_realvar[i] = strtod(t_read, NULL);
@@ -111,7 +98,7 @@ void CNSGA2::Init(const char* param) {
 		// the probability of crossover of real variable (0.6-1.0)
 		fgets(line, sizeof line, file);
 		pcross_real = strtod(line, NULL);
-		// the probablity of mutation of real variables (1/nreal) 
+		// the probablity of mutation of real variables (1/nreal)
 		fgets(line, sizeof line, file);
 		pmut_real = strtod(line, NULL);
 		// the value of distribution index for crossover (5-20)
@@ -131,7 +118,7 @@ void CNSGA2::Init(const char* param) {
 			min_binvar = (double *)malloc(nbin*sizeof(double));
 			max_binvar = (double *)malloc(nbin*sizeof(double));
 			
-			for ( int i = 0; i < nbin; i++ ) {
+			for (int i = 0; i < nbin; i++) {
 				// the number of bits for binary variable i
 				fgets(line, sizeof line, file);
 				char* t_read = strtok(line," ");
@@ -152,7 +139,7 @@ void CNSGA2::Init(const char* param) {
 			pmut_bin = strtod(line, NULL);
 		}
 		
-		for ( int i = 0; i < nbin; i++ )
+		for (int i = 0; i < nbin; i++)
 			bitlength += nbits[i];
 	}
 	
@@ -166,24 +153,24 @@ void CNSGA2::Init(const char* param) {
 
 // This function allocates the memory needed for the given populations
 void CNSGA2::InitMemory() {
-	parent_pop 	= (population *)malloc(sizeof(population));
-	child_pop 	= (population *)malloc(sizeof(population));
-	mixed_pop 	= (population *)malloc(sizeof(population));
+	parent_pop  = (population *)malloc(sizeof(population));
+	child_pop   = (population *)malloc(sizeof(population));
+	mixed_pop   = (population *)malloc(sizeof(population));
 	
-	allocate_memory_pop (parent_pop, popsize);
-	allocate_memory_pop (child_pop, popsize);
-	allocate_memory_pop (mixed_pop, 2*popsize);
+	allocate_memory_pop(parent_pop, popsize);
+	allocate_memory_pop(child_pop, popsize);
+	allocate_memory_pop(mixed_pop, 2*popsize);
 }
 
 // Function to allocate memory to a population
-void CNSGA2::allocate_memory_pop (population *pop, int size) {
+void CNSGA2::allocate_memory_pop(population *pop, int size) {
 	pop->ind = (individual *)malloc(size*sizeof(individual));
-	for (int i=0; i < size; i++ )
+	for (int i=0; i < size; i++)
 		allocate_memory_ind (&(pop->ind[i]));
 }
 
 // Function to allocate memory to an individual
-void CNSGA2::allocate_memory_ind (individual *ind) {
+void CNSGA2::allocate_memory_ind(individual *ind) {
 	int j;
 	if (nreal != 0) {
 		ind->xreal = (double *)malloc(nreal*sizeof(double));
@@ -202,14 +189,14 @@ void CNSGA2::allocate_memory_ind (individual *ind) {
 }
 
 // Function to deallocate memory to a population
-void CNSGA2::deallocate_memory_pop (population *pop, int size) {
-	for (int i = 0; i < size; i++ )
+void CNSGA2::deallocate_memory_pop(population *pop, int size) {
+	for (int i = 0; i < size; i++)
 		deallocate_memory_ind (&(pop->ind[i]));
 	free (pop->ind);
 }
 
 // Function to deallocate memory to an individual
-void CNSGA2::deallocate_memory_ind (individual *ind) {
+void CNSGA2::deallocate_memory_ind(individual *ind) {
 	if (nreal != 0)
 		free(ind->xreal);
 	
@@ -225,8 +212,8 @@ void CNSGA2::deallocate_memory_ind (individual *ind) {
 }
 
 // Initialize a population randomly
-void CNSGA2::InitPop (population *pop, double prob) {
-	for ( int i = 0; i < popsize; i++ )
+void CNSGA2::InitPop(population *pop, double prob) {
+	for (int i = 0; i < popsize; i++)
 		InitInd(&(pop->ind[i]), prob);
 }
 
@@ -234,14 +221,14 @@ void CNSGA2::InitPop (population *pop, double prob) {
 void CNSGA2::InitInd(individual *ind, double prob) {
 	// Initialize real variables
 	if (nreal!=0) {
-		for (int j = 0; j < nreal; j++ )
+		for (int j = 0; j < nreal; j++)
 			ind->xreal[j] = randgen->rndreal (min_realvar[j], max_realvar[j]);
 	}
 	
 	// Initialize binary variables
 	if (nbin!=0) {
-		for (int j = 0; j < nbin; j++ ) {
-			for (int k = 0; k < nbits[j]; k++ ) {
+		for (int j = 0; j < nbin; j++) {
+			for (int k = 0; k < nbits[j]; k++) {
 				if (randgen->randomperc() >= prob)
 					ind->gene[j][k] = 0;
 				else
@@ -252,22 +239,22 @@ void CNSGA2::InitInd(individual *ind, double prob) {
 }
 
 // Resume a population
-void CNSGA2::ResumePop (population *pop, const char* fileinput) {
+void CNSGA2::ResumePop(population *pop, const char* fileinput) {
 	FILE *file = fopen(fileinput, "r");
-	char line [ 10000 ];
+	char line[10000];
 	int number_imports = 0;
 	
-	if ( file != NULL ) {
+	if (file != NULL) {
 		// Discard first two lines (comments)
 		fgets(line, sizeof line, file);
 		fgets(line, sizeof line, file);
 		
-		for ( int i = 0; i < popsize; i++ ) {
+		for (int i = 0; i < popsize; i++) {
 			// Read a line from the file and finish if empty is read
 			char tmp[80];
-			int output = fscanf (file, "%s", tmp);
+			int output = fscanf(file, "%s", tmp);
 			
-			if ( output == EOF ) {
+			if (output == EOF) {
 				break;
 			}
 			
@@ -278,8 +265,8 @@ void CNSGA2::ResumePop (population *pop, const char* fileinput) {
 			
 			// Initialize binary variables
 			int f;
-			for (int j = 0; j < nbin; j++ ) {
-				for (int k = 0; k < nbits[j]; k++ ) {
+			for (int j = 0; j < nbin; j++) {
+				for (int k = 0; k < nbits[j]; k++) {
 					fscanf (file, "%d", &f);
 					(&pop->ind[i])->gene[j][k] = f;
 				}
@@ -300,7 +287,7 @@ void CNSGA2::ResumePop (population *pop, const char* fileinput) {
 // Decode a population to find out the binary variable values based on its bit pattern
 void CNSGA2::decodePop(population *pop) {
 	if (nbin!=0) {
-		for (int i = 0; i < popsize; i++ )
+		for (int i = 0; i < popsize; i++)
 			decodeInd (&(pop->ind[i]));
 	}
 }
@@ -309,7 +296,7 @@ void CNSGA2::decodePop(population *pop) {
 void CNSGA2::decodeInd(individual *ind) {
 	int sum;
 	if (nbin!=0) {
-		for (int j = 0; j < nbin; j++ ) {
+		for (int j = 0; j < nbin; j++) {
 			sum=0;
 			for (int k=0; k<nbits[j]; k++) {
 				if (ind->gene[j][k]==1)
@@ -321,16 +308,10 @@ void CNSGA2::decodeInd(individual *ind) {
 }
 
 /* Routine to evaluate objective function values and constraints for a population */
-void CNSGA2::evaluatePop (population *pop, const double events[]) {
+void CNSGA2::evaluatePop(population *pop, CPLEX& netplan, const double events[]) {
 	static int evaCounter = 0;
-	// Declare variables to store the optimization model
-	CPLEX netplan;
-	if (evaCounter == 0)
-	{
-		//CPLEX netplan;
-		#ifdef DEBUG_EVALUATEPOP	
-		cout << "In CNSGA2::evaluatePop, popsize is " << popsize << endl;
-		#endif
+
+	if (evaCounter == 0) {
 		// Read optimization problem and store it in memory
 		// what parameters are loaded ? where are the data located ? 
 		netplan.LoadProblem();
@@ -338,12 +319,8 @@ void CNSGA2::evaluatePop (population *pop, const double events[]) {
 	}
 	
 	for (int i=0; i<popsize; i++) {
-		
 		netplan.SolveProblem( (&pop->ind[i])->xbin, (&pop->ind[i])->obj, events);
 		(&pop->ind[i])->constr_violation = 0.0;
-		#ifdef DEBUG_EVALUATEPOP
-		//cout << "\t after netplan.SolveProblem , try to solve Individual: " << i+1 << " netplan.objReturnSize is " << netplan.objReturnSize << endl;
-		#endif
 		//evaluateInd (&(pop->ind[i]), events, netplan);
 	}
 }
@@ -354,15 +331,13 @@ void CNSGA2::evaluatePopInd (population* pop, const double events[], int beginIn
 	static int callCounter = 0 ;
 	// Declare variables to store the optimization model
 	CPLEX netplan;
-	if (callCounter == 0)
-	{	
-	// Read optimization problem and store it in memory
-	netplan.LoadProblem();
-	netplan.objReturnSize = 0;
-	++callCounter;
+	if (callCounter == 0) {
+		// Read optimization problem and store it in memory
+		netplan.LoadProblem();
+		netplan.objReturnSize = 0;
+		++callCounter;
 	}  
-	for (int i=beginInd; i<= beginInd; i++) 
- 	{
+	for (int i=beginInd; i<= beginInd; i++) {
 		//netplan.SolveProblem( (&pop->ind[i])->xbin, (&pop->ind[i])->obj, events);
 		netplan.SolveProblem( (&pop->ind[i])->xbin, (&pop->ind[i])->obj, events);
 		#ifdef DEBUG_evaluatePopInd
@@ -370,9 +345,8 @@ void CNSGA2::evaluatePopInd (population* pop, const double events[], int beginIn
 		#endif
 		objRSize = netplan.objReturnSize; 
 		//netplan.SolveProblem( myIndXreal, objValue, events);
-
+		
 		(&pop->ind[i])->constr_violation = 0.0;
-	
 	}
 }
 // master use it 
@@ -381,13 +355,13 @@ void CNSGA2::mEvaluatePopInd (population* pop, const double events[], vector<dou
 	static int callCounter = 0 ;
 	// Declare variables to store the optimization model
 	//CPLEX netplan;
-	if (callCounter == 0)
-	{
-	// Read optimization problem and store it in memory
-	netplan.LoadProblem();
-	netplan.objReturnSize    =  0;
-	++callCounter; 
-	}	
+	if (callCounter == 0) {
+		// Read optimization problem and store it in memory
+		netplan.LoadProblem();
+		netplan.objReturnSize = 0;
+		++callCounter; 
+	}
+	
 	double* objValue = NULL;
  	mResultTaskPackageT12[0] =  genNum;
 	mResultTaskPackageT12[1] =  canTag;
@@ -396,13 +370,9 @@ void CNSGA2::mEvaluatePopInd (population* pop, const double events[], vector<dou
 	for (int i=beginInd; i<= beginInd; i++) {
 		netplan.SolveProblem( (&pop->ind[i])->xbin, (&pop->ind[i])->obj, events);
 		objValue = (&pop->ind[i])->obj;
-		#ifdef DEBUG_mEvaluatePopInd
-		cout << "I am rank " << myRank << " in mEvaluatePopInd master run left Individual: " << i << " netplan->objReturnSize = " << netplan.objReturnSize << "\n\n" << endl;
-		#endif
 		//netplan.SolveProblem( myIndXreal, objValue, events);
 		// for (int ii =0 ; ii < nobj ; ii++)
-		for (int ii =0 ; ii < netplan.objReturnSize ; ii++)
-		{
+		for (int ii =0 ; ii < netplan.objReturnSize ; ii++) {
 			mResultTaskPackageT12[ii+4] = objValue[ii]; // get solved obj value
 		}
 		(&pop->ind[i])->constr_violation = 0.0;
@@ -452,7 +422,7 @@ void CNSGA2::receivePop(population *pop) {
 */
 
 /* Routine to evaluate objective function values and constraints for an individual */
-/*void CNSGA2::evaluateInd (individual *ind, const double events[], CPLEX& netplan) {
+/*void CNSGA2::evaluateInd(individual *ind, const double events[], CPLEX& netplan) {
 	netplan.SolveProblem(ind->xbin, ind->obj, events);
 	// test_problem (ind->xreal, ind->xbin, ind->gene, ind->obj, ind->constr);
 	if (ncon==0)
@@ -467,11 +437,11 @@ void CNSGA2::receivePop(population *pop) {
 }*/
 
 // Assign rank and crowding distance to a population of size pop_size
-void CNSGA2::assignRankCrowdingDistance (population *new_pop) {
+void CNSGA2::assignRankCrowdingDistance(population *new_pop) {
 	int flag, end;
 	
-	int front_size 	= 0;
-	int rank 		= 1;
+	int front_size = 0;
+	int rank = 1;
 	
 	list *orig;
 	list *cur;
@@ -489,8 +459,8 @@ void CNSGA2::assignRankCrowdingDistance (population *new_pop) {
 	cur->child = NULL;
 	
 	temp1 = orig;
-		
-	for ( int i = 0; i < popsize; i++ ) {
+	
+	for (int i = 0; i < popsize; i++) {
 		linkedlist->insert (temp1,i);
 		temp1 = temp1->child;
 	}
@@ -539,7 +509,7 @@ void CNSGA2::assignRankCrowdingDistance (population *new_pop) {
 			temp2 = temp2->child;
 		} while (temp2 != NULL);
 		
-		assignCrowdingDistanceList (new_pop, cur->child, front_size);
+		assignCrowdingDistanceList(new_pop, cur->child, front_size);
 		temp2 = cur->child;
 		do {
 			temp2 = linkedlist->del(temp2);
@@ -559,7 +529,7 @@ void CNSGA2::assignRankCrowdingDistance (population *new_pop) {
    1 if a dominates b
    -1 if b dominates a
    0 if both a and b are non-dominated */
-int CNSGA2::checkDominance (individual *a, individual *b) {
+int CNSGA2::checkDominance(individual *a, individual *b) {
 	int flag1 = 0;
 	int flag2 = 0;
 	
@@ -579,14 +549,14 @@ int CNSGA2::checkDominance (individual *a, individual *b) {
 			if (a->constr_violation == 0 && b->constr_violation <0)
 				return (1);
 			else {
-				for ( int i = 0; i < nobj; i++ ) {
+				for (int i = 0; i < nobj; i++) {
 					if (a->obj[i] < b->obj[i])
 						flag1 = 1;
 					else {
 						if (a->obj[i] > b->obj[i])
 							flag2 = 1;
 					}
-				}                
+				}
 				if (flag1==1 && flag2==0)
 					return (1);
 				else {
@@ -601,7 +571,7 @@ int CNSGA2::checkDominance (individual *a, individual *b) {
 }
 
 // Method to compute crowding distance based on objective function values when the population in in the form of a list
-void CNSGA2::assignCrowdingDistanceList (population *pop, list *lst, int front_size) {
+void CNSGA2::assignCrowdingDistanceList(population *pop, list *lst, int front_size) {
 	int **obj_array;
 	int *dist;
 	
@@ -622,10 +592,10 @@ void CNSGA2::assignCrowdingDistanceList (population *pop, list *lst, int front_s
 	obj_array = (int **)malloc(nobj*sizeof(int));
 	dist = (int *)malloc(front_size*sizeof(int));
 
-	for (int i = 0; i < nobj; i++ )
+	for (int i = 0; i < nobj; i++)
 		obj_array[i] = (int *)malloc(front_size*sizeof(int));
 	
-	for ( int i = 0; i < front_size; i++ ) {
+	for (int i = 0; i < front_size; i++) {
 		dist[i] = temp->index;
 		temp = temp->child;
 	}
@@ -634,7 +604,7 @@ void CNSGA2::assignCrowdingDistanceList (population *pop, list *lst, int front_s
 	
 	free (dist);
 	
-	for (int i = 0; i < nobj; i++ )
+	for (int i = 0; i < nobj; i++)
 		free (obj_array[i]);
 	
 	free (obj_array);
@@ -643,21 +613,21 @@ void CNSGA2::assignCrowdingDistanceList (population *pop, list *lst, int front_s
 }
 
 /* Routine to compute crowding distances */
-void CNSGA2::assignCrowdingDistance (population *pop, int *dist, int **obj_array, int front_size) {
-	for ( int i = 0; i < nobj; i++ ) {
-		for ( int j = 0; j < front_size; j++ )
+void CNSGA2::assignCrowdingDistance(population *pop, int *dist, int **obj_array, int front_size) {
+	for (int i = 0; i < nobj; i++) {
+		for (int j = 0; j < front_size; j++)
 			obj_array[i][j] = dist[j];
 		
 		quicksort->quicksort_front_obj (pop, i, obj_array[i], front_size);
 	}
-	for (int i = 0; i < front_size; i++ )
+	for (int i = 0; i < front_size; i++)
 		pop->ind[dist[i]].crowd_dist = 0.0;
 	
-	for ( int i = 0; i < nobj; i++ )
+	for (int i = 0; i < nobj; i++)
 		pop->ind[obj_array[i][0]].crowd_dist = INF;
 	
-	for ( int i = 0; i < nobj; i++ ) {
-		for ( int j = 1; j < front_size-1; j++ ) {
+	for (int i = 0; i < nobj; i++) {
+		for (int j = 1; j < front_size-1; j++) {
 			if (pop->ind[obj_array[i][j]].crowd_dist != INF) {
 				if (pop->ind[obj_array[i][front_size-1]].obj[i] == pop->ind[obj_array[i][0]].obj[i])
 					pop->ind[obj_array[i][j]].crowd_dist += 0.0;
@@ -666,14 +636,14 @@ void CNSGA2::assignCrowdingDistance (population *pop, int *dist, int **obj_array
 			}
 		}
 	}
-	for ( int j = 0; j < front_size; j++ ) {
+	for (int j = 0; j < front_size; j++) {
 		if (pop->ind[dist[j]].crowd_dist != INF)
 			pop->ind[dist[j]].crowd_dist = (pop->ind[dist[j]].crowd_dist)/nobj;
 	}
 }
 
 /* Routine to compute crowding distance based on objective function values when the population in in the form of an array */
-void CNSGA2::assignCrowdingDistanceIndices (population *pop, int c1, int c2) {
+void CNSGA2::assignCrowdingDistanceIndices(population *pop, int c1, int c2) {
 	int **obj_array;
 	int *dist;
 	int i, j;
@@ -706,7 +676,7 @@ void CNSGA2::assignCrowdingDistanceIndices (population *pop, int c1, int c2) {
 }
 
 /* Routine for tournament selection, it creates a new_pop from old_pop by performing tournament selection and the crossover */
-void CNSGA2::selection (population *old_pop, population *new_pop) {
+void CNSGA2::selection(population *old_pop, population *new_pop) {
 	int *a1, *a2;
 	int temp, rand;
 	
@@ -743,7 +713,7 @@ void CNSGA2::selection (population *old_pop, population *new_pop) {
 }
 
 /* Routine for binary tournament */
-individual* CNSGA2::tournament (individual *ind1, individual *ind2) {
+individual* CNSGA2::tournament(individual *ind1, individual *ind2) {
 	int flag;
 	flag = checkDominance (ind1, ind2);
 	if (flag==1)
@@ -766,15 +736,15 @@ individual* CNSGA2::tournament (individual *ind1, individual *ind2) {
 }
 
 /* Function to cross two individuals */
-void CNSGA2::crossover (individual *parent1, individual *parent2, individual *child1, individual *child2) {
+void CNSGA2::crossover(individual *parent1, individual *parent2, individual *child1, individual *child2) {
 	if (nreal!=0)
-		realcross (parent1, parent2, child1, child2);
+		realcross(parent1, parent2, child1, child2);
 	if (nbin!=0)
-		bincross (parent1, parent2, child1, child2);
+		bincross(parent1, parent2, child1, child2);
 }
 
 /* Routine for real variable SBX crossover */
-void CNSGA2::realcross (individual *parent1, individual *parent2, individual *child1, individual *child2) {
+void CNSGA2::realcross(individual *parent1, individual *parent2, individual *child1, individual *child2) {
 	int i;
 	double rand;
 	double y1, y2, yl, yu;
@@ -783,7 +753,7 @@ void CNSGA2::realcross (individual *parent1, individual *parent2, individual *ch
 	if (randgen->randomperc() <= pcross_real) {
 		nrealcross++;
 		for (i=0; i<nreal; i++) {
-			if (randgen->randomperc()<=0.5 ) {
+			if (randgen->randomperc()<=0.5) {
 				if (fabs(parent1->xreal[i]-parent2->xreal[i]) > EPS) {
 					if (parent1->xreal[i] < parent2->xreal[i]) {
 						y1 = parent1->xreal[i];
@@ -853,7 +823,7 @@ void CNSGA2::realcross (individual *parent1, individual *parent2, individual *ch
 }
 
 /* Routine for two point binary crossover */
-void CNSGA2::bincross (individual *parent1, individual *parent2, individual *child1, individual *child2) {
+void CNSGA2::bincross(individual *parent1, individual *parent2, individual *child1, individual *child2) {
 	int i, j;
 	int temp, site1, site2;
 	for (i=0; i<nbin; i++) {
@@ -889,8 +859,8 @@ void CNSGA2::bincross (individual *parent1, individual *parent2, individual *chi
 }
 
 /* Function to perform mutation in a population */
-void CNSGA2::mutatePop (population *pop) {
-	for ( int i=0; i < popsize; i++ )
+void CNSGA2::mutatePop(population *pop) {
+	for (int i=0; i < popsize; i++)
 		mutateInd(&(pop->ind[i]));
 }
 
@@ -905,8 +875,8 @@ void CNSGA2::mutateInd (individual *ind) {
 
 /* Routine for binary mutation of an individual */
 void CNSGA2::binMutateInd (individual *ind) {
-	for ( int j = 0; j < nbin; j++ ) { 
-		for ( int k = 0; k < nbits[j]; k++ ) {
+	for (int j = 0; j < nbin; j++) {
+		for (int k = 0; k < nbits[j]; k++) {
 			if (randgen->randomperc() <= pmut_bin) {
 				if (ind->gene[j][k] == 0)
 					ind->gene[j][k] = 1;
@@ -919,10 +889,10 @@ void CNSGA2::binMutateInd (individual *ind) {
 }
 
 /* Routine for real polynomial mutation of an individual */
-void CNSGA2::realMutateInd (individual *ind) {
+void CNSGA2::realMutateInd(individual *ind) {
 	double rnd, delta1, delta2, mut_pow, deltaq;
 	double y, yl, yu, val, xy;
-	for ( int j = 0; j < nreal; j++ ) {
+	for (int j = 0; j < nreal; j++) {
 		if (randgen->randomperc() <= pmut_real) {
 			y = ind->xreal[j];
 			yl = min_realvar[j];
@@ -955,37 +925,37 @@ void CNSGA2::realMutateInd (individual *ind) {
 }
 
 /* Routine to merge two populations into one */
-void CNSGA2::merge(population *pop1, population *pop2, population *pop3) {    
+void CNSGA2::merge(population *pop1, population *pop2, population *pop3) {
 	int i, k;
-	for ( i = 0; i < popsize; i++ )
+	for (i = 0; i < popsize; i++)
 		copyInd (&(pop1->ind[i]), &(pop3->ind[i]));
 
-	for ( i = 0, k = popsize; i < popsize; i++, k++ )
+	for (i = 0, k = popsize; i < popsize; i++, k++)
 		copyInd (&(pop2->ind[i]), &(pop3->ind[k]));
 }
 
 /* Routine to copy an individual 'ind1' into another individual 'ind2' */
-void CNSGA2::copyInd (individual *ind1, individual *ind2) {
+void CNSGA2::copyInd(individual *ind1, individual *ind2) {
 	ind2->rank = ind1->rank;
 	ind2->constr_violation = ind1->constr_violation;
 	ind2->crowd_dist = ind1->crowd_dist;
 	
 	if (nreal!=0) {
-		for ( int i = 0; i < nreal; i++ )
+		for (int i = 0; i < nreal; i++)
 			ind2->xreal[i] = ind1->xreal[i];
 	}
 	if (nbin!=0) {
-		for ( int i = 0; i < nbin; i++ ) {
+		for (int i = 0; i < nbin; i++) {
 			ind2->xbin[i] = ind1->xbin[i];
-			for ( int j = 0; j < nbits[i]; j++ )
+			for (int j = 0; j < nbits[i]; j++)
 				ind2->gene[i][j] = ind1->gene[i][j];
 		}
 	}
-	for ( int i = 0; i < nobj; i++ )
+	for (int i = 0; i < nobj; i++)
 		ind2->obj[i] = ind1->obj[i];
 		
 	if (ncon!=0) {
-		for ( int i = 0; i < ncon; i++ )
+		for (int i = 0; i < ncon; i++)
 			ind2->constr[i] = ind1->constr[i];
 	}
 }
@@ -1054,7 +1024,7 @@ void CNSGA2::fillNondominatedSort (population *mixed_pop, population *new_pop) {
 		} while (temp1 != NULL);
 		temp2 = elite->child;
 		j=i;
-		if ( (archieve_size+front_size) <= popsize) {
+		if ((archieve_size+front_size) <= popsize) {
 			do {
 				copyInd (&mixed_pop->ind[temp2->index], &new_pop->ind[i]);
 				new_pop->ind[i].rank = rank;
@@ -1062,7 +1032,7 @@ void CNSGA2::fillNondominatedSort (population *mixed_pop, population *new_pop) {
 				temp2 = temp2->child;
 				i+=1;
 			} while (temp2 != NULL);
-			assignCrowdingDistanceIndices (new_pop, j, i-1);
+			assignCrowdingDistanceIndices(new_pop, j, i-1);
 			rank+=1;
 		} else {
 			crowdingFill (mixed_pop, new_pop, i, front_size, elite);
@@ -1091,7 +1061,7 @@ void CNSGA2::fillNondominatedSort (population *mixed_pop, population *new_pop) {
 }
 
 /* Routine to fill a population with individuals in the decreasing order of crowding distance */
-void CNSGA2::crowdingFill (population *mixed_pop, population *new_pop, int count, int front_size, list *elite) {
+void CNSGA2::crowdingFill(population *mixed_pop, population *new_pop, int count, int front_size, list *elite) {
 	int *dist;
 	list *temp;
 	int i, j;
@@ -1113,7 +1083,7 @@ void CNSGA2::crowdingFill (population *mixed_pop, population *new_pop, int count
 }
 
 
-/*void CNSGA2::test_problem (double *xreal, double *xbin, int **gene, double *objective, double *constr) {
+/*void CNSGA2::test_problem(double *xreal, double *xbin, int **gene, double *objective, double *constr) {
 	double f1, f2, g, h;
 	int i;
 	f1 = 1.0 - (exp(-4.0*xreal[0]))*pow((sin(4.0*PI*xreal[0])),6.0);
@@ -1125,11 +1095,11 @@ void CNSGA2::crowdingFill (population *mixed_pop, population *new_pop, int count
 	g = pow(g,0.25);
 	g = 1.0 + 9.0*g;
 	h = 1.0 - pow((f1/g),2.0);
-	f2 = g*h;*/
+	f2 = g*h;
 	
-	/*double g, h;
+	double g, h;
 	g = 0.0f;
-	for (int i = 1; i < 10; i++ ) {
+	for (int i = 1; i < 10; i++) {
 		g += xreal[i];
 	}
 	
