@@ -28,6 +28,7 @@ class CNSGA2 {
 		CNSGA2();
 		CNSGA2(bool output, double seed);
 		~CNSGA2(void);
+		CNSGA2(int noFileIO); //only for evalaute()
 		
 		// Initialization methods
 		void Init(const char* param);
@@ -48,6 +49,13 @@ class CNSGA2 {
 		
 		// Population evaluate methods
 		void evaluatePop (population *pop, const double events[]);
+		// used for solving one pop ind
+		void evaluatePopInd (population *pop, const double events[], int workerPopSize, int& objRSize, int myRank);
+		//void evaluatePopInd (population *pop, const double events[], int workerPopSize, int& objRSize, int myRank, CPLEX* netplan);
+		// master solve one ind
+		void mEvaluatePopInd (population* pop, const double events[], vector<double>& mResultTaskPackageT12, int beginInd, int nobj, int genNum, char canTag, int myRank);
+		//void mEvaluatePopInd (population* pop, const double events[], vector<double>& mResultTaskPackageT12, int beginInd, int nobj, int genNum, char canTag, int myRank, CPLEX* netplan);
+	
 		void sendPop(population *pop);
 		void receivePop(population *pop);
 		// void evaluateInd (individual *ind, const double events[], CPLEX& netplan);
@@ -111,6 +119,8 @@ class CNSGA2 {
 		double		*max_binvar;
 		int			bitlength;
 		
+		bool 		memallo;
+		
 		// Populations
 		population *parent_pop;
 		population *child_pop;
@@ -121,4 +131,28 @@ class CNSGA2 {
 		CFileIO*		fileio;
 		CQuicksort*		quicksort;
 		CLinkedList*	linkedlist;
+		
+		int getPopsize(){return popsize;};
+		int getNreal(){return nreal;};
+		int getNbin(){return nbin;};
+		//int getNbins(){return nbins;};
+		int getNcon(){return ncon;};
+		int getNobj(){return nobj;};
+		int getNgen(){return ngen;};
+};
+
+class newCNSGA2:public CNSGA2{
+public:
+	//newCNSGA2(){memallo = false;  cout << " constructor for newCNSGA2 \n\n" << endl;};
+	newCNSGA2(int noFileIO);
+	//newCNSGA2(int newClass);	
+	//newCNSGA2(int myClass);
+	//~newCNSGA2();
+	
+		//cout << " destructor for newCNSGA2 \n\n" << endl;
+		//#ifdef DEBUG_twice_free
+		//DOUBLE_DELETE_GAURD
+		//#endif
+	
+	
 };
