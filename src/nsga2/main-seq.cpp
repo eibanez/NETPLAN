@@ -52,6 +52,13 @@ int main (int argc, char **argv) {
 	
 	cout << "- Initialization done, now performing first generation" << endl;
 	
+	// -- Evaluate 1A -- //
+	nsga2a->decodePop(nsga2a->parent_pop);
+	nsga2a->evaluatePop(nsga2a->parent_pop, netplan, events);
+	nsga2a->assignRankCrowdingDistance(nsga2a->parent_pop);
+	fprintf(nsga2a->fileio->fpt1,"# gen = 1A\n");
+	nsga2a->fileio->report_pop(nsga2a->parent_pop, nsga2a->fileio->fpt1);
+	
 	for (int i = 1; i <= nsga2a->ngen; i++) {
 		printHeader("elapsed");
 		
@@ -59,20 +66,14 @@ int main (int argc, char **argv) {
 		if (i > 1) {
 			nsga2a->selection(nsga2a->parent_pop, nsga2a->child_pop);
 			nsga2a->mutatePop(nsga2a->child_pop);
-		}
-		nsga2a->decodePop(nsga2a->child_pop);
-		nsga2a->evaluatePop(nsga2a->child_pop, netplan, events);
-		if (i == 1) {
-			nsga2a->assignRankCrowdingDistance(nsga2a->parent_pop);
-			fprintf(nsga2a->fileio->fpt1,"# gen = 1A\n",i);
-			nsga2a->fileio->report_pop (nsga2a->parent_pop, nsga2a->fileio->fpt1);   // Initial pop out
-		} else {
+			nsga2a->decodePop(nsga2a->child_pop);
+			nsga2a->evaluatePop(nsga2a->child_pop, netplan, events);
 			nsga2a->merge(nsga2b->parent_pop, nsga2a->child_pop, nsga2a->mixed_pop);
 			nsga2a->fillNondominatedSort(nsga2a->mixed_pop, nsga2a->parent_pop);
 		}
 		
 		// -- Report(i)A -- //
-		fprintf(nsga2a->fileio->fpt4,"# gen = %dA\n",i);
+		fprintf(nsga2a->fileio->fpt4,"# gen = %dA\n", i);
 		nsga2a->fileio->report_pop(nsga2a->parent_pop, nsga2a->fileio->fpt4);
 		nsga2a->fileio->flushIO();
 		cout << "- Finished generation #" << i << "A" << endl;
@@ -86,14 +87,14 @@ int main (int argc, char **argv) {
 		nsga2b->evaluatePop(nsga2b->child_pop, netplan, events);
 		if (i == 1) {
 			nsga2b->assignRankCrowdingDistance(nsga2b->child_pop);
-			fprintf(nsga2a->fileio->fpt1,"# gen = 1B\n",i);
+			fprintf(nsga2a->fileio->fpt1,"# gen = 1B\n");
 			nsga2a->fileio->report_pop(nsga2b->child_pop, nsga2a->fileio->fpt1);     // Initial pop out
 		}
 		nsga2b->merge(nsga2a->parent_pop, nsga2b->child_pop, nsga2b->mixed_pop);
 		nsga2b->fillNondominatedSort(nsga2b->mixed_pop, nsga2b->parent_pop);
 		
 		// -- Report(i)B -- //
-		fprintf(nsga2a->fileio->fpt4,"# gen = %dB\n",i);
+		fprintf(nsga2a->fileio->fpt4,"# gen = %dB\n", i);
 		nsga2a->fileio->report_pop(nsga2b->parent_pop, nsga2a->fileio->fpt4);
 		nsga2a->fileio->flushIO();
 		
