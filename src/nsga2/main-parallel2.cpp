@@ -215,32 +215,33 @@ int main (int argc, char **argv) {
 		nsga2b->randgen->randomize();					// Initialize random number generator
 		nsga2b->Init("prepdata/param.in");				// This sets all variables related to GA
 		nsga2b->InitMemory();							// This allocates memory for the populations
-		nsga2b->InitPop(nsga2b->parent_pop, Np_start);	// Initialize parent population randomly
+		nsga2b->InitPop(nsga2b->child_pop, Np_start);	// Initialize parent population randomly
 		
 		// -- Send 1B -- // 
-		nsga2b->decodePop(nsga2b->parent_pop);
+		nsga2b->decodePop(nsga2b->child_pop);
 		
-		initPopPara(nsga2b->parent_pop, message_para_to_workers_Vec, initPara, mySize, myRank, xdataV);
+		initPopPara(nsga2b->child_pop, message_para_to_workers_Vec, initPara, mySize, myRank, xdataV);
 		// compute 1B---------------------
-		myNeplanTaskScheduler(nsga2b, nsga2b->popsize, mySize, myRank, nsga2b->parent_pop, 'B', genNum, message_para_to_workers_Vec, message_to_master_type, myT1Flag, myT2Flag, resultTaskPackageT1, resultTaskPackageT2Pr, xdataV, objSize, resultTaskPackageT12B, xdata_to_workers_type, myGenerationNum, Mpara_to_workers_type, ncon);	
-		//myNeplanTaskScheduler(nsga2b, nsga2b->popsize, mySize, myRank, nsga2b->parent_pop, 'B', genNum, message_para_to_workers_Vec, message_to_master_type, myT1Flag, myT2Flag, resultTaskPackageT1, resultTaskPackageT2Pr, xdataV, objSize, resultTaskPackageT12B, xdata_to_workers_type, myGenerationNum, Mpara_to_workers_type, ncon, netplan);
+		myNeplanTaskScheduler(nsga2b, nsga2b->popsize, mySize, myRank, nsga2b->child_pop, 'B', genNum, message_para_to_workers_Vec, message_to_master_type, myT1Flag, myT2Flag, resultTaskPackageT1, resultTaskPackageT2Pr, xdataV, objSize, resultTaskPackageT12B, xdata_to_workers_type, myGenerationNum, Mpara_to_workers_type, ncon);	
+		//myNeplanTaskScheduler(nsga2b, nsga2b->popsize, mySize, myRank, nsga2b->child_pop, 'B', genNum, message_para_to_workers_Vec, message_to_master_type, myT1Flag, myT2Flag, resultTaskPackageT1, resultTaskPackageT2Pr, xdataV, objSize, resultTaskPackageT12B, xdata_to_workers_type, myGenerationNum, Mpara_to_workers_type, ncon, netplan);
+		
+		// -- Receive (i)A -- //
+		if (mySize > 1) {
+			testAResult = myNeplanTaskSchedulerTest('A', nsga2a->parent_pop, mySize, myRank, myT1Flag, myT2Flag, xRVSize, resultTaskPackageT12A, 1);
+			if (testAResult != ISTRUE) {
+				while(1) {
+					if (myNeplanTaskSchedulerTest('A', nsga2a->parent_pop, mySize, myRank, myT1Flag, myT2Flag, xRVSize, resultTaskPackageT12A, 1) == ISTRUE)
+						break; 
+				}
+			}
+		}
+		nsga2a->assignRankCrowdingDistance(nsga2a->parent_pop);
+		fprintf(nsga2a->fileio->fpt1, "# gen = 1A\n");
+		nsga2a->fileio->report_pop(nsga2a->parent_pop, nsga2a->fileio->fpt1);  // Initial population
 		
 		for (int i = 1; i <= nsga2a->ngen; i++) {
 			// -- Receive (i)A -- //
-			if (i == 1) {
-				if (mySize > 1) {
-					testAResult = myNeplanTaskSchedulerTest('A', nsga2a->parent_pop, mySize, myRank, myT1Flag, myT2Flag, xRVSize, resultTaskPackageT12A, 1);
-					if (testAResult != ISTRUE) {
-						while(1) {
-							if (myNeplanTaskSchedulerTest('A', nsga2a->parent_pop, mySize, myRank, myT1Flag, myT2Flag, xRVSize, resultTaskPackageT12A, 1) == ISTRUE)
-								break; 
-						}
-					}
-				}
-				nsga2a->assignRankCrowdingDistance(nsga2a->parent_pop);
-				fprintf(nsga2a->fileio->fpt1,"# gen = 1A\n",i);
-				nsga2a->fileio->report_pop (nsga2a->parent_pop, nsga2a->fileio->fpt1);  // Initial population
-			} else {
+			if (i > 1) {
 				if (mySize > 1) {
 					testAResult = myNeplanTaskSchedulerTest('A', nsga2a->child_pop, mySize, myRank, myT1Flag, myT2Flag, xRVSize, resultTaskPackageT12A, 1);
 					if (testAResult != ISTRUE) {
@@ -255,7 +256,7 @@ int main (int argc, char **argv) {
 			}
 			
 			// -- Report (i)A -- //
-			fprintf(nsga2a->fileio->fpt4,"# gen = %dA\n",i);
+			fprintf(nsga2a->fileio->fpt4, "# gen = %dA\n", i);
 			nsga2a->fileio->report_pop(nsga2a->parent_pop, nsga2a->fileio->fpt4);
 			nsga2a->fileio->flushIO();
 			
@@ -265,12 +266,11 @@ int main (int argc, char **argv) {
 				nsga2a->mutatePop(nsga2a->child_pop);
 				nsga2a->decodePop(nsga2a->child_pop);
 				
-				//nsga2a->sendPop(nsga2a->child_pop);
 				// JINXU: This function puts the individuals in the queue
 				initPopPara(nsga2a->child_pop, message_para_to_workers_Vec, initPara, mySize, myRank, xdataV);
 				// schedule 2A -----------------------
 				
-				myNeplanTaskScheduler(nsga2a, nsga2a->popsize, mySize, myRank, nsga2a->child_pop, 'A', i, message_para_to_workers_Vec, message_to_master_type, myT1Flag, myT2Flag, resultTaskPackageT1, resultTaskPackageT2Pr, xdataV, objSize, resultTaskPackageT12A, xdata_to_workers_type, i, Mpara_to_workers_type, ncon);	
+				myNeplanTaskScheduler(nsga2a, nsga2a->popsize, mySize, myRank, nsga2a->child_pop, 'A', i, message_para_to_workers_Vec, message_to_master_type, myT1Flag, myT2Flag, resultTaskPackageT1, resultTaskPackageT2Pr, xdataV, objSize, resultTaskPackageT12A, xdata_to_workers_type, i, Mpara_to_workers_type, ncon);
 				//myNeplanTaskScheduler(nsga2a, nsga2a->popsize, mySize, myRank, nsga2a->child_pop, 'A', i, message_para_to_workers_Vec, message_to_master_type, myT1Flag, myT2Flag, resultTaskPackageT1, resultTaskPackageT2Pr, xdataV, objSize, resultTaskPackageT12A, xdata_to_workers_type, i, Mpara_to_workers_type, ncon, netplan);
 			}
 			
@@ -288,14 +288,14 @@ int main (int argc, char **argv) {
 			
 			if (i == 1) {
 				nsga2b->assignRankCrowdingDistance(nsga2b->child_pop);
-				fprintf(nsga2a->fileio->fpt1,"# gen = 1B\n",i);
+				fprintf(nsga2a->fileio->fpt1, "# gen = 1B\n");
 				nsga2a->fileio->report_pop(nsga2b->child_pop, nsga2a->fileio->fpt1); // Initial population
 			}
 			nsga2b->merge(nsga2a->parent_pop, nsga2b->child_pop, nsga2b->mixed_pop);
 			nsga2b->fillNondominatedSort(nsga2b->mixed_pop, nsga2b->parent_pop);
 			
 			// -- Report (i)B -- //
-			fprintf(nsga2a->fileio->fpt4,"# gen = %dB\n",i);
+			fprintf(nsga2a->fileio->fpt4, "# gen = %dB\n", i);
 			nsga2a->fileio->report_pop(nsga2b->parent_pop, nsga2a->fileio->fpt4);
 			nsga2a->fileio->flushIO();
 			
@@ -314,12 +314,12 @@ int main (int argc, char **argv) {
 		nsga2a->fileio->report_pop(nsga2b->parent_pop, nsga2a->fileio->fpt2);
 		nsga2a->fileio->report_feasible(nsga2b->parent_pop, nsga2a->fileio->fpt3);
 		if (nsga2a->nreal != 0) {
-			fprintf(nsga2a->fileio->fpt5,"\n Number of crossover of real variable = %d",nsga2a->nrealcross + nsga2b->nrealcross);
-			fprintf(nsga2a->fileio->fpt5,"\n Number of mutation of real variable = %d",nsga2a->nrealmut + nsga2b->nrealmut);
+			fprintf(nsga2a->fileio->fpt5,"\n Number of crossover of real variable = %d", nsga2a->nrealcross + nsga2b->nrealcross);
+			fprintf(nsga2a->fileio->fpt5,"\n Number of mutation of real variable = %d", nsga2a->nrealmut + nsga2b->nrealmut);
 		}
 		if (nsga2a->nbin != 0) {
-			fprintf(nsga2a->fileio->fpt5,"\n Number of crossover of binary variable = %d",nsga2a->nbincross + nsga2b->nbincross);
-			fprintf(nsga2a->fileio->fpt5,"\n Number of mutation of binary variable = %d",nsga2a->nbinmut + nsga2b->nbinmut);
+			fprintf(nsga2a->fileio->fpt5,"\n Number of crossover of binary variable = %d", nsga2a->nbincross + nsga2b->nbincross);
+			fprintf(nsga2a->fileio->fpt5,"\n Number of mutation of binary variable = %d", nsga2a->nbinmut + nsga2b->nbinmut);
 		}
 	} //--------------- end of (myRank == 0) ----------------------------------------------
 	else if (myRank != 0) {
@@ -356,7 +356,7 @@ int main (int argc, char **argv) {
 		endTimeW = MPI_Wtime();
 		
 		cout << "In main(), I am rank " << myRank << " , I am after workerRunTask I use time " << endTimeW - startTimeW << " seconds,  SLEEPTIME is " << SLEEPTIME << " \n\n"  << endl ;
-	}	// end of else if (myRank != 0) 
+	}	// end of else if (myRank != 0)
 	
 	cout << "In main(), I am rank " << myRank << " , I am before MPI_Barrier(MPI_COMM_WORLD). \n\n"  << endl ;
 	
