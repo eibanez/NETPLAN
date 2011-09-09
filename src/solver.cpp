@@ -257,7 +257,7 @@ void CPLEX::StoreDualSolution(int event) {
 			cplexB->getDuals(*TempArray, *rngB);
 		}
 		for (int i = 0; i < IdxNode.size; ++i)
-			(*dualsolution)[0] = (*TempArray)[start + i];
+			(*dualsolution)[start2 + i] = (*TempArray)[start + i];
 	} catch (IloException& e) {
 		cerr << "Concert exception caught: " << e << endl;
 	} catch (...) {
