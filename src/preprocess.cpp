@@ -343,178 +343,103 @@ int main() {
 	
 	cout << endl << "- Writing MPS files..." << endl;
 	int nyears = SLength[0];
-	ofstream afile, myfile[nyears+1];
+	ofstream afile;
 	string Ychar = SName.substr(0,1), temp_string;
 	
 	// afile stores one single MPS file (no Benders)
 	// myfile stores the Benders decomposition
 	afile.open("prepdata/netscore.mps");
-	for (int i = 0; i <= nyears; ++i) {
-		string file_name = "prepdata/bend_" + ToString<int>(i) + ".mps";
-		myfile[i].open(file_name.c_str());
-	}
 	
 	// NAME and ROWS and Cost objective funtion)
 	afile << "NAME" << endl;
 	afile << "ROWS" << endl;
 	afile << " N obj" << endl;
-	for (int i = 0; i <= nyears; ++i) {
-		myfile[i] << "NAME" << endl;
-		myfile[i] << "ROWS" << endl;
-		
-		// Cost (objective funtion)
-		myfile[i] << " N obj" << endl;
-	}
 	
 	// Sustainability metrics (rows)
-	for (int j = 0; j < SustMet.size(); ++j) {
-		for (int i = 1; i <= nyears; ++i) {
+	for (int j = 0; j < SustMet.size(); ++j)
+		for (int i = 1; i <= nyears; ++i)
 			afile << " E " << SustMet[j] << Ychar << i << endl;
-			myfile[i] << " E " << SustMet[j] << Ychar << i << endl;
-		}
-	}
 	
 	// Peak load
-	for (unsigned int i = 0; i < Nodes.size(); ++i) {
-		temp_string = Nodes[i].NodePeakRows();
-		afile << temp_string;
-		myfile[0] << temp_string;
-	}
+	for (unsigned int i = 0; i < Nodes.size(); ++i)
+		afile << Nodes[i].NodePeakRows();
 	
 	// Nodal demand constraints
-	for (unsigned int i = 0; i < Nodes.size(); ++i) {
-		temp_string = Nodes[i].NodeNames();
-		afile << temp_string;
-		myfile[ Nodes[i].Time() ] << temp_string;
-	}
+	for (unsigned int i = 0; i < Nodes.size(); ++i)
+		afile << Nodes[i].NodeNames();
 	
 	// Upper bound constraints rows
-	for (unsigned int i = 0; i < Arcs.size(); ++i) {
-		temp_string = Arcs[i].ArcUbNames();
-		afile << temp_string;
-		myfile[ Arcs[i].Time() ] << temp_string;
-	}
+	for (unsigned int i = 0; i < Arcs.size(); ++i)
+		afile << Arcs[i].ArcUbNames();
 	
 	// "inv2cap" constraints
-	for (unsigned int i = 0; i < Arcs.size(); ++i) {
-		temp_string = Arcs[i].ArcCapNames();
-		afile << temp_string;
-		myfile[0] << temp_string;
-	}
+	for (unsigned int i = 0; i < Arcs.size(); ++i)
+		afile << Arcs[i].ArcCapNames();
 	
 	// DC Power flow constraints
-	for (unsigned int i = 0; i < Arcs.size(); ++i) {
-		temp_string = Arcs[i].ArcDcNames();
-		afile << temp_string;
-		myfile[ Arcs[i].Time() ] << temp_string;
-	}
+	for (unsigned int i = 0; i < Arcs.size(); ++i)
+		afile << Arcs[i].ArcDcNames();
 	
 	// COLUMNS (Variables)
 	afile << "COLUMNS" << endl;
-	for (int i = 0; i <= nyears; ++i)
-		myfile[i] << "COLUMNS" << endl;
-	
-	// Cost of subproblems (BENDERS ONLY)
-	for (int i = 1; i <= nyears; ++i)
-		myfile[0] << "    cost_" << i << " obj 1" << endl;
 	
 	// Capacities  (these vary slightly for Benders)
-	for (unsigned int i = 0; i < Arcs.size(); ++i) {
+	for (unsigned int i = 0; i < Arcs.size(); ++i)
 		afile << Arcs[i].CapArcColumns(0);
-		myfile[0] << Arcs[i].CapArcColumns(1);
-		myfile[ Arcs[i].Time() ] << Arcs[i].CapArcColumns(2);
-	}
 	
 	// Investments
-	for (unsigned int i = 0; i < Arcs.size(); ++i) {
-		temp_string = Arcs[i].InvArcColumns();
-		afile << temp_string;
-		myfile[0] << temp_string;
-	}
+	for (unsigned int i = 0; i < Arcs.size(); ++i)
+		afile << Arcs[i].InvArcColumns();
 	
 	// Sustainability metrics
-	for (int j = 0; j < SustMet.size(); ++j) {
-		for (int i = 1; i <= nyears; ++i) {
+	for (int j = 0; j < SustMet.size(); ++j)
+		for (int i = 1; i <= nyears; ++i)
 			afile << "    " << SustMet[j] << "_" << Ychar << i << " " << SustMet[j] << Ychar << i << " -1" << endl;
-			myfile[i] << "    " << SustMet[j] << "_" << Ychar << i << " " << SustMet[j] << Ychar << i << " -1" << endl;
-		}
-	}
 	
 	// Reserve margin
-	for (unsigned int i = 0; i < Nodes.size(); ++i) {
-		temp_string = Nodes[i].NodeRMColumns();
+	for (unsigned int i = 0; i < Nodes.size(); ++i)
 		afile << temp_string;
-		myfile[0] << temp_string;
-	}
 	
 	// Flows
-	for (unsigned int i = 0; i < Arcs.size(); ++i) {
-		temp_string = Arcs[i].ArcColumns();
-		afile << temp_string;
-		myfile[ Arcs[i].Time() ] << temp_string;
-	}
+	for (unsigned int i = 0; i < Arcs.size(); ++i)
+		afile << Arcs[i].ArcColumns();
 	
 	// Unserved demands
-	for (unsigned int i = 0; i < Nodes.size(); ++i) {
-		temp_string = Nodes[i].NodeUDColumns();
-		afile << temp_string;
-		myfile[ Nodes[i].Time() ] << temp_string;
-	}
+	for (unsigned int i = 0; i < Nodes.size(); ++i)
+		afile << Nodes[i].NodeUDColumns();
 	
 	// Power flow variables (angles)
 	vector<string> DcOutput = DCFlowColumns(ListDCNodes, ListDCArcs);
-	for (unsigned int i = 1; i < DcOutput.size(); ++i) {
+	for (unsigned int i = 1; i < DcOutput.size(); ++i)
 		afile << DcOutput[i];
-		myfile[i] << DcOutput[i];
-	}
 	
 	// RHS
 	afile << "RHS" << endl;
-	for (int i = 0; i <= nyears; ++i)
-		myfile[i] << "RHS" << endl;
 	
 	// Nodal Demands
-	for (unsigned int i = 0; i < Nodes.size(); ++i) {
-		temp_string = Nodes[i].NodeRhs();
-		afile << temp_string;
-		myfile[ Nodes[i].Time() ] << temp_string;
-	}
+	for (unsigned int i = 0; i < Nodes.size(); ++i)
+		afile << Nodes[i].NodeRhs();
 	
 	// Initial capacity terms
-	for (unsigned int i = 0; i < Arcs.size(); ++i) {
-		temp_string = Arcs[i].ArcRhs();
-		afile << temp_string;
-		myfile[0] << temp_string;
-	}
+	for (unsigned int i = 0; i < Arcs.size(); ++i)
+		afile << Arcs[i].ArcRhs();
 	
 	// BOUNDS
 	afile << "BOUNDS" << endl;
-	for (int i = 0; i <= nyears; ++i)
-		myfile[i] << "BOUNDS" << endl;
 	
 	// Peak load must be met
-	for (unsigned int i = 0; i < Nodes.size(); ++i) {
-		temp_string = Nodes[i].NodeRMBounds();
-		afile << temp_string;
-		myfile[0] << temp_string;
-	}
+	for (unsigned int i = 0; i < Nodes.size(); ++i)
+		afile << Nodes[i].NodeRMBounds();
 	
 	// Flow and investment bounds
 	for (unsigned int i = 0; i < Arcs.size(); ++i) {
-		temp_string = Arcs[i].ArcBounds();
-		afile << temp_string;
-		myfile[ Arcs[i].Time() ] << temp_string;
-		temp_string = Arcs[i].ArcInvBounds();
-		afile << temp_string;
-		myfile[0] << temp_string;
+		afile << Arcs[i].ArcBounds();
+		afile << Arcs[i].ArcInvBounds();
 	}
 	
 	// DC Power flow angles
-	for (unsigned int i = 0; i < ListDCNodes.size(); ++i) {
-		temp_string = ListDCNodes[i].DCNodesBounds();
-		afile << temp_string;
-		myfile[ ListDCNodes[i].Time() ] << temp_string;
-	}
+	for (unsigned int i = 0; i < ListDCNodes.size(); ++i)
+		afile << ListDCNodes[i].DCNodesBounds();
 	
 	// Sustainability limits
 	for (int j = 0; j < SustMet.size(); ++j) {
@@ -524,10 +449,8 @@ int main() {
 			for (int i = 1; i <= nyears; ++i) {
 				TempStep[0] = i;
 				string Value = SustLimits[SustIndex][Step2Pos(TempStep)+1];
-				if (Value != "X") {
+				if (Value != "X")
 					afile << " UP bnd " << SustMet[j] << "_" << Step2Str(TempStep) << " " << Value << endl;
-					myfile[i] << " UP bnd " << SustMet[j] << "_" << Step2Str(TempStep) << " " << Value << endl;
-				}
 			}
 		}
 	}
@@ -535,10 +458,6 @@ int main() {
 	// End of file
 	afile << "ENDATA";
 	afile.close();
-	for (int i = 0; i <= nyears; ++i) {
-		myfile[i] << "ENDATA";
-		myfile[i].close();
-	}
 	
 	
 	cout << "- Writing auxiliary files..." << endl;
