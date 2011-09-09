@@ -351,7 +351,7 @@ int main() {
 	afile.open("prepdata/netscore.mps");
 	bfile.open("prepdata/netscore-op.mps");
 	
-	// NAME and ROWS and Cost objective funtion)
+	// NAME and ROWS and Cost objective funtion
 	afile << "NAME" << endl;
 	afile << "ROWS" << endl;
 	afile << " N obj" << endl;

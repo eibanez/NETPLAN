@@ -281,7 +281,7 @@ void CNSGA2::decodeInd(individual *ind) {
 /* Routine to evaluate objective function values and constraints for a population */
 void CNSGA2::evaluatePop(population *pop, CPLEX& netplan, const double events[]) {
 	for (int i=0; i<popsize; i++) {
-		cout << "\tIndividual: " << i+1 << endl;
+		cout << "\t* Individual: " << i+1 << endl;
 		netplan.SolveProblem((&pop->ind[i])->xbin, (&pop->ind[i])->obj, events);
 		(&pop->ind[i])->constr_violation = 0.0;
 		//evaluateInd (&(pop->ind[i]), events, netplan);

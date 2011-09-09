@@ -15,8 +15,6 @@ using namespace std;
 #include "write.h"
 #include "solver.h"
 
-#define MAX_ITER 1000
-
 CPLEX::CPLEX() : env() {
 	try {
 		// Full model
@@ -34,9 +32,9 @@ CPLEX::CPLEX() : env() {
 		rngB = new IloRangeArray(env);
 		
 		// Aditional values
-		solution = new IloNumArray(env);
-		dualsolution = new IloArray<IloNumArray>(env);
-		TempArray = new IloNumArray(env);
+		solution = new IloNumArray(env, 0);
+		TempArray = new IloNumArray(env, 0);
+		dualsolution = NULL;
 	} catch (IloException& e) {
 		cerr << "Concert exception caught: " << e << endl;
 	} catch (...) {
@@ -47,8 +45,10 @@ CPLEX::CPLEX() : env() {
 CPLEX::~CPLEX() {
 	try {
 		// Remove optimization elements from memory
+		if (dualsolution != NULL)
+			dualsolution->end();
+		delete dualsolution;
 		TempArray->end(); delete TempArray;
-		dualsolution->end(); delete dualsolution;
 		solution->end(); delete solution;
 		
 		rngB->end(); delete rngB;
@@ -76,12 +76,9 @@ void CPLEX::LoadProblem() {
 	cout << "- Reading problem..." << endl;
 	
 	try {
-		// Read MPS files
 		if (outputLevel > 0) {
 			cplex->setOut(env.getNullStream());
 			cplexB->setOut(env.getNullStream());
-		} else {
-			cout << "Reading model" << endl;
 		}
 		string file_name = "prepdata/netscore.mps";
 		cplex->importModel(*model, file_name.c_str(), *obj, *var, *rng);
@@ -91,6 +88,9 @@ void CPLEX::LoadProblem() {
 		// Extract models
 		cplex->extract(*model);
 		cplexB->extract(*modelB);
+		
+		// Initialize variable to store dual solutions
+		dualsolution = new IloNumArray(env, (Nevents + 1) * IdxNode.size);
 	} catch (IloException& e) {
 		cerr << "Concert exception caught: " << e << endl;
 	} catch (...) {
@@ -103,33 +103,24 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 	int nyears = SLength[0];
 	
 	try {
-		// Keep track of solution
-		bool optimal = true;
-		int iter = 0;
-		
-		// Only one file
+		// Start by solving full problem
 		if (outputLevel < 2)
-			cout << "- Solving problem" << endl;
+			cout << "- Minimizing cost..." << endl;
 		
-		if (cplex->solve()) {
-			optimal = true;
-			objective[0] = cplex->getObjValue();
-			
-			// Store solution if optimal solution found
-			StoreSolution();
-			StoreDualSolution();
-		} else {
-			optimal = false;
-		}
-		
-		if (!optimal) {
+		if (!cplex->solve()) {
 			// Solution not found, return very large values
 			cout << "\tProblem infeasible!" << endl;
 			for (int i=0; i < Nobj; ++i)
 				objective[i] = 1.0e30;
 		} else {
+			// Solution found, store objective
+			objective[0] = cplex->getObjValue();
 			if (outputLevel < 2)
 				cout << "\tCost: " << objective[0] << endl;
+				
+			// Store solution
+			StoreSolution();
+			StoreDualSolution();
 			
 			// Sustainability metrics
 			vector<double> emissions = SumByRow(*solution, IdxEm);
@@ -152,7 +143,7 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 					objective[1+i] = emissions[i];
 			}
 			
-			// Write emissions and investments in output string (only for NSGA-II postprocessor
+			// Write emissions and investments in output string (only for NSGA-II postprocessor)
 			if (returnString != "skip") {
 				returnString = "";
 				
@@ -178,38 +169,35 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 				
 				// Initialize operational cost
 				CapacityConstraints(events);
-				cplexB->solve();
-				if (cplexB->getCplexStatus() != CPX_STAT_OPTIMAL)
+				if (!cplexB->solve())
 					ResilOptimal = false;
-				else
+				else {
 					for (int event = 1; event <= Nevents; ++event)
-						ResilObj[event-1] = - cplexB->getObjValue();
+						ResilObj[event-1] = -cplexB->getObjValue();
+				}
 				
 				for (int event = 1; event <= Nevents && ResilOptimal; ++event) {
 					// Store capacities as constraints and solve
 					CapacityConstraints(events, event);
-					cplexB->solve();
 					
-					if (cplexB->getCplexStatus() != CPX_STAT_OPTIMAL) {
-						// If subproblem is infeasible
+					if (!cplexB->solve()) {
+						// If operational problem is infeasible
 						ResilObj[event-1] = 1.0e10;
 						ResilOptimal = false;
 						if (outputLevel < 2)
-							cout << "\t\tEvent: " << event << "\tInfeasible!" << endl;
+							cout << "\tEvent: " << event << "\tInfeasible!" << endl;
 					} else {
 						// If subproblem is feasible
-						ResilObj[event-1] += cplexB->getObjValue();
+						ResilObj[event - 1] += cplexB->getObjValue();
 						StoreDualSolution(event);
+						resiliency += ResilObj[event - 1];
+						if (outputLevel < 2)
+							cout << "\tEvent: " << event << "\tCost delta: " << ResilObj[event - 1] << endl;
 					}
 				}
 				
 				if (ResilOptimal) {
 					// Calculate resiliency results
-					for (int j = 0; j < Nevents; ++j) {
-						resiliency += ResilObj[j];
-						if (outputLevel < 2)
-							cout << "\t\tEv: " << j+1 << "\tCost: " << ResilObj[j] << endl;
-					}
 					objective[SustObj.size() + 1] = resiliency / Nevents;
 					if (outputLevel < 2)
 						cout << "\tResiliency: " << resiliency / Nevents << endl;
@@ -223,9 +211,8 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 				if (returnString != "skip") {
 					string tempString = "";
 					
-					for (int event=0; event < Nevents; ++event)
+					for (int event = 0; event < Nevents; ++event)
 						tempString += "," + ToString<double>(ResilObj[event]);
-					
 					returnString = tempString + returnString;
 				}
 			}
@@ -258,14 +245,19 @@ void CPLEX::StoreSolution() {
 
 // Store dual solution vector
 void CPLEX::StoreDualSolution(int event) {
-	dualsolution->clear();
-	
 	try {
-		// Only one file
-		cplex->getDuals(*TempArray, *rng);
-		int start = IdxEm.size + IdxRm.size;
+		int start = IdxEm.size;
+		int start2 = event * IdxNode.size;
+		if (event == 0) {
+			// Full model
+			cplex->getDuals(*TempArray, *rng);
+			start += IdxRm.size;
+		} else {
+			// Operational model
+			cplexB->getDuals(*TempArray, *rngB);
+		}
 		for (int i = 0; i < IdxNode.size; ++i)
-			(*dualsolution)[event].add((*TempArray)[start + i]);
+			(*dualsolution)[0] = (*TempArray)[start + i];
 	} catch (IloException& e) {
 		cerr << "Concert exception caught: " << e << endl;
 	} catch (...) {
@@ -298,7 +290,7 @@ void CPLEX::ApplyMinInv(double *x) {
 // Provide solution as a string vector
 vector<string> CPLEX::SolutionString() {
 	vector<string> solstring(0);
-	for (int i=0; i < solution->getSize(); ++i)
+	for (int i = 0; i < solution->getSize(); ++i)
 		solstring.push_back(ToString<IloNum>((*solution)[i]));
 	return solstring;
 }
@@ -306,8 +298,8 @@ vector<string> CPLEX::SolutionString() {
 // Provide dual solution as a string vector
 vector<string> CPLEX::SolutionDualString(int event) {
 	vector<string> solstring(0);
-	for (int i=0; i < (*dualsolution)[event].getSize(); ++i)
-		solstring.push_back(ToString<IloNum>((*dualsolution)[event][i]));
+	for (int i = 0; i < IdxNode.size; ++i)
+		solstring.push_back(ToString<double>((*dualsolution)[event * IdxNode.size + i]));
 	return solstring;
 }
 

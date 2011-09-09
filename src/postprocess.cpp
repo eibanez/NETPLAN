@@ -42,6 +42,7 @@ int main () {
 	
 	// Report solutions if the problem is feasible
 	if (objective[0] < 1.0e29) {
+		cout << "- Writing output" << endl;
 		vector<string> solstring(netplan.SolutionString());
 		WriteOutput("prepdata/post_emissions.csv", IdxEm, solstring, "% Emissions");
 		WriteOutput("prepdata/post_node_rm.csv", IdxRm, solstring, "% Reserve margins");
@@ -50,7 +51,7 @@ int main () {
 		WriteOutput("prepdata/post_arc_flow.csv", IdxArc, solstring, "% Arc flows");
 		WriteOutput("prepdata/post_node_ud.csv", IdxUd, solstring, "% Demand not served at nodes");
 		
-		for (int i=0; i <= Nevents; ++i) {
+		for (int i = 0; i <= Nevents; ++i) {
 			vector<string> dualstring(netplan.SolutionDualString(i));
 			string file_name = "prepdata/post_nodal_dual_e" + ToString<int>(i) + ".csv";
 			WriteOutput(file_name.c_str(), IdxNode, dualstring, "% Dual variable at demand nodes");

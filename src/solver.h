@@ -23,8 +23,7 @@ struct CPLEX {
 	IloObjective *obj, *objB;
 	IloNumVarArray *var, *varB;
 	IloRangeArray *rng, *rngB;
-	IloNumArray *solution, *TempArray;
-	IloArray<IloNumArray> *dualsolution;
+	IloNumArray *solution, *dualsolution, *TempArray;
 	
 	// Constructor and destructor
 	CPLEX();
