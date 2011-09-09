@@ -19,7 +19,7 @@ typedef vector<VectorStr> MatrixStr;
 // Global variables
 extern string SName;
 extern Step SLength;
-extern bool useDCflow, useBenders;
+extern bool useDCflow;
 extern string DefStep, StorageCode, DCCode, TransStep, TransDummy, TransCoal;
 extern int Npopsize, Nngen, Nobj, Nevents;
 extern string Npcross_real, Npmut_real, Neta_c, Neta_m, Npcross_bin, Npmut_bin, Nstages;

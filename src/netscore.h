@@ -14,7 +14,7 @@
 // Global variables
 string SName;
 Step SLength;
-bool useDCflow = false, useBenders = false;
+bool useDCflow = false;
 string DefStep = "", StorageCode = "S", DCCode = "", TransStep = "", TransDummy = "XT", TransCoal = "";
 int Npopsize = 20, Nngen = 200, Nobj = 1, Nevents = 0;
 string Npcross_real = "0.75", Npmut_real = "0.2", Neta_c = "7", Neta_m = "20", Npcross_bin = "0.4", Npmut_bin = "0.7", Nstages = "2";
