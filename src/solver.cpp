@@ -525,7 +525,7 @@ void CPLEX::SolveProblem(double *x, double *objective, const double events[]) {
 	cout << "I am in CPLEX::SolveProblem now " << endl;// djx
 	time_t startTime, endTime; 
 	double dif;
-	time(&startTime);	
+	time(&startTime);
 	#endif
 	int inv = IdxCap.size;
 	if (useBenders) inv += SLength[0];
@@ -536,7 +536,6 @@ void CPLEX::SolveProblem(double *x, double *objective, const double events[]) {
 	// Solve problem
 	SolveIndividual(objective, events);
 	
-	// Eliminate lower bound constraints
 	#ifdef DEBUG_SOLVEPROBLEM
 	time(&endTime);	
 	cout << "Solve problem takes " << difftime(endTime,startTime) << " seconds \n\n " << endl;  
