@@ -387,6 +387,12 @@ int main() {
 		bfile << temp_string;
 	}
 	
+	// "inv2cap" constraints
+	for (unsigned int i = 0; i < Arcs.size(); ++i) {
+		temp_string = Arcs[i].ArcCapNames();
+		afile << temp_string;
+	}
+	
 	// DC Power flow constraints
 	for (unsigned int i = 0; i < Arcs.size(); ++i) {
 		temp_string = Arcs[i].ArcDcNames();
@@ -408,7 +414,6 @@ int main() {
 	for (unsigned int i = 0; i < Arcs.size(); ++i) {
 		temp_string = Arcs[i].InvArcColumns();
 		afile << temp_string;
-		bfile << temp_string;
 	}
 	
 	// Sustainability metrics
