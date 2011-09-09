@@ -334,16 +334,14 @@ void CNSGA2::evaluatePopInd (population* pop, const double events[], int beginIn
 	if (callCounter == 0) {
 		// Read optimization problem and store it in memory
 		netplan.LoadProblem();
-		netplan.objReturnSize = 0;
 		++callCounter;
 	}  
 	for (int i=beginInd; i<= beginInd; i++) {
 		//netplan.SolveProblem( (&pop->ind[i])->xbin, (&pop->ind[i])->obj, events);
 		netplan.SolveProblem( (&pop->ind[i])->xbin, (&pop->ind[i])->obj, events);
 		#ifdef DEBUG_evaluatePopInd
-		cout << "I am rank " << myRank << " in evaluatePopInd() worker run Individual: " << i << " netplan.objReturnSize is " << netplan.objReturnSize <<  "\n" << endl;
+		cout << "I am rank " << myRank << " in evaluatePopInd() worker run Individual: " << i <<  "\n" << endl;
 		#endif
-		objRSize = netplan.objReturnSize; 
 		//netplan.SolveProblem( myIndXreal, objValue, events);
 		
 		(&pop->ind[i])->constr_violation = 0.0;
@@ -354,11 +352,10 @@ void CNSGA2::evaluatePopInd (population* pop, const double events[], int beginIn
 void CNSGA2::mEvaluatePopInd (population* pop, const double events[], vector<double>& mResultTaskPackageT12, int beginInd, int nobj, int genNum, char canTag, int myRank) {
 	static int callCounter = 0 ;
 	// Declare variables to store the optimization model
-	//CPLEX netplan;
+	CPLEX netplan;
 	if (callCounter == 0) {
 		// Read optimization problem and store it in memory
 		netplan.LoadProblem();
-		netplan.objReturnSize = 0;
 		++callCounter; 
 	}
 	
@@ -371,8 +368,7 @@ void CNSGA2::mEvaluatePopInd (population* pop, const double events[], vector<dou
 		netplan.SolveProblem( (&pop->ind[i])->xbin, (&pop->ind[i])->obj, events);
 		objValue = (&pop->ind[i])->obj;
 		//netplan.SolveProblem( myIndXreal, objValue, events);
-		// for (int ii =0 ; ii < nobj ; ii++)
-		for (int ii =0 ; ii < netplan.objReturnSize ; ii++) {
+		for (int ii = 0 ; ii < Nobj; ii++) {
 			mResultTaskPackageT12[ii+4] = objValue[ii]; // get solved obj value
 		}
 		(&pop->ind[i])->constr_violation = 0.0;

@@ -27,7 +27,7 @@ void CPLEX::LoadProblem() {
 	#ifdef DEBUG_TIMING
 	time_t startTime, endTime; 
 	double dif;
-	time (&startTime);	
+	time (&startTime);
 	#endif
 	//string file_name_temp = ""; int tempi =0; string file_nameT="";
 	try {
@@ -84,9 +84,8 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 	cout << "I am in CPLEX::SolveIndividual with returnString now " << endl; // djx
 	time_t startTime, endTime; 
 	double dif;
-	time(&startTime);	
+	time(&startTime);
 	#endif
-	objReturnSize = 0;
 	
 	try {
 		// Keep track of solution
@@ -538,8 +537,6 @@ void CPLEX::SolveProblem(double *x, double *objective, const double events[]) {
 	SolveIndividual(objective, events);
 	
 	// Eliminate lower bound constraints
-	model[0].remove( ConstrLB );
-	ConstrLB.end();
 	#ifdef DEBUG_SOLVEPROBLEM
 	time(&endTime);	
 	cout << "Solve problem takes " << difftime(endTime,startTime) << " seconds \n\n " << endl;  
