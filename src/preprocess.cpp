@@ -343,103 +343,151 @@ int main() {
 	
 	cout << endl << "- Writing MPS files..." << endl;
 	int nyears = SLength[0];
-	ofstream afile;
+	ofstream afile, bfile;
 	string Ychar = SName.substr(0,1), temp_string;
 	
 	// afile stores one single MPS file (no Benders)
 	// myfile stores the Benders decomposition
 	afile.open("prepdata/netscore.mps");
+	bfile.open("prepdata/netscore-op.mps");
 	
 	// NAME and ROWS and Cost objective funtion)
 	afile << "NAME" << endl;
 	afile << "ROWS" << endl;
 	afile << " N obj" << endl;
+	bfile << "NAME" << endl;
+	bfile << "ROWS" << endl;
+	bfile << " N obj" << endl;
 	
 	// Sustainability metrics (rows)
-	for (int j = 0; j < SustMet.size(); ++j)
-		for (int i = 1; i <= nyears; ++i)
+	for (int j = 0; j < SustMet.size(); ++j) {
+		for (int i = 1; i <= nyears; ++i) {
 			afile << " E " << SustMet[j] << Ychar << i << endl;
+			bfile << " E " << SustMet[j] << Ychar << i << endl;
+		}
+	}
 	
 	// Peak load
-	for (unsigned int i = 0; i < Nodes.size(); ++i)
-		afile << Nodes[i].NodePeakRows();
+	for (unsigned int i = 0; i < Nodes.size(); ++i) {
+		temp_string = Nodes[i].NodePeakRows();
+		afile << temp_string;
+	}
 	
 	// Nodal demand constraints
-	for (unsigned int i = 0; i < Nodes.size(); ++i)
-		afile << Nodes[i].NodeNames();
+	for (unsigned int i = 0; i < Nodes.size(); ++i) {
+		temp_string = Nodes[i].NodeNames();
+		afile << temp_string;
+		bfile << temp_string;
+	}
 	
 	// Upper bound constraints rows
-	for (unsigned int i = 0; i < Arcs.size(); ++i)
-		afile << Arcs[i].ArcUbNames();
-	
-	// "inv2cap" constraints
-	for (unsigned int i = 0; i < Arcs.size(); ++i)
-		afile << Arcs[i].ArcCapNames();
+	for (unsigned int i = 0; i < Arcs.size(); ++i) {
+		temp_string = Arcs[i].ArcUbNames();
+		afile << temp_string;
+		bfile << temp_string;
+	}
 	
 	// DC Power flow constraints
-	for (unsigned int i = 0; i < Arcs.size(); ++i)
-		afile << Arcs[i].ArcDcNames();
+	for (unsigned int i = 0; i < Arcs.size(); ++i) {
+		temp_string = Arcs[i].ArcDcNames();
+		afile << temp_string;
+		bfile << temp_string;
+	}
 	
 	// COLUMNS (Variables)
 	afile << "COLUMNS" << endl;
+	bfile << "COLUMNS" << endl;
 	
 	// Capacities  (these vary slightly for Benders)
-	for (unsigned int i = 0; i < Arcs.size(); ++i)
+	for (unsigned int i = 0; i < Arcs.size(); ++i) {
 		afile << Arcs[i].CapArcColumns(0);
+		bfile << Arcs[i].CapArcColumns(2);
+	}
 	
 	// Investments
-	for (unsigned int i = 0; i < Arcs.size(); ++i)
-		afile << Arcs[i].InvArcColumns();
+	for (unsigned int i = 0; i < Arcs.size(); ++i) {
+		temp_string = Arcs[i].InvArcColumns();
+		afile << temp_string;
+		bfile << temp_string;
+	}
 	
 	// Sustainability metrics
-	for (int j = 0; j < SustMet.size(); ++j)
-		for (int i = 1; i <= nyears; ++i)
+	for (int j = 0; j < SustMet.size(); ++j) {
+		for (int i = 1; i <= nyears; ++i) {
 			afile << "    " << SustMet[j] << "_" << Ychar << i << " " << SustMet[j] << Ychar << i << " -1" << endl;
+			bfile << "    " << SustMet[j] << "_" << Ychar << i << " " << SustMet[j] << Ychar << i << " -1" << endl;
+		}
+	}
 	
 	// Reserve margin
-	for (unsigned int i = 0; i < Nodes.size(); ++i)
+	for (unsigned int i = 0; i < Nodes.size(); ++i) {
+		temp_string = Nodes[i].NodeRMColumns();
 		afile << temp_string;
+	}
 	
 	// Flows
-	for (unsigned int i = 0; i < Arcs.size(); ++i)
-		afile << Arcs[i].ArcColumns();
+	for (unsigned int i = 0; i < Arcs.size(); ++i) {
+		temp_string = Arcs[i].ArcColumns();
+		afile << temp_string;
+		bfile << temp_string;
+	}
 	
 	// Unserved demands
-	for (unsigned int i = 0; i < Nodes.size(); ++i)
-		afile << Nodes[i].NodeUDColumns();
+	for (unsigned int i = 0; i < Nodes.size(); ++i) {
+		temp_string = Nodes[i].NodeUDColumns();
+		afile << temp_string;
+		bfile << temp_string;
+	}
 	
 	// Power flow variables (angles)
 	vector<string> DcOutput = DCFlowColumns(ListDCNodes, ListDCArcs);
-	for (unsigned int i = 1; i < DcOutput.size(); ++i)
+	for (unsigned int i = 1; i < DcOutput.size(); ++i) {
 		afile << DcOutput[i];
+		bfile << DcOutput[i];
+	}
 	
 	// RHS
 	afile << "RHS" << endl;
+	bfile << "RHS" << endl;
 	
 	// Nodal Demands
-	for (unsigned int i = 0; i < Nodes.size(); ++i)
-		afile << Nodes[i].NodeRhs();
+	for (unsigned int i = 0; i < Nodes.size(); ++i) {
+		temp_string = Nodes[i].NodeRhs();
+		afile << temp_string;
+		bfile << temp_string;
+	}
 	
 	// Initial capacity terms
-	for (unsigned int i = 0; i < Arcs.size(); ++i)
-		afile << Arcs[i].ArcRhs();
+	for (unsigned int i = 0; i < Arcs.size(); ++i) {
+		temp_string = Arcs[i].ArcRhs();
+		afile << temp_string;
+	}
 	
 	// BOUNDS
 	afile << "BOUNDS" << endl;
+	bfile << "BOUNDS" << endl;
 	
 	// Peak load must be met
-	for (unsigned int i = 0; i < Nodes.size(); ++i)
-		afile << Nodes[i].NodeRMBounds();
+	for (unsigned int i = 0; i < Nodes.size(); ++i) {
+		temp_string = Nodes[i].NodeRMBounds();
+		afile << temp_string;
+	}
 	
 	// Flow and investment bounds
 	for (unsigned int i = 0; i < Arcs.size(); ++i) {
-		afile << Arcs[i].ArcBounds();
-		afile << Arcs[i].ArcInvBounds();
+		temp_string = Arcs[i].ArcBounds();
+		afile << temp_string;
+		bfile << temp_string;
+		temp_string = Arcs[i].ArcInvBounds();
+		afile << temp_string;
 	}
 	
 	// DC Power flow angles
-	for (unsigned int i = 0; i < ListDCNodes.size(); ++i)
-		afile << ListDCNodes[i].DCNodesBounds();
+	for (unsigned int i = 0; i < ListDCNodes.size(); ++i) {
+		temp_string = ListDCNodes[i].DCNodesBounds();
+		afile << temp_string;
+		bfile << temp_string;
+	}
 	
 	// Sustainability limits
 	for (int j = 0; j < SustMet.size(); ++j) {
@@ -449,8 +497,10 @@ int main() {
 			for (int i = 1; i <= nyears; ++i) {
 				TempStep[0] = i;
 				string Value = SustLimits[SustIndex][Step2Pos(TempStep)+1];
-				if (Value != "X")
+				if (Value != "X") {
 					afile << " UP bnd " << SustMet[j] << "_" << Step2Str(TempStep) << " " << Value << endl;
+					bfile << " UP bnd " << SustMet[j] << "_" << Step2Str(TempStep) << " " << Value << endl;
+				}
 			}
 		}
 	}
@@ -458,6 +508,8 @@ int main() {
 	// End of file
 	afile << "ENDATA";
 	afile.close();
+	bfile << "ENDATA";
+	bfile.close();
 	
 	
 	cout << "- Writing auxiliary files..." << endl;
