@@ -41,6 +41,7 @@ void ReadParameters(const char* fileinput) {
 				else if (prop == "StepLength") SLength = Str2Step(value);
 				else if (prop == "StepHours") StepHours.push_back(value);
 				else if (prop == "UseDCFlow") useDCflow = (value == "true" || value == "True" || value == "TRUE");
+				else if (prop == "UseBenders") useBenders = (value == "true" || value == "True" || value == "TRUE");
 				else if (prop == "OutputLevel") outputLevel = atoi(value.c_str());
 				else if (prop == "CodeDC") DCCode = value;
 				else if (prop == "DefStep") DefStep = value;
