@@ -10,12 +10,12 @@
 // Contructors and destructor for the Node class
 Node::Node() : Properties(NodeDefault) {}
 
-Node::Node(const Node& rhs) : Properties(rhs.GetVecStr()) {}
+Node::Node(const Node& rhs) : Properties(rhs.Properties) {}
 
 Node::~Node() {}
 
 Node& Node::operator=(const Node& rhs) {
-	Properties = rhs.GetVecStr();
+	Properties = rhs.Properties;
 	return *this;
 }
 
@@ -37,11 +37,6 @@ double Node::GetDouble(const string& selector) const {
 	output = (Get(selector) != "X") ? atof(Get(selector).c_str()) : 0;
 	return output;
 }
-
-// Copy the entire vector of properties
-vector<string> Node::GetVecStr() const {
-	return Properties;
-};
 
 // Modify a property
 void Node::Set(const string& selector, const string& input){
