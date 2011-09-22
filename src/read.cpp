@@ -99,51 +99,52 @@ void ReadParameters(const char* fileinput, GlobalParam *p) {
 	SustMet.insert(SustMet.begin(), SustObj.begin(), SustObj.end());
 	
 	// Declare a vector with the node property codes
-	NodeProp.push_back("Code"); NodeDefault.push_back("X");
-	NodeProp.push_back("ShortCode"); NodeDefault.push_back("X");
-	NodeProp.push_back("Step"); NodeDefault.push_back(DefStep);
-	NodeProp.push_back("StepLength"); NodeDefault.push_back("X");
-	NodeProp.push_back("Demand"); NodeDefault.push_back("0");
-	NodeProp.push_back("DemandPower"); NodeDefault.push_back("X");
-	NodeProp.push_back("DemandRate"); NodeDefault.push_back(demandrate);
-	NodeProp.push_back("PeakPower"); NodeDefault.push_back("X");
-	NodeProp.push_back("PeakPowerRate"); NodeDefault.push_back(peakdemandrate);
-	NodeProp.push_back("CostUD"); NodeDefault.push_back("X");
-	NodeProp.push_back("DiscountRate"); NodeDefault.push_back(discount);
-	NodeProp.push_back("InflationRate"); NodeDefault.push_back(inflation);
+	NodeProp.push_back("Code"); p->NodeDefault.push_back("X");
+	NodeProp.push_back("ShortCode"); p->NodeDefault.push_back("X");
+	NodeProp.push_back("Step"); p->NodeDefault.push_back(DefStep);
+	NodeProp.push_back("StepLength"); p->NodeDefault.push_back("X");
+	NodeProp.push_back("Demand"); p->NodeDefault.push_back("0");
+	NodeProp.push_back("DemandPower"); p->NodeDefault.push_back("X");
+	NodeProp.push_back("DemandRate"); p->NodeDefault.push_back(demandrate);
+	NodeProp.push_back("PeakPower"); p->NodeDefault.push_back("X");
+	NodeProp.push_back("PeakPowerRate"); p->NodeDefault.push_back(peakdemandrate);
+	NodeProp.push_back("CostUD"); p->NodeDefault.push_back("X");
+	NodeProp.push_back("DiscountRate"); p->NodeDefault.push_back(discount);
+	NodeProp.push_back("InflationRate"); p->NodeDefault.push_back(inflation);
 	NodePropOffset = 4;
 	
 	// Declare a vector with the arc property codes
 	string startzero = SName.substr(0,1) + "2";
-	ArcProp.push_back("Code"); ArcDefault.push_back("X");
-	ArcProp.push_back("From"); ArcDefault.push_back("X");
-	ArcProp.push_back("To"); ArcDefault.push_back("X");
-	ArcProp.push_back("FromStep"); ArcDefault.push_back(DefStep);
-	ArcProp.push_back("ToStep"); ArcDefault.push_back(DefStep);
-	ArcProp.push_back("StepLength"); ArcDefault.push_back("X");
-	ArcProp.push_back("InvStep"); ArcDefault.push_back(SName.substr(0,1));
-	ArcProp.push_back("TransInfr"); ArcDefault.push_back("");
-	ArcProp.push_back("OpCost"); ArcDefault.push_back("0");
-	ArcProp.push_back("InvCost"); ArcDefault.push_back("X");
-	ArcProp.push_back("DiscountRate"); ArcDefault.push_back(discount);
-	ArcProp.push_back("InflationRate"); ArcDefault.push_back(inflation);
-	ArcProp.push_back("Distance"); ArcDefault.push_back("X");
-	ArcProp.push_back("OpMin"); ArcDefault.push_back("0");
-	ArcProp.push_back("OpMax"); ArcDefault.push_back("Inf");
-	ArcProp.push_back("InvMin"); ArcDefault.push_back("0");
-	ArcProp.push_back("InvMax"); ArcDefault.push_back("Inf");
-	ArcProp.push_back("InvStart"); ArcDefault.push_back(startzero);
-	ArcProp.push_back("LifeSpan"); ArcDefault.push_back("X");
-	ArcProp.push_back("Eff"); ArcDefault.push_back("1");
-	ArcProp.push_back("InvertEff"); ArcDefault.push_back("N");
-	ArcProp.push_back("Suscep"); ArcDefault.push_back("X");
-	ArcProp.push_back("CapacityFactor"); ArcDefault.push_back("0");
+	ArcProp.push_back("Code"); p->ArcDefault.push_back("X");
+	ArcProp.push_back("From"); p->ArcDefault.push_back("X");
+	ArcProp.push_back("To"); p->ArcDefault.push_back("X");
+	ArcProp.push_back("FromStep"); p->ArcDefault.push_back(DefStep);
+	ArcProp.push_back("ToStep"); p->ArcDefault.push_back(DefStep);
+	ArcProp.push_back("StepLength"); p->ArcDefault.push_back("X");
+	ArcProp.push_back("InvStep"); p->ArcDefault.push_back(SName.substr(0,1));
+	ArcProp.push_back("TransInfr"); p->ArcDefault.push_back("");
+	ArcProp.push_back("OpCost"); p->ArcDefault.push_back("0");
+	ArcProp.push_back("InvCost"); p->ArcDefault.push_back("X");
+	ArcProp.push_back("DiscountRate"); p->ArcDefault.push_back(discount);
+	ArcProp.push_back("InflationRate"); p->ArcDefault.push_back(inflation);
+	ArcProp.push_back("Distance"); p->ArcDefault.push_back("X");
+	ArcProp.push_back("OpMin"); p->ArcDefault.push_back("0");
+	ArcProp.push_back("OpMax"); p->ArcDefault.push_back("Inf");
+	ArcProp.push_back("InvMin"); p->ArcDefault.push_back("0");
+	ArcProp.push_back("InvMax"); p->ArcDefault.push_back("Inf");
+	ArcProp.push_back("InvStart"); p->ArcDefault.push_back(startzero);
+	ArcProp.push_back("LifeSpan"); p->ArcDefault.push_back("X");
+	ArcProp.push_back("Eff"); p->ArcDefault.push_back("1");
+	ArcProp.push_back("InvertEff"); p->ArcDefault.push_back("N");
+	ArcProp.push_back("Suscep"); p->ArcDefault.push_back("X");
+	ArcProp.push_back("CapacityFactor"); p->ArcDefault.push_back("0");
 	// Sustainability
-	for (int j = 0; j < SustMet.size(); ++j) { ArcProp.push_back("Op" + SustMet[j]); ArcDefault.push_back("0"); }
+	for (int j = 0; j < SustMet.size(); ++j)
+		ArcProp.push_back("Op" + SustMet[j]); p->ArcDefault.push_back("0");
+	
 	// Resiliency events
-	for (int j = 1; j <= Nevents; ++j) {
-		ArcProp.push_back("CapacityLoss" + ToString<int>(j)); ArcDefault.push_back("1");
-	}
+	for (int j = 1; j <= Nevents; ++j)
+		ArcProp.push_back("CapacityLoss" + ToString<int>(j)); p->ArcDefault.push_back("1");
 	
 	ArcPropOffset = 8;
 }
@@ -245,8 +246,8 @@ MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const in
 }
 
 // Read Node list and store it in a vector of 'Nodes' (only 'ShortCode' is stored)
-vector<Node> ReadListNodes(const char* fileinput) {
-	vector<Node> output(0);
+vector<Node> ReadListNodes(const char* fileinput, GlobalParam *p) {
+	vector<Node> output(0, Node(p));
 	char* t_read;
 	char line[CHAR_LINE];
 	int i = 0;
@@ -263,7 +264,7 @@ vector<Node> ReadListNodes(const char* fileinput) {
 			
 			// Skip first line
 			if ((i!=0 && line[0]!='%') && (line[0]!='\0')) {
-				Node Temp_Node;
+				Node Temp_Node(p);
 				t_read = strtok(line,",");
 				Temp_Node.Set("ShortCode", string(t_read));
 				output.push_back(Temp_Node);
@@ -317,8 +318,8 @@ MatrixStr ReadStep(const char* fileinput) {
 }
 
 // Read Arc list and store in a vector of 'Arcs' (Only 'From' and 'To' codes are stored)
-vector<Arc> ReadListArcs(const char* fileinput) {
-	vector<Arc> output(0);
+vector<Arc> ReadListArcs(const char* fileinput, GlobalParam *p) {
+	vector<Arc> output(0, Arc(p));
 	char* t_read;
 	char line[CHAR_LINE];
 	int i = 0;
@@ -335,7 +336,7 @@ vector<Arc> ReadListArcs(const char* fileinput) {
 			
 			// Skip first line, then read the rest
 			if ((i!=0) && (line[0]!='%') && (line[0]!='\0')) {
-				Arc Temp_Arc;
+				Arc Temp_Arc(p);
 				t_read = strtok(line,",");
 				Temp_Arc.Set("From", string(t_read));
 				t_read = strtok(NULL,",");
@@ -357,8 +358,8 @@ vector<Arc> ReadListArcs(const char* fileinput) {
 void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput, GlobalParam *p) {
 	// Create default nodes and arcs
 	vector<string> DefNodes(0), DefFrom(0), DefTo(0), DefInf(0);
-	Node TempNode;
-	Arc TempArc;
+	Node TempNode(p);
+	Arc TempArc(p);
 	int NInfra = p->TransInfra.size(), NFleet = 0, NComm = p->TransComm.size(), k = 0;
 	string Infra = "", Fleet = "", FleetInf = "", Comm = "", Coal = "";
 	

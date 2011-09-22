@@ -12,6 +12,14 @@ time_t startTime, endTime;
 
 // Structure for global parameters ****************************************************************
 GlobalParam::GlobalParam() {
+	// Node parameters
+	NodeProp = vector<string>(0);
+	NodeDefault = vector<string>(0);
+	
+	// Arc parameters
+	ArcProp = vector<string>(0);
+	ArcDefault = vector<string>(0);
+	
 	// Transportation variables
 	TransStep = "";
 	TransDummy = "XT";

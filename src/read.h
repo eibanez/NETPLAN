@@ -12,8 +12,8 @@
 #include "arc.h"
 
 void ReadParameters(const char* fileinput, GlobalParam *p);
-vector<Node> ReadListNodes(const char* fileinput);
-vector<Arc> ReadListArcs(const char* fileinput);
+vector<Node> ReadListNodes(const char* fileinput, GlobalParam *p);
+vector<Arc> ReadListArcs(const char* fileinput, GlobalParam *p);
 MatrixStr ReadStep(const char* fileinput);
 MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const int num_fields);
 void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput, GlobalParam *p);

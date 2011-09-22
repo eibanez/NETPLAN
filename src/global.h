@@ -27,6 +27,12 @@ enum HeaderOption { H_Default, H_Prep, H_Post, H_PostNsga, H_Time, H_Benders,
 struct GlobalParam {
 	GlobalParam();
 	
+	// Node parameters
+	vector<string> NodeProp, NodeDefault;
+	
+	// Arc parameters
+	vector<string> ArcProp, ArcDefault;
+	
 	// Transportation variables
 	string TransStep, TransDummy;
 	vector<string> TransInfra, TransComm;
@@ -40,7 +46,7 @@ extern string DefStep, StorageCode, DCCode, TransCoal;
 extern int Npopsize, Nngen, Nobj, Nevents;
 extern string Npcross_real, Npmut_real, Neta_c, Neta_m, Npcross_bin, Npmut_bin, Nstages;
 extern double Np_start;
-extern vector<string> ArcProp, ArcDefault, NodeProp, NodeDefault, StepHours, SustObj, SustMet;
+extern vector<string> ArcProp, NodeProp, StepHours, SustObj, SustMet;
 extern int NodePropOffset, ArcPropOffset, outputLevel;
 // Store indices to recover data after optimization
 extern Index IdxNode, IdxUd, IdxRm, IdxArc, IdxInv, IdxCap, IdxUb, IdxEm, IdxDc, IdxNsga;

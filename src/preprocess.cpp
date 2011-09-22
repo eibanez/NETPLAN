@@ -20,23 +20,23 @@ int main() {
 	mkdir("./bestdata", 0777);
 	
 	// Variables to store information
-	vector<Node> ListNodes(0), Nodes(0), ListDCNodes(0);
-	vector<Arc> ListArcs(0), Arcs(0), ListDCArcs(0);
+	vector<Node> ListNodes(0, Node(&p)), Nodes(0, Node(&p)), ListDCNodes(0, Node(&p));
+	vector<Arc> ListArcs(0, Arc(&p)), Arcs(0, Arc(&p)), ListDCArcs(0, Arc(&p));
 	MatrixStr NStep(0), ATransEnergy(0), SustLimits(0);
 	vector<MatrixStr> NVectorProp(0), AVectorProp(0);
 	vector<int> NVectorIndex(NodeProp.size()-NodePropOffset, -1), AVectorIndex(ArcProp.size()-ArcPropOffset, -1);
 	
 	cout << "- Reading list of nodes...\n";
-	ListNodes = ReadListNodes("data/nodes_List.csv");
+	ListNodes = ReadListNodes("data/nodes_List.csv", &p);
 	cout << "- Reading node data...\n";
 	NStep = ReadStep("data/nodes_Step.csv");
-	for (unsigned int t=NodePropOffset; t < NodeProp.size(); ++t) {
+	for (unsigned int t = NodePropOffset; t < NodeProp.size(); ++t) {
 		string file_name = "data/nodes_" + NodeProp[t] + ".csv";
-		NVectorProp.push_back(ReadProperties(file_name.c_str(), NodeDefault[t], 1));
+		NVectorProp.push_back(ReadProperties(file_name.c_str(), p.NodeDefault[t], 1));
 	}
 	
 	cout << "- Reading list of arcs...\n";
-	ListArcs = ReadListArcs("data/arcs_List.csv");
+	ListArcs = ReadListArcs("data/arcs_List.csv", &p);
 	cout << "- Reading arc data...\n";
 	ATransEnergy = ReadProperties("data/arcs_TransEnergy.csv", "X", 2);
 	for (unsigned int t=ArcPropOffset; t < ArcProp.size(); ++t) {
@@ -48,7 +48,7 @@ int main() {
 			// Resiliency properties
 			file_name = "data/events/" + ArcProp[t] + ".csv";
 		}
-		AVectorProp.push_back(ReadProperties(file_name.c_str(), ArcDefault[t], 2));
+		AVectorProp.push_back(ReadProperties(file_name.c_str(), p.ArcDefault[t], 2));
 	}
 	
 	cout << "- Creating transportation network...\n";

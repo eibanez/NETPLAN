@@ -8,7 +8,7 @@
 #include "node.h"
 
 // Contructors and destructor for the Node class
-Node::Node() : Properties(NodeDefault) {}
+Node::Node(GlobalParam *p) : Properties(p->NodeDefault) {}
 
 Node::Node(const Node& rhs) : Properties(rhs.Properties) {}
 

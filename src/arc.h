@@ -9,7 +9,7 @@
 
 // Declare class to store arc information
 struct Arc {
-	Arc();
+	Arc(GlobalParam *p);
 	Arc(const Arc& rhs);
 	Arc(const Arc& rhs, const bool reverse);
 	~Arc();

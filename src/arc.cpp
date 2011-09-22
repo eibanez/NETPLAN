@@ -8,8 +8,8 @@
 #include "arc.h"
 
 // Contructors and destructor for the Arc class
-Arc::Arc() :
-	Properties(ArcDefault),
+Arc::Arc(GlobalParam *p) :
+	Properties(p->ArcDefault),
 	Energy2Trans(false),
 	Trans2Energy(0) {}
 

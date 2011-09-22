@@ -9,7 +9,7 @@
 
 // Declare class type to hold node information
 struct Node {
-	Node();
+	Node(GlobalParam *p);
 	Node(const Node& rhs);
 	~Node();
 	Node& operator=(const Node& rhs);
