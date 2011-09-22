@@ -36,13 +36,16 @@ struct GlobalParam {
 	// Transportation variables
 	string TransStep, TransDummy;
 	vector<string> TransInfra, TransComm;
+	
+	// Common parameters
+	string DefStep;
 };
 
 // Global variables
 extern string SName;
 extern Step SLength;
 extern bool useDCflow;
-extern string DefStep, StorageCode, DCCode, TransCoal;
+extern string StorageCode, DCCode, TransCoal;
 extern int Npopsize, Nngen, Nobj, Nevents;
 extern string Npcross_real, Npmut_real, Neta_c, Neta_m, Npcross_bin, Npmut_bin, Nstages;
 extern double Np_start;

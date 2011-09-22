@@ -210,8 +210,9 @@ int main() {
 					// Read code and step for energy node
 					string LoadCode = ATransEnergy[IndexTemp][1];
 					int LoadIndex = FindCode(LoadCode, NStep);
-					string LoadStepCode = DefStep;
-					if (LoadIndex >= 0) LoadStepCode = NStep[LoadIndex][1];
+					string LoadStepCode = p.DefStep;
+					if (LoadIndex >= 0)
+						LoadStepCode = NStep[LoadIndex][1];
 					
 					if (LoadStepCode.size() <= TempArcStepCode.size()) {
 						Step LoadStep = TempStep;

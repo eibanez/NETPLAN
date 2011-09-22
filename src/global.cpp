@@ -25,6 +25,9 @@ GlobalParam::GlobalParam() {
 	TransDummy = "XT";
 	TransInfra = vector<string>(0);
 	TransComm = vector<string>(0);
+	
+	// Common parameters
+	string DefStep = "";
 }
 
 // Print error messages

@@ -38,8 +38,11 @@ void ReadParameters(const char* fileinput, GlobalParam *p) {
 				else if (prop == "UseDCFlow") useDCflow = (value == "true" || value == "True" || value == "TRUE");
 				else if (prop == "OutputLevel") outputLevel = atoi(value.c_str());
 				else if (prop == "CodeDC") DCCode = value;
-				else if (prop == "DefStep") DefStep = value;
-				else if (prop == "DefDiscount") discount = value;
+				else if (prop == "DefStep") {
+					p->DefStep = value;
+					if (p->TransStep == "")
+						p->TransStep = value;
+				} else if (prop == "DefDiscount") discount = value;
 				else if (prop == "DefInflation") inflation = value;
 				else if (prop == "DefDemandRate") demandrate = value;
 				// Transportation parameters
@@ -101,7 +104,7 @@ void ReadParameters(const char* fileinput, GlobalParam *p) {
 	// Declare a vector with the node property codes
 	NodeProp.push_back("Code"); p->NodeDefault.push_back("X");
 	NodeProp.push_back("ShortCode"); p->NodeDefault.push_back("X");
-	NodeProp.push_back("Step"); p->NodeDefault.push_back(DefStep);
+	NodeProp.push_back("Step"); p->NodeDefault.push_back(p->DefStep);
 	NodeProp.push_back("StepLength"); p->NodeDefault.push_back("X");
 	NodeProp.push_back("Demand"); p->NodeDefault.push_back("0");
 	NodeProp.push_back("DemandPower"); p->NodeDefault.push_back("X");
@@ -118,8 +121,8 @@ void ReadParameters(const char* fileinput, GlobalParam *p) {
 	ArcProp.push_back("Code"); p->ArcDefault.push_back("X");
 	ArcProp.push_back("From"); p->ArcDefault.push_back("X");
 	ArcProp.push_back("To"); p->ArcDefault.push_back("X");
-	ArcProp.push_back("FromStep"); p->ArcDefault.push_back(DefStep);
-	ArcProp.push_back("ToStep"); p->ArcDefault.push_back(DefStep);
+	ArcProp.push_back("FromStep"); p->ArcDefault.push_back(p->DefStep);
+	ArcProp.push_back("ToStep"); p->ArcDefault.push_back(p->DefStep);
 	ArcProp.push_back("StepLength"); p->ArcDefault.push_back("X");
 	ArcProp.push_back("InvStep"); p->ArcDefault.push_back(SName.substr(0,1));
 	ArcProp.push_back("TransInfr"); p->ArcDefault.push_back("");
