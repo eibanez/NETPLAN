@@ -43,8 +43,7 @@ struct CPLEX {
 	void LoadProblem();
 	
 	// Solves current model
-	void SolveIndividual(double *objective, const double events[], string & returnString);
-	void SolveIndividual(double *objective, const double events[]);
+	void SolveIndividual(double *objective, const double events[], const bool saveDual = false, string *returnString = NULL);
 	
 	// Store complete solution vector
 	void StoreSolution(bool onlymaster=false);
