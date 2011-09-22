@@ -68,16 +68,23 @@ void WriteOutput(const char* fileinput, Index& idx, vector<string>& values, cons
 		for (int i = 0; i < idx.size; ++i) {
 			// This produces a new line if necessary
 			if (idx.position[i] != prevpos) {
-				for (int j = prevcol; j < maximum; ++j) myfile << ",";
-				myfile << "\n" << idx.name[i];
-				for (int j = minimum; j < idx.column[i]; ++j) myfile << ",";
+				while (++prevcol < maximum)
+					myfile << ",";
+				myfile << endl << idx.name[i];
+				for (int j = minimum; j < idx.column[i]; ++j)
+					myfile << ",";
 				prevpos = idx.position[i];
 				prevcol = idx.column[i] - 1;
 			}
-			for (int j=prevcol; j < idx.column[i]; ++j)  myfile << ",";
+			while (++prevcol < idx.column[i])
+				myfile << ",";
 			myfile << values[begin + i];
-			prevcol = idx.column[i];
 		}
+		
+		// Finalize last row
+		while (++prevcol < maximum)
+			myfile << ",";
+		myfile << endl;
 	}
 	
 	myfile << endl;
