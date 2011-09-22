@@ -49,7 +49,7 @@ extern string StorageCode, DCCode, TransCoal;
 extern int Npopsize, Nngen, Nobj, Nevents;
 extern string Npcross_real, Npmut_real, Neta_c, Neta_m, Npcross_bin, Npmut_bin, Nstages;
 extern double Np_start;
-extern vector<string> ArcProp, NodeProp, StepHours, SustObj, SustMet;
+extern vector<string> ArcProp, StepHours, SustObj, SustMet;
 extern int NodePropOffset, ArcPropOffset, outputLevel;
 // Store indices to recover data after optimization
 extern Index IdxNode, IdxUd, IdxRm, IdxArc, IdxInv, IdxCap, IdxUb, IdxEm, IdxDc, IdxNsga;

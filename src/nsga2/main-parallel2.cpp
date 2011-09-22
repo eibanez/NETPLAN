@@ -17,7 +17,8 @@ int main (int argc, char **argv) {
 	printHeader(H_NsgaParallel);
 	
 	// Read global parameters
-	ReadParameters("data/parameters.csv");
+	GlobalParam p;
+	ReadParameters("data/parameters.csv", &p);
 	
 	// -- Initialization of A -- //
 	nsga2a->randgen->randomize();                   // Initialize random number generator

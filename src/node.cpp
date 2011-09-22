@@ -20,45 +20,34 @@ Node& Node::operator=(const Node& rhs) {
 }
 
 // Read a node property in string format
-string Node::Get(const string& selector) const {
-	string temp_output;
-	int index = FindNodeSelector(selector);
-	if (index >= 0) temp_output = Properties[index];
-	else {
-		temp_output = "ERROR";
-		printError("noderead", selector);
-	};
-	return temp_output;
+string Node::Get(const Node_Prop selector) const {
+	return Properties[selector];
 };
 
 // Read a property as a double
-double Node::GetDouble(const string& selector) const {
+double Node::GetDouble(const Node_Prop selector) const {
 	double output;
-	output = (Get(selector) != "X") ? atof(Get(selector).c_str()) : 0;
+	output = (Properties[selector] != "X")
+	         ? atof(Properties[selector].c_str())
+	         : 0;
 	return output;
 }
 
 // Modify a property
-void Node::Set(const string& selector, const string& input){
-	int index = FindNodeSelector(selector);
-	if (index >= 0) Properties[index] = input;
-	else printError("nodewrite", selector);
+void Node::Set(const Node_Prop selector, const string& input){
+	Properties[selector] = input;
 };
 
 // Multiply stored values by 'value'
-void Node::Multiply(const string& selector, const double value) {
-	int index = FindNodeSelector(selector);
-	if (index >= 0) {
-		double actual = GetDouble(selector);
-		if (actual != 0) {
-			Set(selector, ToString<double>(actual * value));
-		}
-	} else printError("nodewrite", selector);
+void Node::Multiply(const Node_Prop selector, const double value) {
+	double actual = GetDouble(selector);
+	if (actual != 0)
+		Set(selector, ToString<double>(actual * value));
 };
 
 // Get what time the node belongs to (i.e., year)
 int Node::Time() const {
-	return Str2Step(Get("Step"))[0];
+	return Str2Step(Properties[N_Step])[0];
 }
 
 
@@ -66,10 +55,10 @@ int Node::Time() const {
 string Node::NodeNames() const {
 	string temp_output = "";
 	// Create constraint for ach node with a valid demand
-	if ((Get("Demand") != "X") && (Get("Code")[0] != 'X')) {
-		temp_output += " E " + Get("Code") + "\n";
+	if ((Properties[N_Demand] != "X") && (Properties[N_Code][0] != 'X')) {
+		temp_output += " E " + Properties[N_Code] + "\n";
 	} else {
-		temp_output += " N " + Get("Code") + "\n";
+		temp_output += " N " + Properties[N_Code] + "\n";
 	}
 	return temp_output;
 }
@@ -77,9 +66,9 @@ string Node::NodeNames() const {
 string Node::NodeUDColumns() const {
 	string temp_output = "";
 	// If unserved demand is allowed, write the appropriate cost
-	if (Get("CostUD") != "X") {
-		temp_output += "    UD_" + Get("Code") + " obj " + Get("CostUD") + "\n";
-		temp_output += "    UD_" + Get("Code") + " " + Get("Code") + " 1\n";
+	if (Properties[N_CostUD] != "X") {
+		temp_output += "    UD_" + Properties[N_Code] + " obj " + Properties[N_CostUD] + "\n";
+		temp_output += "    UD_" + Properties[N_Code] + " " + Properties[N_Code] + " 1\n";
 	}
 	return temp_output;
 }
@@ -87,8 +76,8 @@ string Node::NodeUDColumns() const {
 string Node::NodePeakRows() const {
 	string temp_output = "";
 	// If peak demand is available, write the appropriate row
-	if ((Get("PeakPower") != "X") && isFirstinYear()) {
-		temp_output += " E pk" + Get("Code") + "\n";
+	if ((Properties[N_PeakPower] != "X") && isFirstinYear()) {
+		temp_output += " E pk" + Properties[N_Code] + "\n";
 	}
 	return temp_output;
 }
@@ -96,60 +85,50 @@ string Node::NodePeakRows() const {
 string Node::NodeRMColumns() const {
 	string temp_output = "";
 	// If peak demand is available, write reserve margin variable
-	if ((Get("PeakPower") != "X") && isFirstinYear()) {
-		temp_output += "    RM_" + Get("Code") + " pk" + Get("Code") + " -" + Get("PeakPower") + "\n";
-	}
+	if ((Properties[N_PeakPower] != "X") && isFirstinYear())
+		temp_output += "    RM_" + Properties[N_Code] + " pk" + Properties[N_Code] + " -" + Properties[N_PeakPower] + "\n";
+	
 	return temp_output;
 }
 
 string Node::NodeRMBounds() const {
 	string temp_output = "";
 	// If peak demand is available, write lower bound for reserve margin
-	if ((Get("PeakPower") != "X") && isFirstinYear()) {
-		temp_output += " LO bnd RM_" + Get("Code") + " 1\n";
-	}
+	if ((Properties[N_PeakPower] != "X") && isFirstinYear())
+		temp_output += " LO bnd RM_" + Properties[N_Code] + " 1\n";
+	
 	return temp_output;
 }
 
 string Node::NodeRhs() const {
 	string temp_output = "";
 	// Demand RHS if it's valid
-	if ((Get("Demand") != "X") && (Get("Demand") != "0")) {
-		temp_output = " rhs " + Get("Code") + " " + Get("Demand") + "\n";
-	}
+	if ((Properties[N_Demand] != "X") && (Properties[N_Demand] != "0"))
+		temp_output = " rhs " + Properties[N_Code] + " " + Properties[N_Demand] + "\n";
+	
 	return temp_output;
 }
 
 string Node::DCNodesBounds() const {
 	string temp_output = "";
 	// Write minimum and max for DC Power flow anges (-pi and pi)
-	temp_output += " LO bnd th" + Get("Code") + " -3.14\n";
-	temp_output += " UP bnd th" + Get("Code") + " 3.14\n";
+	temp_output += " LO bnd th" + Properties[N_Code] + " -3.14\n";
+	temp_output += " UP bnd th" + Properties[N_Code] + " 3.14\n";
 	return temp_output;
 }
 
 // ****** Boolean functions ******
 // Is Node a DC node and are we considering DC flow in the model?
 bool Node::isDCflow() const {
-	return (Get("ShortCode").substr(0,2) == DCCode) && useDCflow;
+	return (Properties[N_ShortCode].substr(0,2) == DCCode) && useDCflow;
 }
 
 // Is this the first node in a year?
 bool Node::isFirstinYear() const {
 	bool output = true;
-	Step tempstep = Str2Step(Get("Step"));
+	Step tempstep = Str2Step(Properties[N_Step]);
 	for (unsigned int k = 1; k < SName.size(); k++)
 		output = output && ((tempstep[k]==0) || (tempstep[k]==1));
 	
 	return output;
-}
-
-// ****** Other functions ******
-// Find the index for a node property selector
-int FindNodeSelector(const string& selector) {
-	int index = -1;
-	for (unsigned int k = 0; k < NodeProp.size(); ++k) {
-		if (selector == NodeProp[k]) index = k;
-	}
-	return index;
 }

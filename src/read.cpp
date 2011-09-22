@@ -102,19 +102,32 @@ void ReadParameters(const char* fileinput, GlobalParam *p) {
 	SustMet.insert(SustMet.begin(), SustObj.begin(), SustObj.end());
 	
 	// Declare a vector with the node property codes
-	NodeProp.push_back("Code"); p->NodeDefault.push_back("X");
-	NodeProp.push_back("ShortCode"); p->NodeDefault.push_back("X");
-	NodeProp.push_back("Step"); p->NodeDefault.push_back(p->DefStep);
-	NodeProp.push_back("StepLength"); p->NodeDefault.push_back("X");
-	NodeProp.push_back("Demand"); p->NodeDefault.push_back("0");
-	NodeProp.push_back("DemandPower"); p->NodeDefault.push_back("X");
-	NodeProp.push_back("DemandRate"); p->NodeDefault.push_back(demandrate);
-	NodeProp.push_back("PeakPower"); p->NodeDefault.push_back("X");
-	NodeProp.push_back("PeakPowerRate"); p->NodeDefault.push_back(peakdemandrate);
-	NodeProp.push_back("CostUD"); p->NodeDefault.push_back("X");
-	NodeProp.push_back("DiscountRate"); p->NodeDefault.push_back(discount);
-	NodeProp.push_back("InflationRate"); p->NodeDefault.push_back(inflation);
-	NodePropOffset = 4;
+	p->NodeProp[N_Code] = "Code";
+	p->NodeProp[N_ShortCode] = "ShortCode";
+	p->NodeProp[N_Step] = "Step";
+	p->NodeProp[N_StepLength] = "StepLength";
+	p->NodeProp[N_Demand] = "Demand";
+	p->NodeProp[N_DemandPower] = "DemandPower";
+	p->NodeProp[N_DemandRate] = "DemandRate";
+	p->NodeProp[N_PeakPower] = "PeakPower";
+	p->NodeProp[N_PeakPowerRate] = "PeakPowerRate";
+	p->NodeProp[N_CostUD] = "CostUD";
+	p->NodeProp[N_Discount_Rate] = "DiscountRate";
+	p->NodeProp[N_InflationRate] = "InflationRate";
+	
+	// Default node properties
+	p->NodeDefault[N_Code] = "X";
+	p->NodeDefault[N_ShortCode] = "X";
+	p->NodeDefault[N_Step] = p->DefStep;
+	p->NodeDefault[N_StepLength] = "X";
+	p->NodeDefault[N_Demand] = "0";
+	p->NodeDefault[N_DemandPower] = "X";
+	p->NodeDefault[N_DemandRate] = demandrate;
+	p->NodeDefault[N_PeakPower] = "X";
+	p->NodeDefault[N_PeakPowerRate] = peakdemandrate;
+	p->NodeDefault[N_CostUD] = "X";
+	p->NodeDefault[N_Discount_Rate] = discount;
+	p->NodeDefault[N_InflationRate] = inflation;
 	
 	// Declare a vector with the arc property codes
 	string startzero = SName.substr(0,1) + "2";
@@ -142,12 +155,16 @@ void ReadParameters(const char* fileinput, GlobalParam *p) {
 	ArcProp.push_back("Suscep"); p->ArcDefault.push_back("X");
 	ArcProp.push_back("CapacityFactor"); p->ArcDefault.push_back("0");
 	// Sustainability
-	for (int j = 0; j < SustMet.size(); ++j)
-		ArcProp.push_back("Op" + SustMet[j]); p->ArcDefault.push_back("0");
+	for (int j = 0; j < SustMet.size(); ++j) {
+		ArcProp.push_back("Op" + SustMet[j]);
+		p->ArcDefault.push_back("0");
+	}
 	
 	// Resiliency events
-	for (int j = 1; j <= Nevents; ++j)
-		ArcProp.push_back("CapacityLoss" + ToString<int>(j)); p->ArcDefault.push_back("1");
+	for (int j = 1; j <= Nevents; ++j) {
+		ArcProp.push_back("CapacityLoss" + ToString<int>(j));
+		p->ArcDefault.push_back("1");
+	}
 	
 	ArcPropOffset = 8;
 }
@@ -269,7 +286,7 @@ vector<Node> ReadListNodes(const char* fileinput, GlobalParam *p) {
 			if ((i!=0 && line[0]!='%') && (line[0]!='\0')) {
 				Node Temp_Node(p);
 				t_read = strtok(line,",");
-				Temp_Node.Set("ShortCode", string(t_read));
+				Temp_Node.Set(N_ShortCode, string(t_read));
 				output.push_back(Temp_Node);
 			}
 			i++;
@@ -426,7 +443,7 @@ void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput, Gl
 	char line[CHAR_LINE];
 	int i = 0;
 	
-	TempNode.Set("Step", p->TransStep);
+	TempNode.Set(N_Step, p->TransStep);
 	TempArc.Set("FromStep", p->TransStep);
 	TempArc.Set("ToStep", p->TransStep);
 	
@@ -483,7 +500,7 @@ void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput, Gl
 				while ((swapindex==0) || ((swapindex==1) && (from!=to))) {
 					for (unsigned int k1 = 0; k1 < ShowNode.size(); ++k1) {
 						if (ShowNode[k1]) {
-							TempNode.Set("ShortCode", DefNodes[k1] + from + to);
+							TempNode.Set(N_ShortCode, DefNodes[k1] + from + to);
 							Nodes.push_back(TempNode);
 							
 							// Coal to transportation
@@ -493,17 +510,17 @@ void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput, Gl
 									// Check if nodes exist, if not it creates it
 									bool fromexists = false, toexists = false;
 									for (unsigned int k2 = 0; k2 < Nodes.size(); ++k2) {
-										if (Nodes[k2].Get("ShortCode") == DefNodes[k1] + from)
+										if (Nodes[k2].Get(N_ShortCode) == DefNodes[k1] + from)
 											fromexists = true;
-										else if (Nodes[k2].Get("ShortCode") == DefNodes[k1] + to)
+										else if (Nodes[k2].Get(N_ShortCode) == DefNodes[k1] + to)
 											toexists = true;
 									}
 									if (!fromexists) {
-										TempNode.Set("ShortCode", DefNodes[k1] + from);
+										TempNode.Set(N_ShortCode, DefNodes[k1] + from);
 										Nodes.push_back(TempNode);
 									}
 									if (!toexists) {
-										TempNode.Set("ShortCode", DefNodes[k1] + to);
+										TempNode.Set(N_ShortCode, DefNodes[k1] + to);
 										Nodes.push_back(TempNode);
 									}
 									

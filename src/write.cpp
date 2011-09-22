@@ -88,7 +88,7 @@ void WriteOutput(const char* fileinput, Index& idx, vector<string>& values, cons
 }
 
 // Write data output for a collection of nodes
-void WriteOutput(const char* fileinput, Index& idx, vector<Node>& Nodes, const string& selector, const string& header) {
+void WriteOutput(const char* fileinput, Index& idx, vector<Node>& Nodes, const Node_Prop selector, const string& header) {
 	vector<string> values(0);
 	for (int i = 0; i < idx.size; ++i)
 		values.push_back(Nodes[i].Get(selector));

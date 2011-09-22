@@ -24,14 +24,14 @@ int main() {
 	vector<Arc> ListArcs(0, Arc(&p)), Arcs(0, Arc(&p)), ListDCArcs(0, Arc(&p));
 	MatrixStr NStep(0), ATransEnergy(0), SustLimits(0);
 	vector<MatrixStr> NVectorProp(0), AVectorProp(0);
-	vector<int> NVectorIndex(NodeProp.size()-NodePropOffset, -1), AVectorIndex(ArcProp.size()-ArcPropOffset, -1);
+	vector<int> NVectorIndex(p.NodeProp.size() - N_OFFSET, -1), AVectorIndex(ArcProp.size() - ArcPropOffset, -1);
 	
 	cout << "- Reading list of nodes...\n";
 	ListNodes = ReadListNodes("data/nodes_List.csv", &p);
 	cout << "- Reading node data...\n";
 	NStep = ReadStep("data/nodes_Step.csv");
-	for (unsigned int t = NodePropOffset; t < NodeProp.size(); ++t) {
-		string file_name = "data/nodes_" + NodeProp[t] + ".csv";
+	for (unsigned int t = N_OFFSET; t < p.NodeProp.size(); ++t) {
+		string file_name = "data/nodes_" + p.NodeProp[t] + ".csv";
 		NVectorProp.push_back(ReadProperties(file_name.c_str(), p.NodeDefault[t], 1));
 	}
 	
@@ -39,7 +39,8 @@ int main() {
 	ListArcs = ReadListArcs("data/arcs_List.csv", &p);
 	cout << "- Reading arc data...\n";
 	ATransEnergy = ReadProperties("data/arcs_TransEnergy.csv", "X", 2);
-	for (unsigned int t=ArcPropOffset; t < ArcProp.size(); ++t) {
+	
+	for (unsigned int t = ArcPropOffset; t < ArcProp.size(); ++t) {
 		string file_name;
 		if (t < ArcProp.size() - Nevents) {
 			// Regular properties
@@ -51,10 +52,10 @@ int main() {
 		AVectorProp.push_back(ReadProperties(file_name.c_str(), p.ArcDefault[t], 2));
 	}
 	
-	cout << "- Creating transportation network...\n";
+	cout << "- Creating transportation network..." << endl;
 	ReadTrans(ListNodes, ListArcs, "data/trans_List.csv", &p);
 	
-	cout << "- Reading sustainability constraints...\n";
+	cout << "- Reading sustainability constraints..." << endl;
 	SustLimits = ReadProperties("data/sust_Limits.csv", "X", 1);
 	
 	// Expand nodes
@@ -65,42 +66,45 @@ int main() {
 		int StepIndex = FindCode(ListNodes[k], NStep);
 		
 		// Identify the row containing data for each property
-		for (unsigned int t=0; t < NVectorIndex.size(); ++t)
+		for (unsigned int t = 0; t < NVectorIndex.size(); ++t)
 			NVectorIndex[t] = FindCode(ListNodes[k], NVectorProp[t]);
 		
 		// Copy step information
-		if (StepIndex >= 0) ListNodes[k].Set("Step", NStep[StepIndex][1]);
+		if (StepIndex >= 0)
+			ListNodes[k].Set(N_Step, NStep[StepIndex][1]);
 		
-		if (ListNodes[k].Get("Step") == "") {
-			printError("nodestep", ListNodes[k].Get("ShortCode"));
+		if (ListNodes[k].Get(N_Step) == "") {
+			printError("nodestep", ListNodes[k].Get(N_ShortCode));
 		} else {
 			// Use a temporary node to store information and cycle through steps
 			Step TempStep(SName.size(), 0);
-			for (unsigned int l = 0; l < ListNodes[k].Get("Step").size(); l++) TempStep[l] = 1;
+			for (unsigned int l = 0; l < ListNodes[k].Get(N_Step).size(); l++)
+				TempStep[l] = 1;
 			
 			while (TempStep <= SLength) {
 				// Apply information
 				Node TempNode = ListNodes[k];
-				TempNode.Set("Step", Step2Str(TempStep));
-				TempNode.Set("StepLength", Step2Hours(TempStep));
+				TempNode.Set(N_Step, Step2Str(TempStep));
+				TempNode.Set(N_StepLength, Step2Hours(TempStep));
 				int l = Step2Pos(TempStep) + 1;
-				TempNode.Set("Code", TempNode.Get("ShortCode") + Step2Str(TempStep));
+				TempNode.Set(N_Code, TempNode.Get(N_ShortCode) + Step2Str(TempStep));
 				
-				for (unsigned int t=0; t < NVectorIndex.size(); ++t) {
-					int tmp_index = NVectorIndex[t];
-					if (tmp_index >= 0) TempNode.Set(NodeProp[NodePropOffset + t], NVectorProp[t][tmp_index][l]);
+				for (int t = N_OFFSET; t < N_SIZE; ++t) {
+					int tmp_index = NVectorIndex[t - N_OFFSET];
+					if (tmp_index >= 0)
+						TempNode.Properties[t] = NVectorProp[t - N_OFFSET][tmp_index][l];
 				}
 				
 				// Calculate demand if power demand is given
-				if ((TempNode.Get("Demand") == "0") && (TempNode.Get("DemandPower") != "X")) {
-					double step_length = TempNode.GetDouble("StepLength");
-					TempNode.Multiply("DemandPower", step_length);
-					TempNode.Set("Demand", TempNode.Get("DemandPower"));
+				if ((TempNode.Get(N_Demand) == "0") && (TempNode.Get(N_DemandPower) != "X")) {
+					double step_length = TempNode.GetDouble(N_StepLength);
+					TempNode.Multiply(N_DemandPower, step_length);
+					TempNode.Set(N_Demand, TempNode.Get(N_DemandPower));
 				}
 				
 				// Adjust peak demand with increase rate
-				double dem_rate = TempNode.GetDouble("DemandRate");
-				double peak_rate = TempNode.GetDouble("PeakPowerRate");
+				double dem_rate = TempNode.GetDouble(N_DemandRate);
+				double peak_rate = TempNode.GetDouble(N_PeakPowerRate);
 				double dem_factor = 1, peak_factor = 1;
 				
 				if ((dem_rate != 0) || (peak_rate != 0)) {
@@ -108,26 +112,26 @@ int main() {
 						dem_factor = dem_factor * (1 + dem_rate);
 						peak_factor = peak_factor * (1 + peak_rate);
 					}
-					TempNode.Multiply("Demand", dem_factor);
-					TempNode.Multiply("PeakPower", peak_factor);
+					TempNode.Multiply(N_Demand, dem_factor);
+					TempNode.Multiply(N_PeakPower, peak_factor);
 				}
 				
 				// Store node for later use
 				Nodes.push_back(TempNode);
 				if (TempNode.isDCflow()) {
 					ListDCNodes.push_back(TempNode);
-					IdxDc.Add(k, TempStep, TempNode.Get("ShortCode"));
+					IdxDc.Add(k, TempStep, TempNode.Get(N_ShortCode));
 				}
 				
 				// Record indices to recover information
-				IdxNode.Add(k, TempStep, TempNode.Get("ShortCode"));
-				if (TempNode.Get("CostUD") != "X") {
-					IdxUd.Add(k, TempStep, TempNode.Get("ShortCode"));
-				}
-				if ((TempNode.Get("PeakPower") != "X") && TempNode.isFirstinYear()) {
+				IdxNode.Add(k, TempStep, TempNode.Get(N_ShortCode));
+				if (TempNode.Get(N_CostUD) != "X")
+					IdxUd.Add(k, TempStep, TempNode.Get(N_ShortCode));
+				
+				if ((TempNode.Get(N_PeakPower) != "X") && TempNode.isFirstinYear()) {
 					Step temp2(SName.size(), 0);
 					temp2[0] = TempStep[0];
-					IdxRm.Add(k, temp2, TempNode.Get("ShortCode"));
+					IdxRm.Add(k, temp2, TempNode.Get(N_ShortCode));
 				}
 				
 				// Move to the next step

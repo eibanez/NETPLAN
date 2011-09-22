@@ -16,7 +16,8 @@ int main (int argc, char **argv) {
 	printHeader(H_Nsga);
 	
 	// Read global parameters
-	ReadParameters("data/parameters.csv");
+	GlobalParam p;
+	ReadParameters("data/parameters.csv", &p);
 	
 	// Read indices
 	ImportIndices();

@@ -7,14 +7,16 @@
 #include <time.h>
 #include <math.h>
 #include "global.h"
+#include "arc.h"
+#include "node.h"
 extern int outputLevel;
 time_t startTime, endTime;
 
 // Structure for global parameters ****************************************************************
 GlobalParam::GlobalParam() {
 	// Node parameters
-	NodeProp = vector<string>(0);
-	NodeDefault = vector<string>(0);
+	NodeProp = vector<string>(N_SIZE);
+	NodeDefault = vector<string>(N_SIZE);
 	
 	// Arc parameters
 	ArcProp = vector<string>(0);
