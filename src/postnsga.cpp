@@ -141,7 +141,7 @@ int main (int argc, char **argv) {
 			// Solve problem
 			double objective[Nobj];
 			string returnSolution = "";
-			netplan.SolveIndividual(objective, events, returnSolution);
+			netplan.SolveIndividual(objective, events, false, &returnSolution);
 			
 			// Write objectives
 			myfile << objective[0];

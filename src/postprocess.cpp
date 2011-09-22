@@ -38,7 +38,7 @@ int main () {
 	
 	// Solve problem
 	double objective[Nobj];
-	netplan.SolveIndividual(objective, events);
+	netplan.SolveIndividual(objective, events, true);
 	
 	// Report solutions if the problem is feasible
 	if (objective[0] < 1.0e29) {

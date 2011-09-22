@@ -99,7 +99,7 @@ void CPLEX::LoadProblem() {
 }
 
 // Solves current model
-void CPLEX::SolveIndividual(double *objective, const double events[], string & returnString) {
+void CPLEX::SolveIndividual(double *objective, const double events[], const bool saveDual, string *returnString) {
 	int nyears = SLength[0];
 	
 	try {
@@ -120,7 +120,8 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 				
 			// Store solution
 			StoreSolution();
-			StoreDualSolution();
+			if (saveDual)
+				StoreDualSolution();
 			
 			// Sustainability metrics
 			vector<double> emissions = SumByRow(*solution, IdxEm);
@@ -143,18 +144,18 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 					objective[1+i] = emissions[i];
 			}
 			
-			// Write emissions and investments in output string (only for NSGA-II postprocessor)
-			if (returnString != "skip") {
-				returnString = "";
+			// Write emissions and investments in output string (only for NSGA-II postprocessor
+			if (returnString != NULL) {
+				*returnString = "";
 				
 				// Write total emissions
 				for (int i=0; i < SustMet.size(); ++i)
-					returnString += "," + ToString<double>(emissions[i]);
+					*returnString += "," + ToString<double>(emissions[i]);
 				
 				// Write investments
 				/*vector<double> Investments = SumByRow(*solution, IdxInv);
 				for (int j=0; j < Investments.size(); ++j)
-					returnString += "," + ToString<double>(Investments[j]);*/
+					*returnString += "," + ToString<double>(Investments[j]);*/
 			}
 			
 			// Resiliency calculations
@@ -208,12 +209,12 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 				}
 				
 				// Report resiliency results
-				if (returnString != "skip") {
+				if (returnString != NULL) {
 					string tempString = "";
 					
 					for (int event = 0; event < Nevents; ++event)
 						tempString += "," + ToString<double>(ResilObj[event]);
-					returnString = tempString + returnString;
+					*returnString = tempString + *returnString;
 				}
 			}
 		}
@@ -222,11 +223,6 @@ void CPLEX::SolveIndividual(double *objective, const double events[], string & r
 	} catch (...) {
 		cerr << "Unknown exception caught" << endl;
 	}
-}
-
-void CPLEX::SolveIndividual(double *objective, const double events[]) {
-	string skipString = "skip";
-	SolveIndividual(objective, events, skipString);
 }
 
 // Store complete solution vector
