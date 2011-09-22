@@ -8,7 +8,7 @@
 #include "solver.h"
 
 int main () {
-	printHeader("postprocessor");
+	printHeader(H_Post);
 	
 	// Read global parameters
 	ReadParameters("data/parameters.csv");

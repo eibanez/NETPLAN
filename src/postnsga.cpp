@@ -8,7 +8,7 @@
 #include "solver.h"
 
 int main (int argc, char **argv) {
-	printHeader("postnsga");
+	printHeader(H_Post);
 	
 	// Read global parameters
 	ReadParameters("data/parameters.csv");
@@ -175,6 +175,6 @@ int main (int argc, char **argv) {
 		cout << "\t       e.g.: ./postnsga [filename]" << endl;
 	}
 	
-	printHeader("completed");
+	printHeader(H_Completed);
 	return 0;
 }

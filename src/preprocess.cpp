@@ -8,7 +8,7 @@
 #include "netscore.h"
 
 int main() {
-	printHeader("preprocessor");
+	printHeader(H_Prep);
 	
 	cout << "- Reading global parameters...\n";
 	ReadParameters("data/parameters.csv");
@@ -606,7 +606,7 @@ int main() {
 	// Close file
 	afile.close();
 	
-	printHeader("completed");
+	printHeader(H_Completed);
 
 	return 0;
 }

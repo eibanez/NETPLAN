@@ -31,64 +31,67 @@ void printError(const string& selector, const string& field) {
 }
 
 // Print header at the beginning of execution
-void printHeader(const string& selector) {
-	if (selector == "default") {
-		cout << endl;
-		cout << "==========================================" << endl;
-		cout << "|  NETSCORE-21 Long-term planning model  |" << endl;
-		cout << "==========================================" << endl;
-		printHeader("time");
-	} else if (selector == "preprocessor") {
+void printHeader(HeaderOption selector) {
+	switch (selector) {
+	case H_Prep:
 		cout << endl;
 		cout << "==========================================" << endl;
 		cout << "|  NETSCORE-21 Long-term planning model  |" << endl;
 		cout << "|          Pre-processing module         |" << endl;
 		cout << "==========================================" << endl;
-		printHeader("time");
-	} else if (selector == "postprocessor") {
+		printHeader(H_Time);
+		break;
+	case H_Post:
 		cout << endl;
 		cout << "==========================================" << endl;
 		cout << "|  NETSCORE-21 Long-term planning model  |" << endl;
 		cout << "|         Post-processing module         |" << endl;
 		cout << "==========================================" << endl;
-		printHeader("time");
-	} else if (selector == "postnsga") {
+		printHeader(H_Time);
+		break;
+	case H_PostNsga:
 		cout << endl;
 		cout << "==========================================" << endl;
 		cout << "|  NETSCORE-21 Long-term planning model  |" << endl;
 		cout << "|     NSGA-II post-processing module     |" << endl;
 		cout << "==========================================" << endl;
-		printHeader("time");
-	} else if (selector == "benders") {
+		printHeader(H_Time);
+		break;
+	case H_Benders:
 		cout << endl;
 		cout << "==========================================" << endl;
 		cout << "|  NETSCORE-21 Long-term planning model  |" << endl;
 		cout << "|          Benders solver module         |" << endl;
 		cout << "==========================================" << endl;
-		printHeader("time");
-	} else if (selector == "nsga") {
+		printHeader(H_Time);
+		break;
+	case H_Nsga:
 		cout << endl;
 		cout << "==========================================" << endl;
 		cout << "|  NETSCORE-21 Long-term planning model  |" << endl;
 		cout << "|      NSGA-II multiobjective solver     |" << endl;
 		cout << "==========================================" << endl;
-		printHeader("time");
-	} else if (selector == "nsga-parallel") {
+		printHeader(H_Time);
+		break;
+	case H_NsgaParallel:
 		cout << endl;
 		cout << "==========================================" << endl;
 		cout << "|  NETSCORE-21 Long-term planning model  |" << endl;
 		cout << "|         NSGA-II parallel solver        |" << endl;
 		cout << "==========================================" << endl;
-		printHeader("time");
-	} else if (selector == "completed") {
+		printHeader(H_Time);
+		break;
+	case H_Completed:
 		cout << endl;
-		printHeader("elapsed");
+		printHeader(H_Elapsed);
 		cout << "===========  Process completed  ==========" << endl << endl;
-	} else if (selector == "time") {
+		break;
+	case H_Time:
 		time(&startTime);
 		cout << "  Current time: " << ctime(&startTime) << endl;
-	} else if (selector == "elapsed") {
-		time(&endTime);
+		break;
+	case H_Elapsed:
+		{ time(&endTime);
 		double difTime = difftime (endTime,startTime);
 		double hours = floor(difTime/3600), mins = floor(difTime/60) - hours * 60;
 		difTime -= hours * 3600 + mins * 60;
@@ -96,7 +99,14 @@ void printHeader(const string& selector) {
 		cout << "  Elapsed time: ";
 		if (hours > 0) cout << hours << " h ";
 		if (mins > 0) cout << mins << " m ";
-		cout << difTime << " s" << endl;
+		cout << difTime << " s" << endl; }
+		break;
+	default:
+		cout << endl;
+		cout << "==========================================" << endl;
+		cout << "|  NETSCORE-21 Long-term planning model  |" << endl;
+		cout << "==========================================" << endl;
+		printHeader(H_Time);
 	}
 }
 

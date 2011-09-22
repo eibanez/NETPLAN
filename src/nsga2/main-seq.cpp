@@ -14,7 +14,7 @@ CNSGA2* nsga2a = new CNSGA2(true, 1.0);
 CNSGA2* nsga2b = new CNSGA2(false, 0.33);
 
 int main (int argc, char **argv) {
-	printHeader("nsga-parallel");
+	printHeader(H_NsgaParallel);
 	
 	// Read global parameters
 	ReadParameters("data/parameters.csv");
@@ -55,7 +55,7 @@ int main (int argc, char **argv) {
 	nsga2a->fileio->report_pop(nsga2a->parent_pop, nsga2a->fileio->fpt1);
 	
 	for (int i = 1; i <= nsga2a->ngen; i++) {
-		printHeader("elapsed");
+		printHeader(H_Elapsed);
 		
 		// -- Evaluate (i)A -- //
 		if (i > 1) {
@@ -108,6 +108,6 @@ int main (int argc, char **argv) {
 		fprintf(nsga2a->fileio->fpt5, "\n Number of mutation of binary variable = %d", nsga2a->nbinmut + nsga2b->nbinmut);
 	}
 	
-	printHeader("completed");
+	printHeader(H_Completed);
 	return (0);
 }

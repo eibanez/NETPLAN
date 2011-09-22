@@ -20,6 +20,9 @@ using namespace std;
 typedef vector<string> VectorStr;
 typedef vector<VectorStr> MatrixStr;
 
+enum HeaderOption { H_Default, H_Prep, H_Post, H_PostNsga, H_Time, H_Benders,
+                    H_Nsga, H_NsgaParallel, H_Completed, H_Elapsed };
+
 // Global variables
 extern string SName;
 extern Step SLength;
@@ -38,7 +41,7 @@ void printError(const string& selector, const char* fileinput);
 void printError(const string& selector, const string& field);
 
 // Print header at the beginning of execution
-void printHeader(const string& selector);
+void printHeader(HeaderOption selector);
 
 // Remove comments and end of line characters
 void CleanLine(char* line);

@@ -13,7 +13,7 @@
 CNSGA2* nsga2 = new CNSGA2();
 
 int main (int argc, char **argv) {
-	printHeader("nsga");
+	printHeader(H_Nsga);
 	
 	// Read global parameters
 	ReadParameters("data/parameters.csv");
@@ -59,7 +59,7 @@ int main (int argc, char **argv) {
 	nsga2->fileio->flushIO();
 
 	for (int i = 2; i <= nsga2->ngen; i++) {
-		printHeader("elapsed");
+		printHeader(H_Elapsed);
 		nsga2->selection(nsga2->parent_pop, nsga2->child_pop);
 		nsga2->mutatePop(nsga2->child_pop);
 		nsga2->decodePop(nsga2->child_pop);
@@ -88,6 +88,6 @@ int main (int argc, char **argv) {
 		fprintf(nsga2->fileio->fpt5, "\n Number of mutation of binary variable = %d", nsga2->nbinmut);
 	}
 	
-	printHeader("completed");
+	printHeader(H_Completed);
 	return (0);
 }
