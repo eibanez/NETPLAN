@@ -13,6 +13,8 @@ time_t startTime, endTime;
 // Structure for global parameters ****************************************************************
 GlobalParam::GlobalParam() {
 	// Transportation variables
+	TransStep = "";
+	TransDummy = "XT";
 	TransInfra = vector<string>(0);
 	TransComm = vector<string>(0);
 }

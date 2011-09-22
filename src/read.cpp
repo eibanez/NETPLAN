@@ -43,7 +43,7 @@ void ReadParameters(const char* fileinput, GlobalParam *p) {
 				else if (prop == "DefInflation") inflation = value;
 				else if (prop == "DefDemandRate") demandrate = value;
 				// Transportation parameters
-				else if (prop == "TransStep") TransStep = value;
+				else if (prop == "TransStep") p->TransStep = value;
 				else if (prop == "TransInfra") p->TransInfra.push_back(value);
 				else if (prop == "TransComm") p->TransComm.push_back(value);
 				else if (prop == "TransCoal") TransCoal = value;
@@ -422,9 +422,9 @@ void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput, Gl
 	char line[CHAR_LINE];
 	int i = 0;
 	
-	TempNode.Set("Step", TransStep);
-	TempArc.Set("FromStep", TransStep);
-	TempArc.Set("ToStep", TransStep);
+	TempNode.Set("Step", p->TransStep);
+	TempArc.Set("FromStep", p->TransStep);
+	TempArc.Set("ToStep", p->TransStep);
 	
 	FILE *file = fopen(fileinput, "r");
 	if (file != NULL) {
@@ -482,8 +482,8 @@ void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput, Gl
 							TempNode.Set("ShortCode", DefNodes[k1] + from + to);
 							Nodes.push_back(TempNode);
 							
-							//Coal to transportation
-							if ((swapindex==0) && (from!=to) && (DefNodes[k1]!=TransDummy) && (DefNodes[k1][1]=='T')) {
+							// Coal to transportation
+							if ((swapindex == 0) && (from != to) && (DefNodes[k1] != p->TransDummy) && (DefNodes[k1][1] == 'T')) {
 								kk = TransCoal.find(DefNodes[k1][0]);
 								if (kk >= 0) {
 									// Check if nodes exist, if not it creates it
