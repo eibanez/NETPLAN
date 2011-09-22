@@ -11,7 +11,8 @@ int main () {
 	printHeader(H_Post);
 	
 	// Read global parameters
-	ReadParameters("data/parameters.csv");
+	GlobalParam p;
+	ReadParameters("data/parameters.csv", &p);
 	
 	// Set output level so that Benders steps are reported on screen
 	if (outputLevel == 2) outputLevel = 1;

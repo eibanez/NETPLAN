@@ -11,7 +11,8 @@ int main() {
 	printHeader(H_Prep);
 	
 	cout << "- Reading global parameters...\n";
-	ReadParameters("data/parameters.csv");
+	GlobalParam p;
+	ReadParameters("data/parameters.csv", &p);
 	
 	// Create folders to store files if it doesn't exist
 	mkdir("./prepdata", 0777);
@@ -51,7 +52,7 @@ int main() {
 	}
 	
 	cout << "- Creating transportation network...\n";
-	ReadTrans(ListNodes, ListArcs, "data/trans_List.csv");
+	ReadTrans(ListNodes, ListArcs, "data/trans_List.csv", &p);
 	
 	cout << "- Reading sustainability constraints...\n";
 	SustLimits = ReadProperties("data/sust_Limits.csv", "X", 1);

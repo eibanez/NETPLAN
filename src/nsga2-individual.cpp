@@ -11,7 +11,8 @@ int main () {
 	printHeader(H_Post);
 	
 	// Read global parameters
-	ReadParameters("data/parameters.csv");
+	GlobalParam p;
+	ReadParameters("data/parameters.csv", &p);
 	
 	// Import indices to export data
 	ImportIndices();

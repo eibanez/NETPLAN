@@ -10,6 +10,13 @@
 extern int outputLevel;
 time_t startTime, endTime;
 
+// Structure for global parameters ****************************************************************
+GlobalParam::GlobalParam() {
+	// Transportation variables
+	TransInfra = vector<string>(0);
+	TransComm = vector<string>(0);
+}
+
 // Print error messages
 void printError(const string& selector, const char* fileinput) {
 	if (selector == "warning") {

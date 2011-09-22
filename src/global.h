@@ -23,6 +23,14 @@ typedef vector<VectorStr> MatrixStr;
 enum HeaderOption { H_Default, H_Prep, H_Post, H_PostNsga, H_Time, H_Benders,
                     H_Nsga, H_NsgaParallel, H_Completed, H_Elapsed };
 
+// Structure for global parameters ****************************************************************
+struct GlobalParam {
+	GlobalParam();
+	
+	// Transportation variables
+	vector<string> TransInfra, TransComm;
+};
+
 // Global variables
 extern string SName;
 extern Step SLength;
@@ -31,7 +39,7 @@ extern string DefStep, StorageCode, DCCode, TransStep, TransDummy, TransCoal;
 extern int Npopsize, Nngen, Nobj, Nevents;
 extern string Npcross_real, Npmut_real, Neta_c, Neta_m, Npcross_bin, Npmut_bin, Nstages;
 extern double Np_start;
-extern vector<string> ArcProp, ArcDefault, NodeProp, NodeDefault, TransInfra, TransComm, StepHours, SustObj, SustMet;
+extern vector<string> ArcProp, ArcDefault, NodeProp, NodeDefault, StepHours, SustObj, SustMet;
 extern int NodePropOffset, ArcPropOffset, outputLevel;
 // Store indices to recover data after optimization
 extern Index IdxNode, IdxUd, IdxRm, IdxArc, IdxInv, IdxCap, IdxUb, IdxEm, IdxDc, IdxNsga;

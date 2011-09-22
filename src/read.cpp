@@ -10,7 +10,7 @@
 #define CHAR_LINE 15000
 
 // Read global parameters
-void ReadParameters(const char* fileinput) {
+void ReadParameters(const char* fileinput, GlobalParam *p) {
 	char* t_read;
 	string prop, value, discount = "0", inflation = "0", demandrate = "0", peakdemandrate = "0";
 	char line[CHAR_LINE];
@@ -44,8 +44,8 @@ void ReadParameters(const char* fileinput) {
 				else if (prop == "DefDemandRate") demandrate = value;
 				// Transportation parameters
 				else if (prop == "TransStep") TransStep = value;
-				else if (prop == "TransInfra") TransInfra.push_back(value);
-				else if (prop == "TransComm") TransComm.push_back(value);
+				else if (prop == "TransInfra") p->TransInfra.push_back(value);
+				else if (prop == "TransComm") p->TransComm.push_back(value);
 				else if (prop == "TransCoal") TransCoal = value;
 				// Sustainability metrics and objectives
 				else if (prop == "AddObj") SustObj.push_back(value);
@@ -354,41 +354,41 @@ vector<Arc> ReadListArcs(const char* fileinput) {
 }
 
 // Read and create transportation network
-void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput) {
+void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput, GlobalParam *p) {
 	// Create default nodes and arcs
 	vector<string> DefNodes(0), DefFrom(0), DefTo(0), DefInf(0);
 	Node TempNode;
 	Arc TempArc;
-	int NInfra = TransInfra.size(), NFleet = 0, NComm = TransComm.size(), k = 0;
+	int NInfra = p->TransInfra.size(), NFleet = 0, NComm = p->TransComm.size(), k = 0;
 	string Infra = "", Fleet = "", FleetInf = "", Comm = "", Coal = "";
 	
 	// Determine the number of fleet
 	for (unsigned int i = 0; i < NInfra; ++i)
-		NFleet += TransInfra[i].size()-1;
+		NFleet += p->TransInfra[i].size() - 1;
 	
 	vector< vector<bool> > NodeTable(0), ArcTable(0);
 	vector<bool> TableColumn(NFleet, false);
 	
 	// For each line in the definition of infrastructures
 	for (unsigned int i = 0; i < NInfra; ++i) {
-		Infra.push_back(TransInfra[i][0]);
+		Infra.push_back(p->TransInfra[i][0]);
 		
 		// Create an arc (for infrastructure capacity constraints)
-		DefFrom.push_back(TransInfra[i].substr(0,1) + TransInfra[i].substr(0,1));
+		DefFrom.push_back(p->TransInfra[i].substr(0, 1) + p->TransInfra[i].substr(0, 1));
 		DefTo.push_back("XX");
 		DefInf.push_back("");
 		ArcTable.push_back(TableColumn);
 		
 		// For each fleet within that infrastructure
-		for (unsigned int j = 1; j < TransInfra[i].size(); ++j) {
+		for (unsigned int j = 1; j < p->TransInfra[i].size(); ++j) {
 			// Create an arc (for fleet capacity constraints)
-			DefFrom.push_back(TransInfra[i].substr(j,1) + TransInfra[i].substr(j,1));
+			DefFrom.push_back(p->TransInfra[i].substr(j,1) + p->TransInfra[i].substr(j,1));
 			DefTo.push_back("XX");
 			DefInf.push_back("");
 			ArcTable.push_back(TableColumn);
 			
-			Fleet.push_back(TransInfra[i][j]);
-			FleetInf.push_back(TransInfra[i][0]);
+			Fleet.push_back(p->TransInfra[i][j]);
+			FleetInf.push_back(p->TransInfra[i][0]);
 			
 			ArcTable[ArcTable.size()-1][k] = true;
 			ArcTable[ArcTable.size()-j-1][k] = true;
@@ -398,18 +398,18 @@ void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput) {
 	
 	// For each commodity
 	for (unsigned int i = 0; i < NComm; ++i) {
-		Comm.push_back(TransComm[i][0]);
-		DefNodes.push_back(TransComm[i].substr(0,1) + "T");
+		Comm.push_back(p->TransComm[i][0]);
+		DefNodes.push_back(p->TransComm[i].substr(0, 1) + "T");
 		NodeTable.push_back(TableColumn);
 		
-		for (unsigned int j = 1; j < TransComm[i].size(); ++j) {
+		for (unsigned int j = 1; j < p->TransComm[i].size(); ++j) {
 			// Find for each fleet that the commodity can use
-			k = Fleet.find(TransComm[i][j]);
+			k = Fleet.find(p->TransComm[i][j]);
 			if (k >= 0) {
 				// Create arc
-				DefFrom.push_back(Fleet.substr(k,1) + Fleet.substr(k,1));
-				DefTo.push_back(TransComm[i].substr(0,1) + "T");
-				DefInf.push_back(FleetInf.substr(k,1) + FleetInf.substr(k,1));
+				DefFrom.push_back(Fleet.substr(k, 1) + Fleet.substr(k,1));
+				DefTo.push_back(p->TransComm[i].substr(0, 1) + "T");
+				DefInf.push_back(FleetInf.substr(k, 1) + FleetInf.substr(k, 1));
 				ArcTable.push_back(TableColumn);
 				
 				ArcTable[ArcTable.size()-1][k] = true;

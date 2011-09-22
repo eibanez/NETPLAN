@@ -19,7 +19,7 @@ string DefStep = "", StorageCode = "S", DCCode = "", TransStep = "", TransDummy 
 int Npopsize = 20, Nngen = 200, Nobj = 1, Nevents = 0;
 string Npcross_real = "0.75", Npmut_real = "0.2", Neta_c = "7", Neta_m = "20", Npcross_bin = "0.4", Npmut_bin = "0.7", Nstages = "2";
 double Np_start = 0.5;
-vector<string> ArcProp(0), ArcDefault(0), NodeProp(0), NodeDefault(0), TransInfra(0), TransComm(0), StepHours(0), SustObj(0), SustMet(0);
+vector<string> ArcProp(0), ArcDefault(0), NodeProp(0), NodeDefault(0), StepHours(0), SustObj(0), SustMet(0);
 int NodePropOffset = 0, ArcPropOffset = 0, outputLevel = 2;
 // Store indices to recover data after optimization
 Index IdxNode, IdxUd, IdxRm, IdxArc, IdxInv, IdxCap, IdxUb, IdxEm, IdxDc, IdxNsga;
