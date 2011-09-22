@@ -7,11 +7,7 @@
 //        http://www.iitk.ac.in/kangal/codes.shtml
 // --------------------------------------------------------------
 
-using namespace std;
 #include "CNSGA2.h"
-#include <fstream>
-#include <string>
-#include <vector>
 #include "../netscore.h"
 
 CNSGA2* nsga2a = new CNSGA2(true, 1.0);

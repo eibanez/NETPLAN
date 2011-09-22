@@ -4,13 +4,8 @@
 //    2009-2011 (c) Eduardo Ibanez
 // --------------------------------------------------------------
 
-using namespace std;
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include "netscore.h"
 #include <sys/stat.h>
+#include "netscore.h"
 
 int main() {
 	printHeader("preprocessor");

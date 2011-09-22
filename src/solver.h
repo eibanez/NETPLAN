@@ -6,12 +6,6 @@
 
 #ifndef _SOLVER_H_
 #define _SOLVER_H_
-
-using namespace std;
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
 #include "global.h"
 #include <ilcplex/ilocplex.h>
 

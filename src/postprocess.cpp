@@ -4,15 +4,8 @@
 //    2009-2011 (c) Eduardo Ibanez
 // --------------------------------------------------------------
 
-using namespace std;
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
 #include "netscore.h"
 #include "solver.h"
-#include <ilcplex/ilocplex.h>
-ILOSTLBEGIN
 
 int main () {
 	printHeader("postprocessor");

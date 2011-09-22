@@ -7,7 +7,11 @@
 #ifndef _GLOBAL_H_
 #define _GLOBAL_H_
 
+using namespace std;
+#include <iostream>
+#include <fstream>
 #include <string>
+#include <vector>
 #include <sstream>
 #include "step.h"
 #include "index.h"

@@ -4,12 +4,9 @@
 //    2009-2011 (c) Eduardo Ibanez
 // --------------------------------------------------------------
 
-using namespace std;
-#include <iostream>
-#include <fstream>
-#include <string>
 #include <time.h>
 #include <math.h>
+#include "global.h"
 extern int outputLevel;
 time_t startTime, endTime;
 

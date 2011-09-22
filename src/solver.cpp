@@ -4,16 +4,12 @@
 //    2009-2011 (c) Eduardo Ibanez
 // --------------------------------------------------------------
 
-using namespace std;
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
 #include "global.h"
 #include "index.h"
 #include "read.h"
 #include "write.h"
 #include "solver.h"
+ILOSTLBEGIN
 
 CPLEX::CPLEX() : env() {
 	try {
