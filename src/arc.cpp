@@ -14,35 +14,36 @@ Arc::Arc() :
 	Trans2Energy(0) {}
 
 Arc::Arc(const Arc& rhs) :
-	Properties(rhs.GetVecStr("Properties")),
-	Energy2Trans(rhs.GetBool("Energy2Trans")),
-	Trans2Energy(rhs.GetVecStr("Trans2Energy")) {}
+	Properties(rhs.Properties),
+	Trans2Energy(rhs.Trans2Energy) {
+	Energy2Trans = rhs.Energy2Trans;
+}
 
 // This constructor creates an arc going in the opposite direction
 Arc::Arc(const Arc& rhs, const bool reverse) :
-	Properties(rhs.GetVecStr("Properties")),
-	Energy2Trans(rhs.GetBool("Energy2Trans")),
-	Trans2Energy(rhs.GetVecStr("Trans2Energy")) {
-		if (reverse) {
-			if (!isTransport()) {
-				string temp = Get("To");
-				Set("To", Get("From"));
-				Set("From", temp);
-			} else {
-				string temp = Get("From");
-				Set("From", temp.substr(0,2) + temp.substr(4,2) + temp.substr(2,2));
-				temp = Get("To");
-				Set("To", temp.substr(0,2) + temp.substr(4,2) + temp.substr(2,2));
-			}
+	Properties(rhs.Properties),
+	Trans2Energy(rhs.Trans2Energy) {
+	Energy2Trans = rhs.Energy2Trans;
+	if (reverse) {
+		if (!isTransport()) {
+			string temp = Get("To");
+			Set("To", Get("From"));
+			Set("From", temp);
+		} else {
+			string temp = Get("From");
+			Set("From", temp.substr(0,2) + temp.substr(4,2) + temp.substr(2,2));
+			temp = Get("To");
+			Set("To", temp.substr(0,2) + temp.substr(4,2) + temp.substr(2,2));
 		}
 	}
+}
 
 Arc::~Arc() {}
 
 Arc& Arc::operator=(const Arc& rhs) {
-	Properties = rhs.GetVecStr("Properties");
-	Energy2Trans = rhs.GetBool("Energy2Trans");
-	Trans2Energy = rhs.GetVecStr("Trans2Energy");
+	Properties = rhs.Properties;
+	Energy2Trans = rhs.Energy2Trans;
+	Trans2Energy = rhs.Trans2Energy;
 	return *this;
 }
 
@@ -70,27 +71,6 @@ double Arc::GetDouble(const string& selector) const {
 	output = (Get(selector) != "X") ? atof(Get(selector).c_str()) : 0;
 	return output;
 }
-
-// Read a boolean property
-bool Arc::GetBool(const string& selector) const {
-	bool temp_output;
-	if (selector == "Energy2Trans") temp_output = Energy2Trans;
-	else printError("arcread", selector);
-	
-	return temp_output;
-};
-
-// Read an entire vector of string properties
-vector<string> Arc::GetVecStr(const string& selector) const {
-	vector<string> temp_output;
-	if (selector == "Properties")
-		temp_output = Properties;
-	else if (selector == "Trans2Energy")
-		temp_output = Trans2Energy;
-	else
-		printError("arcread", selector);
-	return temp_output;
-};
 
 // Modify a propery
 void Arc::Set(const string& selector, const string& input){
