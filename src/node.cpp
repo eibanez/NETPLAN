@@ -4,20 +4,21 @@
 //    2009-2011 (c) Eduardo Ibanez
 // --------------------------------------------------------------
 
-#include "global.h"
 #include "node.h"
 
 // Contructors and destructor for the Node class
-Node::Node(GlobalParam *p) : Properties(p->NodeDefault) {}
+Node::Node(GlobalParam *prop) : Properties(prop->NodeDefault) {
+	isDCflow = false;
+	p = prop;
+}
 
-Node::Node(const Node& rhs) : Properties(rhs.Properties) {}
+Node::Node(const Node& rhs) : Properties(rhs.Properties) {
+	isDCflow = rhs.isDCflow;
+	p = rhs.p;
+}
 
 Node::~Node() {}
 
-Node& Node::operator=(const Node& rhs) {
-	Properties = rhs.Properties;
-	return *this;
-}
 
 // Read a node property in string format
 string Node::Get(const Node_Prop selector) const {
@@ -36,6 +37,9 @@ double Node::GetDouble(const Node_Prop selector) const {
 // Modify a property
 void Node::Set(const Node_Prop selector, const string& input){
 	Properties[selector] = input;
+	
+	if (selector == N_ShortCode)
+		isDCflow = (input.substr(0,2) == DCCode) && useDCflow;
 };
 
 // Multiply stored values by 'value'
@@ -118,11 +122,6 @@ string Node::DCNodesBounds() const {
 }
 
 // ****** Boolean functions ******
-// Is Node a DC node and are we considering DC flow in the model?
-bool Node::isDCflow() const {
-	return (Properties[N_ShortCode].substr(0,2) == DCCode) && useDCflow;
-}
-
 // Is this the first node in a year?
 bool Node::isFirstinYear() const {
 	bool output = true;

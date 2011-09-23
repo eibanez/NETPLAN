@@ -7,16 +7,17 @@
 #ifndef _NODE_H_
 #define _NODE_H_
 
+#include "global.h"
+
 enum Node_Prop { N_Code, N_ShortCode, N_Step, N_StepLength, N_Demand,
                  N_DemandPower, N_DemandRate, N_PeakPower, N_PeakPowerRate,
                  N_CostUD, N_Discount_Rate, N_InflationRate, N_SIZE, N_OFFSET = 4 };
 
 // Declare class type to hold node information
 struct Node {
-	Node(GlobalParam *p);
+	Node(GlobalParam *prop);
 	Node(const Node& rhs);
 	~Node();
-	Node& operator=(const Node& rhs);
 	
 	string Get(const Node_Prop selector) const;
 	double GetDouble(const Node_Prop selector) const;
@@ -32,11 +33,12 @@ struct Node {
 	string NodeRhs() const;
 	string DCNodesBounds() const;
 	
-	bool isDCflow() const;
 	bool isFirstinYear() const;
 	
 	// Variables
 	vector<string> Properties;
+	bool isDCflow;
+	GlobalParam *p;
 };
 
 #endif  // _NODE_H_

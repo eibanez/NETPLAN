@@ -118,7 +118,7 @@ int main() {
 				
 				// Store node for later use
 				Nodes.push_back(TempNode);
-				if (TempNode.isDCflow()) {
+				if (TempNode.isDCflow) {
 					ListDCNodes.push_back(TempNode);
 					IdxDc.Add(k, TempStep, TempNode.Get(N_ShortCode));
 				}
