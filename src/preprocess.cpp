@@ -7,6 +7,12 @@
 #include <sys/stat.h>
 #include "netscore.h"
 
+// Given a matrix of values, finds the row that fits best to a code
+int FindCode(const string& mystr, const MatrixStr mymatrix);
+int FindCode(const string& strfrom, const string& strto, const MatrixStr mymatrix);
+int FindCode(const Node& mynode, const MatrixStr mymatrix);
+int FindCode(const Arc& myarc, const MatrixStr mymatrix);
+
 int main() {
 	printHeader(H_Prep);
 	
@@ -615,3 +621,92 @@ int main() {
 
 	return 0;
 }
+
+
+// Given a matrix of values, finds the row that fits best to a code. It tries to match the whole code, two or one letters.
+int FindCode(const string& mystr, const MatrixStr mymatrix) {
+	int output = -1, no_char = -1, one_char = -1, two_char = -1, k = 0;
+	
+	while ((k < mymatrix.size()) && (output == -1)) {
+		string val = mymatrix[k][0];
+		if (val == mystr)                   output = k;
+		else if (val == "")                 no_char = k;
+		else if (val == mystr.substr(0,1))  one_char = k;
+		else if (val == mystr.substr(0,2))  two_char = k;
+		++k;
+	}
+	
+	if (output == -1) {
+		if (no_char != -1)   output = no_char;
+		if (one_char != -1)  output = one_char;
+		if (two_char != -1)  output = two_char;
+	}
+	
+	return output;
+}
+
+// This function has the same porpuse, but prepared for arcs
+int FindCode(const string& strfrom, const string& strto, const MatrixStr mymatrix) {
+	int output = -1, one_one = -1, one_two = -1, one_all = -1, two_two = -1, two_all = -1, k = 0;
+	int zero_zero = -1, zero_one = -1, zero_two = -1, zero_all = -1;
+	
+		while ((k < mymatrix.size()) && (output == -1)) {
+			string Mfrom = mymatrix[k][0], Mto = mymatrix[k][1];
+			if (Mfrom == strfrom) {
+				if (Mto == strto)                   output = k;
+				else if (Mto == strto.substr(0,1))  one_all = k;
+				else if (Mto == strto.substr(0,2))  two_all = k;
+				else if (Mto == "")                 zero_all = k;
+			} else if (Mfrom == strfrom.substr(0,2)) {
+				if (strto == mymatrix[k][1])        two_all = k;
+				else if (Mto == strto.substr(0,1))  one_two = k;
+				else if (Mto == strto.substr(0,2))  two_two = k;
+				else if (Mto == "")                 zero_two = k;
+			} else if (Mfrom == strfrom.substr(0,1)) {
+				if (Mto == strto)                   one_all = k;
+				else if (Mto == strto.substr(0,1))  one_one = k;
+				else if (Mto == strto.substr(0,2))  one_two = k;
+				else if (Mto == "")                 zero_one = k;
+			} else if (Mfrom == "") {
+				if (Mto == strto)                   zero_all = k;
+				else if (Mto == strto.substr(0,1))  zero_one = k;
+				else if (Mto == strto.substr(0,2))  zero_two = k;
+				else if (Mto == "")                 zero_zero = k;
+			}
+			++k;
+		}
+	
+	if (output == -1) {
+		if (zero_zero != -1) output = zero_zero;
+		if (zero_one != -1)  output = zero_one;
+		if (zero_two != -1)  output = zero_two;
+		if (zero_all != -1)  output = zero_all;
+		if (one_one != -1)   output = one_one;
+		if (one_two != -1)   output = one_two;
+		if (one_all != -1)   output = one_all;
+		if (two_two != -1)   output = two_two;
+		if (two_all != -1)   output = two_all;
+	}
+	
+	return output;
+}
+
+// Shortcuts for nodes and arcs
+int FindCode(const Node& mynode, const MatrixStr mymatrix) {
+	return FindCode(mynode.ShortCode, mymatrix);
+}
+
+int FindCode(const Arc& myarc, const MatrixStr mymatrix) {
+	int output = -1;
+	// Look for properties for the arc in the opposite direction
+	Arc myarc2(myarc, true);
+	if (myarc.isBidirect() || myarc.isTransport()) {
+		int code1 = FindCode(myarc.Get("From"), myarc.Get("To"), mymatrix);
+		int code2 = FindCode(myarc2.Get("From"), myarc2.Get("To"), mymatrix);
+		output = (code1 >= code2) ? code1 : code2;
+	} else {
+		output = FindCode(myarc.Get("From"), myarc.Get("To"), mymatrix);
+	}
+	return output;
+}
+
