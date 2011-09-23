@@ -118,7 +118,7 @@ GlobalStep::GlobalStep(string text, vector<string>& shrs) {
 	Col = vector<int>(MaxPos);
 	Text = vector<string>(MaxPos);
 	Hours = vector<int>(MaxPos);
-	FirstYear = vector<bool>(MaxPos);
+	isFirstYear = vector<bool>(MaxPos);
 	int pos, prevpos = -1;
 	
 	// i represents the number of digits
@@ -132,16 +132,21 @@ GlobalStep::GlobalStep(string text, vector<string>& shrs) {
 		while (pos < MaxPos) {
 			// String representation
 			string str = "";
-			for (unsigned int k = 0; k < SName.size(); ++k)
-				if (refStep[k] > 0)
-					str += SName.substr(k,1 ) + ToString<int>(refStep[k]);
+			for (int j = 0; j <= i; ++j)
+				str += Chars.substr(j, 1) + ToString<int>(refStep[j]);
 			Text[pos] = str;
 			
-			// StepLength
+			// Step length
 			if (refStep.back() == 0)
 				Hours[pos] = stephours[i];
 			else
 				Hours[pos] = stephours[i + refStep.back() - 1];
+			
+			// Is it the first in the year?
+			bool isFirst = true;
+			for (int j = 0; j <= i; ++j)
+				isFirst = isFirst && (refStep[j] == 1);
+			isFirstYear[pos] = isFirst;
 			
 			// Next step
 			prevpos = pos;

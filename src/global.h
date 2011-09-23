@@ -52,7 +52,7 @@ struct GlobalStep {
 	
 	vector<int> NextStep, Col, Hours, Length, Year;
 	vector<string> Text, YearString;
-	vector<bool> FirstYear;
+	vector<bool> isFirstYear;
 	string Chars, YearChar;
 	int NumYears, MaxPos;
 };
