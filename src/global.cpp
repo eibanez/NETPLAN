@@ -38,6 +38,8 @@ GlobalParam::GlobalParam() {
 
 // Step variables *********************************************************************************
 GlobalStep::GlobalStep(string text, vector<string>& shrs) {
+	
+	
 	using std::replace;
 	
 	// Isolate characters that are not numbers
@@ -54,7 +56,7 @@ GlobalStep::GlobalStep(string text, vector<string>& shrs) {
 	replace(tChars.begin(), tChars.end(), '9', '\0');
 	
 	Chars = "";
-	for (unsigned int k = 0; k < tChars.size(); k++) 
+	for (unsigned int k = 0; k < tChars.size(); ++k)
 		if (tChars[k] != '\0')
 			Chars.push_back(tChars[k]);
 	
@@ -70,7 +72,7 @@ GlobalStep::GlobalStep(string text, vector<string>& shrs) {
 	
 	// Maximum position, lengths of different steps and num of years
 	Length = vector<int>(Chars.size(), 0);
-	MaxPos = 0;
+	MaxPos = MaxStep.front();
 	Length[0] = MaxStep.front();
 	NumYears = MaxStep.front();
 	YearChar = Chars.substr(0, 1);
@@ -110,6 +112,59 @@ GlobalStep::GlobalStep(string text, vector<string>& shrs) {
 		stephours.insert(stephours.begin(), temp_hour);
 		temp_hour = temp_hour * MaxStep[j];
 	}
+	
+	// Columns, next steps, strings, and step hours
+	NextStep = vector<int>(MaxPos);
+	Col = vector<int>(MaxPos);
+	Text = vector<string>(MaxPos);
+	Hours = vector<int>(MaxPos);
+	FirstYear = vector<bool>(MaxPos);
+	int pos, prevpos = -1;
+	
+	// i represents the number of digits
+	for (int i = 0; i < Chars.size(); ++i) {
+		vector<int> refStep(Chars.size(), 0);
+		for (int j = 0; j <= i; ++j)
+			refStep[j] = 1;
+		
+		pos = i;
+		
+		while (pos < MaxPos) {
+			// String representation
+			string str = "";
+			for (unsigned int k = 0; k < SName.size(); ++k)
+				if (refStep[k] > 0)
+					str += SName.substr(k,1 ) + ToString<int>(refStep[k]);
+			Text[pos] = str;
+			
+			// StepLength
+			if (refStep.back() == 0)
+				Hours[pos] = stephours[i];
+			else
+				Hours[pos] = stephours[i + refStep.back() - 1];
+			
+			// Next step
+			prevpos = pos;
+			++refStep[i];
+			for (int k = i; k >= 1; --k) {
+				if (refStep[k] > MaxStep[k]) {
+					refStep[k] -= MaxStep[k];
+					++refStep[k - 1];
+				}
+			}
+			
+			// Next position
+			pos = -1;
+			for (int j = 0; j <= i; ++j) {
+				int temp_size = 1;
+				for (int k = Chars.size() - 1; k > j; --k)
+					temp_size = temp_size * MaxStep[k] + 1;
+				
+				pos += (refStep[j] - 1) * temp_size + 1;
+			}
+			NextStep[prevpos] = pos;
+		}
+	}
 }
 
 
@@ -130,6 +185,7 @@ void printError(const string& selector, const string& field) {
 	else if (selector == "nodestep")  cout << "\tERROR: Node '" << field << "' without defined step\n";
 	else if (selector == "arcstep")   cout << "\tERROR: Arc '" << field << "' without defined step\n";
 	else if (selector == "parameter") cout << "\tERROR: General parameter '" << field << "' caused a problem\n";
+	else if (selector == "step")      cout << "\tERROR: Missing step value 'StepLength'" << endl;
 	else                              cout << "\tERROR and error code '" << selector << "' not defined\n";
 }
 

@@ -12,7 +12,7 @@
 // Read global parameters
 void ReadParameters(const char* fileinput, GlobalParam *p) {
 	char* t_read;
-	string prop, value, discount = "0", inflation = "0", demandrate = "0", peakdemandrate = "0";
+	string prop, value, discount = "0", inflation = "0", demandrate = "0", peakdemandrate = "0", step = "";
 	char line[CHAR_LINE];
 	
 	FILE *file = fopen(fileinput, "r");
@@ -33,8 +33,10 @@ void ReadParameters(const char* fileinput, GlobalParam *p) {
 				
 				// Apply read item
 				if (prop == "StepName") SName = value;
-				else if (prop == "StepLength") SLength = Str2Step(value);
-				else if (prop == "StepHours") StepHours.push_back(value);
+				else if (prop == "StepLength") {
+					SLength = Str2Step(value);
+					step = value;
+				} else if (prop == "StepHours") StepHours.push_back(value);
 				else if (prop == "UseDCFlow") useDCflow = (value == "true" || value == "True" || value == "TRUE");
 				else if (prop == "OutputLevel") outputLevel = atoi(value.c_str());
 				else if (prop == "CodeDC") DCCode = value;
@@ -73,7 +75,7 @@ void ReadParameters(const char* fileinput, GlobalParam *p) {
 	} else { printError("error", fileinput); }
 	
 	// Initialize time steps
-	p->s = new GlobalStep(Step2Str(SLength), StepHours);
+	p->s = new GlobalStep(value, StepHours);
 	
 	// Calculate how many hours are there for each step and store it in StepHours
 	int laststep = SLength[SName.size()-1], temp_hour = 0;

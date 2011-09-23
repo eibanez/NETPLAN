@@ -50,7 +50,7 @@ struct GlobalParam {
 struct GlobalStep {
 	GlobalStep(string text, vector<string>& shrs);
 	
-	vector<int> NextStep, Col, StepHours, Length, Year;
+	vector<int> NextStep, Col, Hours, Length, Year;
 	vector<string> Text, YearString;
 	vector<bool> FirstYear;
 	string Chars, YearChar;
