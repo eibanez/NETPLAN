@@ -8,11 +8,13 @@
 
 // Contructors and destructor for the Node class
 Node::Node(GlobalParam *prop) : Properties(prop->NodeDefault) {
+	ShortCode = "";
 	isDCflow = false;
 	p = prop;
 }
 
 Node::Node(const Node& rhs) : Properties(rhs.Properties) {
+	ShortCode = rhs.ShortCode;
 	isDCflow = rhs.isDCflow;
 	p = rhs.p;
 }
@@ -22,7 +24,13 @@ Node::~Node() {}
 
 // Read a node property in string format
 string Node::Get(const Node_Prop selector) const {
-	return Properties[selector];
+	switch (selector) {
+	case N_ShortCode:
+		return ShortCode;
+		break;
+	default:
+		return Properties[selector];
+	}
 };
 
 // Read a property as a double
@@ -36,10 +44,14 @@ double Node::GetDouble(const Node_Prop selector) const {
 
 // Modify a property
 void Node::Set(const Node_Prop selector, const string& input){
-	Properties[selector] = input;
-	
-	if (selector == N_ShortCode)
+	switch (selector) {
+	case N_ShortCode:
+		ShortCode = input;
 		isDCflow = (input.substr(0,2) == DCCode) && useDCflow;
+		break;
+	default:
+		Properties[selector] = input;
+	}
 };
 
 // Multiply stored values by 'value'
@@ -53,7 +65,6 @@ void Node::Multiply(const Node_Prop selector, const double value) {
 int Node::Time() const {
 	return Str2Step(Properties[N_Step])[0];
 }
-
 
 // ****** MPS output functions ******
 string Node::NodeNames() const {

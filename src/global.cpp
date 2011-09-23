@@ -4,6 +4,7 @@
 //    2009-2011 (c) Eduardo Ibanez
 // --------------------------------------------------------------
 
+#include <algorithm>
 #include <time.h>
 #include <math.h>
 #include "global.h"
@@ -12,7 +13,7 @@
 extern int outputLevel;
 time_t startTime, endTime;
 
-// Structure for global parameters ****************************************************************
+// Global parameters ******************************************************************************
 GlobalParam::GlobalParam() {
 	// Node parameters
 	NodeProp = vector<string>(N_SIZE);
@@ -30,7 +31,87 @@ GlobalParam::GlobalParam() {
 	
 	// Common parameters
 	string DefStep = "";
+	
+	// Steps
+	s = NULL;
 }
+
+// Step variables *********************************************************************************
+GlobalStep::GlobalStep(string text, vector<string>& shrs) {
+	using std::replace;
+	
+	// Isolate characters that are not numbers
+	string tChars = text;
+	replace(tChars.begin(), tChars.end(), '0', '\0');
+	replace(tChars.begin(), tChars.end(), '1', '\0');
+	replace(tChars.begin(), tChars.end(), '2', '\0');
+	replace(tChars.begin(), tChars.end(), '3', '\0');
+	replace(tChars.begin(), tChars.end(), '4', '\0');
+	replace(tChars.begin(), tChars.end(), '5', '\0');
+	replace(tChars.begin(), tChars.end(), '6', '\0');
+	replace(tChars.begin(), tChars.end(), '7', '\0');
+	replace(tChars.begin(), tChars.end(), '8', '\0');
+	replace(tChars.begin(), tChars.end(), '9', '\0');
+	
+	Chars = "";
+	for (unsigned int k = 0; k < tChars.size(); k++) 
+		if (tChars[k] != '\0')
+			Chars.push_back(tChars[k]);
+	
+	// Store the values for the maximum step
+	vector<int> MaxStep(Chars.size(), 0);
+	size_t found;
+	int zeros = 0;
+	for (unsigned int k = 0; k < Chars.size(); ++k) {
+		found = text.find(Chars[k]);
+		if (found != string::npos)
+			MaxStep[k] = atoi(text.substr(found + 1).c_str());
+	}
+	
+	// Maximum position, lengths of different steps and num of years
+	Length = vector<int>(Chars.size(), 0);
+	MaxPos = 0;
+	Length[0] = MaxStep.front();
+	NumYears = MaxStep.front();
+	YearChar = Chars.substr(0, 1);
+	for (unsigned int j = 1; j < Chars.size(); ++j) {
+		Length[j] = Length[j - 1] * MaxStep[j];
+		MaxPos += Length[j];
+	}
+	
+	// What year does the position belong?
+	Year = vector<int>(0);
+	YearString = vector<string>(0);
+	for (int i = 1; i <= NumYears; ++i) {
+		for (int j = 0; j < MaxPos / NumYears; ++j) {
+			Year.push_back(i);
+			YearString.push_back(YearChar + ToString<int>(i));
+		}
+	}
+	
+	// Calculate how many hours are there for each step
+	int laststep = MaxStep[Chars.size() - 1], temp_hour = 0;
+	vector<int> stephours(laststep, 1);
+	if (shrs.size() == 0) {
+		temp_hour = laststep;
+	} else if (shrs.size() == laststep) {
+		for (int i = 0; i < laststep; ++i) {
+			stephours[i] = atoi(shrs[i].c_str());
+			temp_hour += stephours[i];
+		}
+	} else {
+		if (shrs.size() > 1)
+			printError("parameter", string("StepHours"));
+		for (int i = 0; i < laststep; ++i)
+			stephours[i] = atoi(shrs[0].c_str());
+		temp_hour = laststep * stephours[0];
+	}
+	for (int j = Chars.size() - 2; j >= 0; --j) {
+		stephours.insert(stephours.begin(), temp_hour);
+		temp_hour = temp_hour * MaxStep[j];
+	}
+}
+
 
 // Print error messages
 void printError(const string& selector, const char* fileinput) {

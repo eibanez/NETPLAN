@@ -9,9 +9,10 @@
 
 #include "global.h"
 
-enum Node_Prop { N_Code, N_ShortCode, N_Step, N_StepLength, N_Demand,
+enum Node_Prop { N_Code, N_Step, N_StepLength, N_Demand,
                  N_DemandPower, N_DemandRate, N_PeakPower, N_PeakPowerRate,
-                 N_CostUD, N_Discount_Rate, N_InflationRate, N_SIZE, N_OFFSET = 4 };
+                 N_CostUD, N_Discount_Rate, N_InflationRate, N_SIZE,
+                 N_ShortCode, N_OFFSET = N_Demand };
 
 // Declare class type to hold node information
 struct Node {
@@ -37,6 +38,7 @@ struct Node {
 	
 	// Variables
 	vector<string> Properties;
+	string ShortCode;
 	bool isDCflow;
 	GlobalParam *p;
 };

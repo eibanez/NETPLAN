@@ -72,6 +72,9 @@ void ReadParameters(const char* fileinput, GlobalParam *p) {
 		fclose(file);
 	} else { printError("error", fileinput); }
 	
+	// Initialize time steps
+	p->s = new GlobalStep(Step2Str(SLength), StepHours);
+	
 	// Calculate how many hours are there for each step and store it in StepHours
 	int laststep = SLength[SName.size()-1], temp_hour = 0;
 	if (StepHours.size() == 0) {
@@ -103,7 +106,6 @@ void ReadParameters(const char* fileinput, GlobalParam *p) {
 	
 	// Declare a vector with the node property codes
 	p->NodeProp[N_Code] = "Code";
-	p->NodeProp[N_ShortCode] = "ShortCode";
 	p->NodeProp[N_Step] = "Step";
 	p->NodeProp[N_StepLength] = "StepLength";
 	p->NodeProp[N_Demand] = "Demand";
@@ -117,7 +119,6 @@ void ReadParameters(const char* fileinput, GlobalParam *p) {
 	
 	// Default node properties
 	p->NodeDefault[N_Code] = "X";
-	p->NodeDefault[N_ShortCode] = "X";
 	p->NodeDefault[N_Step] = p->DefStep;
 	p->NodeDefault[N_StepLength] = "X";
 	p->NodeDefault[N_Demand] = "0";

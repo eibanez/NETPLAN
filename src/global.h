@@ -22,8 +22,9 @@ typedef vector<VectorStr> MatrixStr;
 
 enum HeaderOption { H_Default, H_Prep, H_Post, H_PostNsga, H_Time, H_Benders,
                     H_Nsga, H_NsgaParallel, H_Completed, H_Elapsed };
+struct GlobalStep;
 
-// Structure for global parameters ****************************************************************
+// Global parameters ******************************************************************************
 struct GlobalParam {
 	GlobalParam();
 	
@@ -39,7 +40,23 @@ struct GlobalParam {
 	
 	// Common parameters
 	string DefStep;
+	
+	// Steps
+	GlobalStep *s;
 };
+
+
+// Step variables *********************************************************************************
+struct GlobalStep {
+	GlobalStep(string text, vector<string>& shrs);
+	
+	vector<int> NextStep, Col, StepHours, Length, Year;
+	vector<string> Text, YearString;
+	vector<bool> FirstYear;
+	string Chars, YearChar;
+	int NumYears, MaxPos;
+};
+
 
 // Global variables
 extern string SName;
