@@ -43,6 +43,7 @@ struct GlobalParam {
 	
 	// Steps
 	GlobalStep *s;
+	MatrixStr NStep;
 };
 
 

@@ -22,14 +22,13 @@ int main() {
 	// Variables to store information
 	vector<Node> ListNodes(0, Node(&p)), Nodes(0, Node(&p)), ListDCNodes(0, Node(&p));
 	vector<Arc> ListArcs(0, Arc(&p)), Arcs(0, Arc(&p)), ListDCArcs(0, Arc(&p));
-	MatrixStr NStep(0), ATransEnergy(0), SustLimits(0);
+	MatrixStr ATransEnergy(0), SustLimits(0);
 	vector<MatrixStr> NVectorProp(0), AVectorProp(0);
 	vector<int> NVectorIndex(p.NodeProp.size() - N_OFFSET, -1), AVectorIndex(ArcProp.size() - ArcPropOffset, -1);
 	
-	cout << "- Reading list of nodes...\n";
+	cout << "- Reading node list and data...\n";
+	p.NStep = ReadStep("data/nodes_Step.csv");
 	ListNodes = ReadListNodes("data/nodes_List.csv", &p);
-	cout << "- Reading node data...\n";
-	NStep = ReadStep("data/nodes_Step.csv");
 	for (unsigned int t = N_OFFSET; t < p.NodeProp.size(); ++t) {
 		string file_name = "data/nodes_" + p.NodeProp[t] + ".csv";
 		NVectorProp.push_back(ReadProperties(file_name.c_str(), p.NodeDefault[t], 1));
@@ -63,7 +62,7 @@ int main() {
 		// Print progress
 		cout << "\r- Expanding nodes... " << k+1 << " / " << ListNodes.size() << flush;
 		
-		int StepIndex = FindCode(ListNodes[k], NStep);
+		int StepIndex = FindCode(ListNodes[k], p.NStep);
 		
 		// Identify the row containing data for each property
 		for (unsigned int t = 0; t < NVectorIndex.size(); ++t)
@@ -71,7 +70,7 @@ int main() {
 		
 		// Copy step information
 		if (StepIndex >= 0)
-			ListNodes[k].Set(N_Step, NStep[StepIndex][1]);
+			ListNodes[k].Set(N_Step, p.NStep[StepIndex][1]);
 		
 		if (ListNodes[k].Get(N_Step) == "") {
 			printError("nodestep", ListNodes[k].Get(N_ShortCode));
@@ -148,16 +147,16 @@ int main() {
 		cout << "\r- Expanding arcs... " << k+1 << " / " << ListArcs.size() << flush;
 		
 		// Identify the row containing data for each property
-		int StepFromIndex = FindCode(ListArcs[k].Get("From"),NStep);
-		int StepToIndex = FindCode(ListArcs[k].Get("To"),NStep);
+		int StepFromIndex = FindCode(ListArcs[k].Get("From"), p.NStep);
+		int StepToIndex = FindCode(ListArcs[k].Get("To"), p.NStep);
 		int TransEnergyIndex = FindCode(ListArcs[k].Get("From"), ATransEnergy);
 		for (unsigned int t=0; t < AVectorIndex.size(); ++t) {
 			AVectorIndex[t] = FindCode(ListArcs[k], AVectorProp[t]);
 		}
 		
 		// Recover step information
-		if (StepFromIndex >= 0) ListArcs[k].Set("FromStep", NStep[StepFromIndex][1]);
-		if (StepToIndex >= 0) ListArcs[k].Set("ToStep", NStep[StepToIndex][1]);
+		if (StepFromIndex >= 0) ListArcs[k].Set("FromStep", p.NStep[StepFromIndex][1]);
+		if (StepToIndex >= 0) ListArcs[k].Set("ToStep", p.NStep[StepToIndex][1]);
 		
 		// Check for a storage arc
 		bool isStorage = ListArcs[k].isStorage();
@@ -213,10 +212,10 @@ int main() {
 				while (isTrans2Energy) {
 					// Read code and step for energy node
 					string LoadCode = ATransEnergy[IndexTemp][1];
-					int LoadIndex = FindCode(LoadCode, NStep);
+					int LoadIndex = FindCode(LoadCode, p.NStep);
 					string LoadStepCode = p.DefStep;
 					if (LoadIndex >= 0)
-						LoadStepCode = NStep[LoadIndex][1];
+						LoadStepCode = p.NStep[LoadIndex][1];
 					
 					if (LoadStepCode.size() <= TempArcStepCode.size()) {
 						Step LoadStep = TempStep;
