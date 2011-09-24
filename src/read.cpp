@@ -75,7 +75,7 @@ void ReadParameters(const char* fileinput, GlobalParam *p) {
 	} else { printError("error", fileinput); }
 	
 	// Initialize time steps
-	p->s = new GlobalStep(value, StepHours);
+	p->s = new GlobalStep(step, StepHours);
 	
 	// Calculate how many hours are there for each step and store it in StepHours
 	int laststep = SLength[SName.size()-1], temp_hour = 0;
@@ -175,8 +175,9 @@ void ReadParameters(const char* fileinput, GlobalParam *p) {
 // Read properties file and store it in a matrix of strings.
 // The first 'num_fields' columns are copied and not touched.
 // The rest of the columns correspond to the different 'Steps' as determined by the function 'Step2Pos'
-MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const int num_fields) {
-	VectorStr Values(Step2Pos(SLength) + num_fields + 1), Header(0);
+MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const int num_fields, GlobalStep *s) {
+	VectorStr Values(s->MaxPos + num_fields + 1, defvalue);
+	vector<int> Header(0);
 	MatrixStr output(0);
 	char* t_read;
 	string t2_read;
@@ -193,74 +194,71 @@ MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const in
 			// Remove comments and end of line characters
 			CleanLine(line);
 			
-			// Avoid line comments
-			if ((line[0]!='%') || (line[0]!='\0')) {
-				if (i==0) {
+			// Avoid empty line or with comments
+			if ((line[0] != '%') || (line[0] != '\0')) {
+				if (i == 0) {
 					// Read column headers and store them
-					i++;
-					
-					// Skip first 'num_fields' columns
-					t_read = strtok(line,",");
-					for (int k=0; k < num_fields; k++) {
-						t_read = strtok(NULL, ",");
-						j++;
-					}
-					
+					t_read = strtok(line, ",");
 					while (t_read != NULL) {
-						Header.push_back(t_read);
+						// Skip first 'num_fields' columns
+						if (j >= num_fields)
+							Header.push_back(s->Str2Pos(t_read)); ////////////////////////////////////////////////////////////////////////
 						t_read = strtok(NULL, ",");
-						j++;
+						++j;
 					}
+				} else if (i == 1) {
+					// First row contains just default value
+					for (int m = 0; m < num_fields; ++m)
+						Values[m] = "";
+					output.push_back(Values);
 				} else {
 					// A line of properties is stored here
-					VectorStr temp_read(j);
-					const char *str = line;
-					const char *delims = ",";
+					const char *str = line, *delims = ",";
 					int k = 0;
 					
-					for (unsigned int m = num_fields; m < Values.size(); m++) Values[m] = defvalue;
+					// Default values
+					Values = VectorStr(s->MaxPos + num_fields + 1, defvalue);
 					
 					size_t start = 0;
 					
 					while (str[start] != '\0') {
 						size_t end = strcspn(str + start, delims);
-						t2_read = string(line).substr(start,end);
+						t2_read = string(line).substr(start, end);
 						
 						if (k < num_fields) {
+							// Row names
 							Values[k] = t2_read;
 						} else if (end != 0) {
-							if (Header[k-num_fields] == "const") {
-								for (unsigned int m = num_fields; m < Values.size(); m++)  Values[m] = t2_read;
-							} else {
-								Step Temp_Step = Str2Step(Header[k-num_fields]);
-								if (Temp_Step[0] == 0) {
-									// Step is smaller than a year (to repeat monthly data, etc.)
-									Step Temp_Begin(SName.size(), 0);
-									bool zeros = true;
-									for (int l = 0; (l < SName.size()) & zeros; ++l) {
-										if (Temp_Step[l] == 0)
-											Temp_Begin[l] = 1;
-										else
-											zeros = false;
-									}
-									while (Temp_Begin < SLength) {
-										int m = Step2Pos(StepSum(Temp_Step, Temp_Begin)) + num_fields;
-										Values[m] = t2_read;
-										Temp_Begin = NextStep(Temp_Begin);
-									}
-								} else if (Temp_Step[0] > 0) {
-									// Step with year
-									int a = Step2Pos(Temp_Step) + num_fields;
-									int b = Step2Pos(NextStep(Temp_Step)) + num_fields;
-									for (int m = a; (m < b) && (m < Values.size()); m++)  Values[m] = t2_read;
+							// Values
+							int initialPos = Header[k - num_fields];
+							if (initialPos == 0) {
+								// 'const' value ////////////////////////////////////////////////////////////////////////////////////////////
+								for (unsigned int m = num_fields; m < Values.size(); ++m)
+									Values[m] = t2_read;
+							} else if (initialPos < 0) {
+								// Step is smaller than a year (to repeat monthly data, etc.) ///////////////////////////////////////////////
+								int pos = -initialPos; //////////////////////////////////////////////////////////////////////////////////////
+								
+								while (pos < s->MaxPos) {
+									Values[pos] = t2_read;
+									pos = s->Next[pos];
 								}
+							} else if (initialPos > 0) {
+								// Step with year
+								int a = initialPos + num_fields;
+								int b = s->Next[initialPos] + num_fields;
+								if (b > Values.size())
+									b = Values.size();
+								for (int m = a; m < b; ++m)
+									Values[m] = t2_read;
 							}
 						}
 						start += (str[start + end] != '\0') ? end + 1 : end;
-						k++;
+						++k;
 					}
 					output.push_back(Values);
 				}
+				++i;
 			}
 		}
 		fclose(file);

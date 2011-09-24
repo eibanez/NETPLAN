@@ -37,13 +37,13 @@ int main() {
 	ListNodes = ReadListNodes("data/nodes_List.csv", &p);
 	for (unsigned int t = N_OFFSET; t < p.NodeProp.size(); ++t) {
 		string file_name = "data/nodes_" + p.NodeProp[t] + ".csv";
-		NVectorProp.push_back(ReadProperties(file_name.c_str(), p.NodeDefault[t], 1));
+		NVectorProp.push_back(ReadProperties(file_name.c_str(), p.NodeDefault[t], 1, p.s));
 	}
 	
 	cout << "- Reading list of arcs...\n";
 	ListArcs = ReadListArcs("data/arcs_List.csv", &p);
 	cout << "- Reading arc data...\n";
-	ATransEnergy = ReadProperties("data/arcs_TransEnergy.csv", "X", 2);
+	ATransEnergy = ReadProperties("data/arcs_TransEnergy.csv", "X", 2, p.s);
 	
 	for (unsigned int t = ArcPropOffset; t < ArcProp.size(); ++t) {
 		string file_name;
@@ -54,14 +54,14 @@ int main() {
 			// Resiliency properties
 			file_name = "data/events/" + ArcProp[t] + ".csv";
 		}
-		AVectorProp.push_back(ReadProperties(file_name.c_str(), p.ArcDefault[t], 2));
+		AVectorProp.push_back(ReadProperties(file_name.c_str(), p.ArcDefault[t], 2, p.s));
 	}
 	
 	cout << "- Creating transportation network..." << endl;
 	ReadTrans(ListNodes, ListArcs, "data/trans_List.csv", &p);
 	
 	cout << "- Reading sustainability constraints..." << endl;
-	SustLimits = ReadProperties("data/sust_Limits.csv", "X", 1);
+	SustLimits = ReadProperties("data/sust_Limits.csv", "X", 1, p.s);
 	
 	// Expand nodes
 	for (unsigned int k=0; k < ListNodes.size(); ++k) {

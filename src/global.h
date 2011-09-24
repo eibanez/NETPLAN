@@ -50,8 +50,11 @@ struct GlobalParam {
 // Step variables *********************************************************************************
 struct GlobalStep {
 	GlobalStep(string text, vector<string>& shrs);
+	vector<int> Str2Step(const string& mystep);
+	int Step2Pos(const vector<int>& mystep);
+	int Str2Pos(const string& mystep);
 	
-	vector<int> NextStep, Col, Hours, Length, Year;
+	vector<int> MaxStep, Next, Col, Hours, Length, Year;
 	vector<string> Text, YearString;
 	vector<bool> isFirstYear;
 	string Chars, YearChar;

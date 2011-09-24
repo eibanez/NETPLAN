@@ -38,8 +38,6 @@ GlobalParam::GlobalParam() {
 
 // Step variables *********************************************************************************
 GlobalStep::GlobalStep(string text, vector<string>& shrs) {
-	
-	
 	using std::replace;
 	
 	// Isolate characters that are not numbers
@@ -55,31 +53,21 @@ GlobalStep::GlobalStep(string text, vector<string>& shrs) {
 	replace(tChars.begin(), tChars.end(), '8', '\0');
 	replace(tChars.begin(), tChars.end(), '9', '\0');
 	
-	Chars = "";
 	for (unsigned int k = 0; k < tChars.size(); ++k)
 		if (tChars[k] != '\0')
 			Chars.push_back(tChars[k]);
 	
 	// Store the values for the maximum step
-	vector<int> MaxStep(Chars.size(), 0);
-	size_t found;
-	int zeros = 0;
-	for (unsigned int k = 0; k < Chars.size(); ++k) {
-		found = text.find(Chars[k]);
-		if (found != string::npos)
-			MaxStep[k] = atoi(text.substr(found + 1).c_str());
-	}
+	MaxStep = Str2Step(text);
+	MaxPos = Step2Pos(MaxStep);
 	
 	// Maximum position, lengths of different steps and num of years
 	Length = vector<int>(Chars.size(), 0);
-	MaxPos = MaxStep.front();
 	Length[0] = MaxStep.front();
 	NumYears = MaxStep.front();
 	YearChar = Chars.substr(0, 1);
-	for (unsigned int j = 1; j < Chars.size(); ++j) {
+	for (unsigned int j = 1; j < Chars.size(); ++j)
 		Length[j] = Length[j - 1] * MaxStep[j];
-		MaxPos += Length[j];
-	}
 	
 	// What year does the position belong?
 	Year = vector<int>(0);
@@ -114,11 +102,12 @@ GlobalStep::GlobalStep(string text, vector<string>& shrs) {
 	}
 	
 	// Columns, next steps, strings, and step hours
-	NextStep = vector<int>(MaxPos);
-	Col = vector<int>(MaxPos);
-	Text = vector<string>(MaxPos);
-	Hours = vector<int>(MaxPos);
-	isFirstYear = vector<bool>(MaxPos);
+	Next = vector<int>(MaxPos + 1);
+	Next[0] = MaxPos;
+	Col = vector<int>(MaxPos + 1);
+	Text = vector<string>(MaxPos + 1);
+	Hours = vector<int>(MaxPos + 1);
+	isFirstYear = vector<bool>(MaxPos + 1);
 	int pos, prevpos = -1;
 	
 	// i represents the number of digits
@@ -127,9 +116,9 @@ GlobalStep::GlobalStep(string text, vector<string>& shrs) {
 		for (int j = 0; j <= i; ++j)
 			refStep[j] = 1;
 		
-		pos = i;
+		pos = i + 1;
 		
-		while (pos < MaxPos) {
+		while (pos <= MaxPos) {
 			// String representation
 			string str = "";
 			for (int j = 0; j <= i; ++j)
@@ -159,17 +148,53 @@ GlobalStep::GlobalStep(string text, vector<string>& shrs) {
 			}
 			
 			// Next position
-			pos = -1;
-			for (int j = 0; j <= i; ++j) {
-				int temp_size = 1;
-				for (int k = Chars.size() - 1; k > j; --k)
-					temp_size = temp_size * MaxStep[k] + 1;
-				
-				pos += (refStep[j] - 1) * temp_size + 1;
-			}
-			NextStep[prevpos] = pos;
+			pos = Step2Pos(refStep);
+			Next[prevpos] = pos;
 		}
 	}
+}
+
+// Converts a string like 'y1m2' into the appropriate 'Step' (vector of integers)
+vector<int> GlobalStep::Str2Step(const string& mystep) {
+	size_t found;
+	vector<int> output(Chars.size(), 0);
+	for (unsigned int k = 0; k < Chars.size(); ++k) {
+		found = mystep.find(Chars[k]);
+		if (found != string::npos)
+			output[k] = atoi(mystep.substr(found + 1).c_str());
+	}
+	return output;
+}
+
+// Given a 'Step', it determines the column position
+// It goes like this: 'const' 'y1' 'y1m1' 'y1m1h1' 'y1m1h2' ... 'y1m2' etc.
+int GlobalStep::Step2Pos(const vector<int>& mystep) {
+	int pos = 0, mult = (mystep[0] == 0) ? -1 : 1, j = 0;
+	
+	vector<int> ms(mystep);
+	for (int i = 0; i < Chars.size(); ++i)
+		if (ms[i] != 0)
+			break;
+		else if (i == Chars.size() - 1)
+			mult = 0;
+		else
+			ms[i] = 1;
+	
+	while ((j < Chars.size()) && (ms[j] > 0) && (mult != 0)) {
+		int temp_size = 1;
+		for (int k = Chars.size() - 1; k > j; --k)
+			temp_size = temp_size * MaxStep[k] + 1;
+	
+		pos += (ms[j] - 1) * temp_size + 1;
+		++j;
+	}
+	return mult * pos;
+}
+
+// Combine the previous ones
+int GlobalStep::Str2Pos(const string& mystep) {
+	vector<int> temp(Str2Step(mystep));
+	return Step2Pos(temp);
 }
 
 
