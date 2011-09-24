@@ -343,14 +343,13 @@ int main() {
 	
 	// Save index for sustainability metrics
 	for (int j = 0; j < SustMet.size(); ++j)
-		for (int i = 1; i <= SLength[0]; ++i)
+		for (int i = 1; i <= p.s->NumYears; ++i)
 			IdxEm.Add(j, i-1, i, SustMet[j]);
 	
 	
 	cout << endl << "- Writing MPS files..." << endl;
-	int nyears = SLength[0];
 	ofstream afile, bfile;
-	string Ychar = SName.substr(0,1), temp_string;
+	string temp_string;
 	
 	// afile stores one single MPS file (no Benders)
 	// myfile stores the Benders decomposition
@@ -367,9 +366,9 @@ int main() {
 	
 	// Sustainability metrics (rows)
 	for (int j = 0; j < SustMet.size(); ++j) {
-		for (int i = 1; i <= nyears; ++i) {
-			afile << " E " << SustMet[j] << Ychar << i << endl;
-			bfile << " E " << SustMet[j] << Ychar << i << endl;
+		for (int i = 1; i <= p.s->NumYears; ++i) {
+			afile << " E " << SustMet[j] << p.s->YearChar << i << endl;
+			bfile << " E " << SustMet[j] << p.s->YearChar << i << endl;
 		}
 	}
 	
@@ -424,9 +423,9 @@ int main() {
 	
 	// Sustainability metrics
 	for (int j = 0; j < SustMet.size(); ++j) {
-		for (int i = 1; i <= nyears; ++i) {
-			afile << "    " << SustMet[j] << "_" << Ychar << i << " " << SustMet[j] << Ychar << i << " -1" << endl;
-			bfile << "    " << SustMet[j] << "_" << Ychar << i << " " << SustMet[j] << Ychar << i << " -1" << endl;
+		for (int i = 1; i <= p.s->NumYears; ++i) {
+			afile << "    " << SustMet[j] << "_" << p.s->YearChar << i << " " << SustMet[j] << p.s->YearChar << i << " -1" << endl;
+			bfile << "    " << SustMet[j] << "_" << p.s->YearChar << i << " " << SustMet[j] << p.s->YearChar << i << " -1" << endl;
 		}
 	}
 	
@@ -505,7 +504,7 @@ int main() {
 		int SustIndex = FindCode(SustMet[j], SustLimits);
 		if (SustIndex >= 0) {
 			Step TempStep(SName.size(), 0);
-			for (int i = 1; i <= nyears; ++i) {
+			for (int i = 1; i <= p.s->NumYears; ++i) {
 				TempStep[0] = i;
 				string Value = SustLimits[SustIndex][Step2Pos(TempStep)+1];
 				if (Value != "X") {
@@ -529,7 +528,7 @@ int main() {
 	afile.open("prepdata/bend_events.csv");
 	
 	// Determines whether an operational year needs to be solved for each event
-	vector<double> YearEvents(nyears*(Nevents+1), 0);
+	vector<double> YearEvents(p.s->NumYears * (Nevents + 1), 0);
 	
 	for (unsigned int i = 0; i < Arcs.size(); ++i) {
 		vector<string> ArcEvents(Arcs[i].Events());
@@ -546,10 +545,10 @@ int main() {
 			afile << endl;
 		}
 	}
-	for (int i=0; i < nyears; ++i) {
-		afile << YearEvents[ i * (Nevents+1) ];
-		for (int k=1; k <= Nevents; ++k) {
-			afile << "," << YearEvents[ i * (Nevents+1) + k ];
+	for (int i = 0; i < p.s->NumYears; ++i) {
+		afile << YearEvents[ i * (Nevents + 1) ];
+		for (int k = 1; k <= Nevents; ++k) {
+			afile << "," << YearEvents[ i * (Nevents + 1) + k ];
 		}
 		afile << endl;
 	}
