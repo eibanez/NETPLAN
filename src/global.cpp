@@ -169,34 +169,38 @@ vector<int> GlobalStep::Str2Step(const string& mystep) {
 // Given a 'Step', it determines the column position
 // It goes like this: 'const' 'y1' 'y1m1' 'y1m1h1' 'y1m1h2' ... 'y1m2' etc.
 int GlobalStep::Step2Pos(const vector<int>& mystep) {
-	int pos = 0, mult = (mystep[0] == 0) ? -1 : 1, j = 0;
+	int pos = 0, j = 0;
+	bool isZero = false;
 	
 	vector<int> ms(mystep);
 	for (int i = 0; i < Chars.size(); ++i)
 		if (ms[i] != 0)
 			break;
 		else if (i == Chars.size() - 1)
-			mult = 0;
+			isZero = true;
 		else
-			ms[i] = 1;
+			ms[i] = -1;
 	
-	while ((j < Chars.size()) && (ms[j] > 0) && (mult != 0)) {
+	while ((j < Chars.size()) && (ms[j] != 0) && !isZero) {
 		int temp_size = 1;
 		for (int k = Chars.size() - 1; k > j; --k)
 			temp_size = temp_size * MaxStep[k] + 1;
-	
+		
 		pos += (ms[j] - 1) * temp_size + 1;
 		++j;
 	}
-	return mult * pos;
+	return pos;
 }
 
 // Combine the previous ones
 int GlobalStep::Str2Pos(const string& mystep) {
-	vector<int> temp(Str2Step(mystep));
-	return Step2Pos(temp);
+	if (mystep == "const")
+		return 0;
+	else {
+		vector<int> temp(Str2Step(mystep));
+		return Step2Pos(temp);
+	}
 }
-
 
 // Print error messages
 void printError(const string& selector, const char* fileinput) {

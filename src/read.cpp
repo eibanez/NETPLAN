@@ -78,23 +78,24 @@ void ReadParameters(const char* fileinput, GlobalParam *p) {
 	p->s = new GlobalStep(step, StepHours);
 	
 	// Calculate how many hours are there for each step and store it in StepHours
-	int laststep = SLength[SName.size()-1], temp_hour = 0;
+	int laststep = SLength[SName.size() - 1], temp_hour = 0;
 	if (StepHours.size() == 0) {
-		for (int i=0; i < laststep; ++i)
+		for (int i = 0; i < laststep; ++i)
 			StepHours.push_back("1");
 		temp_hour = laststep;
 	} else if (StepHours.size() == laststep) {
-		for (int i=0; i < laststep; ++i)
+		for (int i = 0; i < laststep; ++i)
 			temp_hour += atoi(StepHours[i].c_str());
+	} else if (StepHours.size() > 1) {
+		printError("parameter", string("StepHours"));
 	} else {
-		if (StepHours.size() > 1)
-			printError("parameter", string("StepHours"));
-		for (int i=1; i < StepHours.size(); ++i)
+		for (int i = 1; i < StepHours.size(); ++i)
 			StepHours[i] = StepHours[0];
-		for (int i=StepHours.size(); i < laststep; ++i)
+		for (int i = StepHours.size(); i < laststep; ++i)
 			StepHours.push_back(StepHours[0]);
 		temp_hour = laststep * atoi(StepHours[0].c_str());
 	}
+	
 	for (int j = SName.size()-2; j >= 0; --j) {
 		StepHours.insert(StepHours.begin(), ToString<int>(temp_hour));
 		temp_hour = temp_hour * SLength[j];
@@ -195,18 +196,21 @@ MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const in
 			CleanLine(line);
 			
 			// Avoid empty line or with comments
-			if ((line[0] != '%') || (line[0] != '\0')) {
+			if ((line[0] != '%') && (line[0] != '\0')) {
 				if (i == 0) {
 					// Read column headers and store them
+					++i;
 					t_read = strtok(line, ",");
+					
 					while (t_read != NULL) {
 						// Skip first 'num_fields' columns
 						if (j >= num_fields)
-							Header.push_back(s->Str2Pos(t_read)); ////////////////////////////////////////////////////////////////////////
+							Header.push_back(s->Str2Pos(t_read));
+						
 						t_read = strtok(NULL, ",");
 						++j;
 					}
-				} else if (i == 1) {
+					
 					// First row contains just default value
 					for (int m = 0; m < num_fields; ++m)
 						Values[m] = "";
@@ -217,7 +221,7 @@ MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const in
 					int k = 0;
 					
 					// Default values
-					Values = VectorStr(s->MaxPos + num_fields + 1, defvalue);
+					Values = VectorStr(s->MaxPos + 1 + num_fields, defvalue);
 					
 					size_t start = 0;
 					
@@ -232,15 +236,28 @@ MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const in
 							// Values
 							int initialPos = Header[k - num_fields];
 							if (initialPos == 0) {
-								// 'const' value ////////////////////////////////////////////////////////////////////////////////////////////
-								for (unsigned int m = num_fields; m < Values.size(); ++m)
+								// 'const' value
+								for (int m = num_fields; m < Values.size(); ++m)
 									Values[m] = t2_read;
 							} else if (initialPos < 0) {
 								// Step is smaller than a year (to repeat monthly data, etc.) ///////////////////////////////////////////////
-								int pos = -initialPos; //////////////////////////////////////////////////////////////////////////////////////
+								int pos = 1;
+								while (initialPos <= 0) {
+									initialPos += 2 * (s->Next[pos] - pos);
+									++pos;
+								}
+								--pos;
+								initialPos -= pos;
 								
-								while (pos < s->MaxPos) {
-									Values[pos] = t2_read;
+								if (Values[0] == "NSAL" && num_fields == 1)
+									for (int a = 0; a < Header.size(); ++a)
+										cout << " " << Header[a] << endl;
+								
+								while (pos <= s->MaxPos) {
+									if (Values[0] == "NTCO" && num_fields == 1)
+										cout << Values[0] << " " << s->Text[pos+initialPos] << " " << t2_read << endl;
+									
+									Values[pos + initialPos + num_fields] = t2_read;
 									pos = s->Next[pos];
 								}
 							} else if (initialPos > 0) {
@@ -258,11 +275,12 @@ MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const in
 					}
 					output.push_back(Values);
 				}
-				++i;
 			}
 		}
 		fclose(file);
-	} else printError("warning", fileinput);
+	} else
+		printError("warning", fileinput);
+	
 	return output;
 }
 

@@ -91,7 +91,7 @@ int main() {
 				Node TempNode = ListNodes[k];
 				TempNode.Set(N_Step, Step2Str(TempStep));
 				TempNode.Set(N_StepLength, Step2Hours(TempStep));
-				int l = Step2Pos(TempStep) + 1;
+				int l = p.s->Step2Pos(TempStep) + 1;
 				TempNode.Set(N_Code, TempNode.Get(N_ShortCode) + Step2Str(TempStep));
 				
 				for (int t = N_OFFSET; t < N_SIZE; ++t) {
@@ -197,7 +197,7 @@ int main() {
 			while ((TempStep <= SLength) && (TempToStep <= SLength)) {
 				// Apply information
 				Arc TempArc = ListArcs[k];
-				int l = Step2Pos(TempStep) + 2;
+				int l = p.s->Step2Pos(TempStep) + 2;
 				TempArc.Set("FromStep", Step2Str(TempFromStep));
 				TempArc.Set("ToStep", Step2Str(TempToStep));
 				TempArc.Set("StepLength", Step2Hours(TempStep));
@@ -213,7 +213,7 @@ int main() {
 				}
 				
 				// Is there a load on the an energy node?
-				bool isTrans2Energy = (TransEnergyIndex >= 0);
+				bool isTrans2Energy = (TransEnergyIndex > 0);
 				int IndexTemp = TransEnergyIndex;
 				while (isTrans2Energy) {
 					// Read code and step for energy node
