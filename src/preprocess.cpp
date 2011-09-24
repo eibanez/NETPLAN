@@ -39,6 +39,9 @@ int main() {
 		string file_name = "data/nodes_" + p.NodeProp[t] + ".csv";
 		NVectorProp.push_back(ReadProperties(file_name.c_str(), p.NodeDefault[t], 1, p.s));
 	}
+	// Ajust rates
+	ConvoluteRate(NVectorProp[N_DemandRate - N_OFFSET], 1, p.s);
+	ConvoluteRate(NVectorProp[N_PeakPowerRate - N_OFFSET], 1, p.s);
 	
 	cout << "- Reading list of arcs...\n";
 	ListArcs = ReadListArcs("data/arcs_List.csv", &p);
@@ -110,16 +113,11 @@ int main() {
 				// Adjust peak demand with increase rate
 				double dem_rate = TempNode.GetDouble(N_DemandRate);
 				double peak_rate = TempNode.GetDouble(N_PeakPowerRate);
-				double dem_factor = 1, peak_factor = 1;
 				
-				if ((dem_rate != 0) || (peak_rate != 0)) {
-					for (unsigned int l = 1; l < TempStep[0]; ++l) {
-						dem_factor = dem_factor * (1 + dem_rate);
-						peak_factor = peak_factor * (1 + peak_rate);
-					}
-					TempNode.Multiply(N_Demand, dem_factor);
-					TempNode.Multiply(N_PeakPower, peak_factor);
-				}
+				if (dem_rate != 1)
+					TempNode.Multiply(N_Demand, dem_rate);
+				if (peak_rate != 1)
+					TempNode.Multiply(N_PeakPower, peak_rate);
 				
 				// Store node for later use
 				Nodes.push_back(TempNode);
@@ -161,8 +159,10 @@ int main() {
 		}
 		
 		// Recover step information
-		if (StepFromIndex >= 0) ListArcs[k].Set("FromStep", p.NStep[StepFromIndex][1]);
-		if (StepToIndex >= 0) ListArcs[k].Set("ToStep", p.NStep[StepToIndex][1]);
+		if (StepFromIndex >= 0)
+			ListArcs[k].Set("FromStep", p.NStep[StepFromIndex][1]);
+		if (StepToIndex >= 0)
+			ListArcs[k].Set("ToStep", p.NStep[StepToIndex][1]);
 		
 		// Check for a storage arc
 		bool isStorage = ListArcs[k].isStorage();

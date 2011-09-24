@@ -16,6 +16,7 @@ vector<Node> ReadListNodes(const char* fileinput, GlobalParam *p);
 vector<Arc> ReadListArcs(const char* fileinput, GlobalParam *p);
 MatrixStr ReadStep(const char* fileinput);
 MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const int num_fields, GlobalStep *s);
+void ConvoluteRate(MatrixStr& values, const int num_fields, GlobalStep *s);
 void ReadTrans(vector<Node>& Nodes, vector<Arc>& Arcs, const char* fileinput, GlobalParam *p);
 void ReadEvents(double output[], const char* fileinput);
 

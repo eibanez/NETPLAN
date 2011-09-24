@@ -249,14 +249,7 @@ MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const in
 								--pos;
 								initialPos -= pos;
 								
-								if (Values[0] == "NSAL" && num_fields == 1)
-									for (int a = 0; a < Header.size(); ++a)
-										cout << " " << Header[a] << endl;
-								
 								while (pos <= s->MaxPos) {
-									if (Values[0] == "NTCO" && num_fields == 1)
-										cout << Values[0] << " " << s->Text[pos+initialPos] << " " << t2_read << endl;
-									
 									Values[pos + initialPos + num_fields] = t2_read;
 									pos = s->Next[pos];
 								}
@@ -282,6 +275,24 @@ MatrixStr ReadProperties(const char* fileinput, const string& defvalue, const in
 		printError("warning", fileinput);
 	
 	return output;
+}
+
+// Prepare rates for writing files
+void ConvoluteRate(MatrixStr& values, const int num_fields, GlobalStep *s) {
+	int size = values[0].size(), diffYear = s->Next[1] - 1;
+	for (int i = 0; i < values.size(); ++i) {
+		vector<double> nums(size, 1);
+		
+		// Start applying factor on the second year
+		for (int j = num_fields; j < s->Next[1] + num_fields; ++j)
+			values[i][j] = "1";
+		for (int j = s->Next[1] + num_fields; j < size; ++j) {
+			double num = 1 + atof(values[i][j].c_str());
+			num = num * nums[j - diffYear];
+			nums[j] = num;
+			values[i][j] = ToString<double>(num);
+		}
+	}
 }
 
 // Read Node list and store it in a vector of 'Nodes' (only 'ShortCode' is stored)
