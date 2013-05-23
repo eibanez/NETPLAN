@@ -9,6 +9,7 @@ using namespace std;
 #include <fstream>
 #include <string>
 #include <vector>
+#include <cstdlib>
 #include "global.h"
 
 // Converts a string like 'y1m2' into the appropriate 'Step' (vector of integers)

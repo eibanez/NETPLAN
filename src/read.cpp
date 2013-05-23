@@ -9,6 +9,8 @@ using namespace std;
 #include <fstream>
 #include <string>
 #include <vector>
+#include <cstdlib>
+#include <cstring>
 #include "global.h"
 #include "read.h"
 
