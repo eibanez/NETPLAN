@@ -8,6 +8,7 @@ using namespace std;
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>
 #include <time.h>
 #include <math.h>
 extern int outputLevel;
