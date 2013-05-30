@@ -9,6 +9,7 @@ using namespace std;
 #include <fstream>
 #include <string>
 #include <vector>
+#include <cstdlib>
 #include "global.h"
 #include "arc.h"
 

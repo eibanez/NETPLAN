@@ -1,8 +1,8 @@
 # ---------------------------------------------------------------------
 # CPLEX options 
 # ---------------------------------------------------------------------
-CPLEXDIR      = /usr/local/cplex/ILOG/CPLEX_Studio_AcademicResearch122/cplex
-CONCERTDIR    = /usr/local/cplex/ILOG/CPLEX_Studio_AcademicResearch122/concert
+CPLEXDIR      = /usr/local/cplex/ILOG/CPLEX_Studio125/cplex
+CONCERTDIR    = /usr/local/cplex/ILOG/CPLEX_Studio125/concert
 SYSTEM = x86-64_sles10_4.1
 LIBFORMAT = static_pic
 
